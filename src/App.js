@@ -5,7 +5,7 @@ const CBIWebsite = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-8">
       <header className="text-center py-12">
         <h1 className="text-5xl font-extrabold text-gray-800 mb-4">Co-operative Builders Ireland</h1>
-        <p className="text-xl text-gray-600">Building together. Profiting together.</p>
+        <p className="text-xl text-gray-600">Connecting Construction. Building Futures.</p>
       </header>
 
       <main className="max-w-4xl mx-auto space-y-8">
