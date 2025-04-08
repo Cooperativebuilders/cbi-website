@@ -4,6 +4,11 @@ const CBIWebsite = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-8">
       <header className="text-center py-12">
+        <img
+          src="/Site Logo CB.png"
+          alt="CBI Logo"
+          className="mx-auto mb-6 w-24 h-24"
+        />
         <h1 className="text-5xl font-extrabold text-gray-800 mb-4">Co-operative Builders Ireland</h1>
         <p className="text-xl text-gray-600">Connecting Construction. Building Futures.</p>
       </header>
@@ -34,7 +39,7 @@ const CBIWebsite = () => {
           <h2 className="text-3xl font-bold text-blue-600 mb-4">Join the Community</h2>
           <p className="text-lg text-gray-700 mb-4">
             Become part of a community where everyone invests equally, works equally, and shares profits. 
-            Connect with like-minded professionals on our Discord server today.
+            Connect with like-minded professionals on Discord.
           </p>
           <a
             href="https://www.launchpass.com/co-operative-builders-network/access"
