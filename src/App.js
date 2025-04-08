@@ -34,7 +34,7 @@ const CBIWebsite = () => {
           <h2 className="text-3xl font-bold text-blue-600 mb-4">Join the Community</h2>
           <p className="text-lg text-gray-700 mb-4">
             Become part of a community where everyone invests equally, works equally, and shares profits. 
-            Connect with like-minded professionals on Discord.
+            Connect with like-minded professionals on our Discord server today.
           </p>
           <a
             href="https://www.launchpass.com/co-operative-builders-network/access"
