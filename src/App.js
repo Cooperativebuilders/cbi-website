@@ -5,7 +5,7 @@ const CBIWebsite = () => {
     <div className="p-8 bg-gray-100 min-h-screen">
       <header className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">Co-operative Builders Ireland</h1>
-        <p className="text-xl text-gray-600">Building together. Profiting together.</p>
+        <p className="text-xl text-gray-600">Connecting Construction</p>
       </header>
 
       <section className="mb-8">
