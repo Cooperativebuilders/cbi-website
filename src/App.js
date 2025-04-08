@@ -3,15 +3,22 @@ import React from 'react';
 const CBIWebsite = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-8">
-      <header className="text-center py-12">
-        <img
-          src="/CB Text Logo.png"
-          alt="CBI Logo"
-          className="mx-auto mb-6 w-24 h-24"
-        />
-        <h1 className="text-5xl font-extrabold text-gray-800 mb-4">Co-operative Builders Ireland</h1>
-        <p className="text-xl text-gray-600">Connecting Construction. Building Futures.</p>
-      </header>
+     <header className="flex justify-between items-center py-6 px-4 md:px-8 bg-white shadow-md rounded-xl mb-8">
+  <div className="flex items-center space-x-4">
+    <img
+      src="/CB Text Logo.png"
+      alt="CBI Logo"
+      className="w-12 h-12"
+    />
+    <h1 className="text-2xl font-bold text-gray-800">Co-operative Builders Ireland</h1>
+  </div>
+
+  <nav className="space-x-6 text-blue-600 font-medium text-lg">
+    <a href="#home" className="hover:text-blue-800 transition">Home</a>
+    <a href="#faqs" className="hover:text-blue-800 transition">FAQs</a>
+  </nav>
+</header>
+
 
       <main className="max-w-4xl mx-auto space-y-8">
         <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
