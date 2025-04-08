@@ -5,7 +5,7 @@ const CBIWebsite = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-8">
       <header className="text-center py-12">
         <img
-          src="/Site Logo CB.png"
+          src="/CB Text Logo.png.png"
           alt="CBI Logo"
           className="mx-auto mb-6 w-24 h-24"
         />
