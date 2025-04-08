@@ -12,8 +12,10 @@ const CBIWebsite = () => {
         <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
           <h2 className="text-3xl font-bold text-blue-600 mb-4">About Us</h2>
           <p className="text-lg text-gray-700">
-            Co-operative Builders Ireland (CBI) is a community-driven network of skilled trades and construction professionals. 
-            We work together as equal stakeholders to build, renovate, and profit collectively.
+            Co-operative Builders Ireland (CBI) brings together tradespeople, construction professionals, and investors as equal partners.
+	We pool our skills and resources to buy, renovate or build, and sell properties — sharing profits equally.
+
+	CBI is a decentralized, community-driven approach to property development where everyone has a stake, a say, and a role. By eliminating hierarchy and encouraging equal 		involvement, we build trust, ownership, and commitment from the ground up.
           </p>
         </section>
 
