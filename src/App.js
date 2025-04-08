@@ -24,7 +24,7 @@ const CBIWebsite = () => {
             Be part of a community where everyone invests equally, works equally, and shares profits. Connect with like-minded professionals on Discord.
           </p>
           <a
-            href="https://launchpass.com/CBI"
+            href="https://www.launchpass.com/co-operative-builders-network/access"
             className="mt-4 inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
           >
             Join via LaunchPass
