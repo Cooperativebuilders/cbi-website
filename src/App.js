@@ -17,6 +17,15 @@ const CBIWebsite = () => {
           </p>
         </section>
 
+      <main className="max-w-4xl mx-auto space-y-8">
+        <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
+          <h2 className="text-3xl font-bold text-blue-600 mb-4">Membership Details</h2>
+          <p className="text-lg text-gray-700">
+            Co-operative Builders Ireland (CBI) is a community-driven network of skilled trades and construction professionals. 
+            We work together as equal stakeholders to build, renovate, and profit collectively.
+          </p>
+        </section>
+
         <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
           <h2 className="text-3xl font-bold text-blue-600 mb-4">Join the Community</h2>
           <p className="text-lg text-gray-700 mb-4">
