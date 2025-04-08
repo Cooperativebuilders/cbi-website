@@ -17,7 +17,6 @@ const CBIWebsite = () => {
           </p>
         </section>
 
-      <main className="max-w-4xl mx-auto space-y-8">
         <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
           <h2 className="text-3xl font-bold text-blue-600 mb-4">Membership Details</h2>
           <p className="text-lg text-gray-700">
