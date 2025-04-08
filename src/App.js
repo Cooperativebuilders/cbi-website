@@ -20,7 +20,7 @@ const CBIWebsite = () => {
 </header>
 
 
-      <main className="max-w-4xl mx-auto space-y-8">
+      <main id="home" className="max-w-4xl mx-auto space-y-8">
         <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
           <h2 className="text-3xl font-bold text-blue-600 mb-4">About Us</h2>
           <p className="text-lg text-gray-700">
@@ -55,6 +55,34 @@ const CBIWebsite = () => {
             Join via LaunchPass
           </a>
         </section>
+
+<section id="faqs" className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 mt-12 max-w-4xl mx-auto">
+  <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">Frequently Asked Questions</h2>
+
+  <div className="space-y-6 text-gray-700 text-lg">
+    <div>
+      <h3 className="font-semibold text-blue-500">💬 Who can join CBI?</h3>
+      <p>Anyone interested in property development and construction — whether you're a skilled tradesperson, designer, or investor — is welcome.</p>
+    </div>
+
+    <div>
+      <h3 className="font-semibold text-blue-500">💶 How much do I need to invest?</h3>
+      <p>Projects vary, but many start with members contributing between €2,000–€5,000 each. Every project is its own entity, so members vote on structure and buy-in.</p>
+    </div>
+
+    <div>
+      <h3 className="font-semibold text-blue-500">👷‍♂️ Do I need tools or experience?</h3>
+      <p>Nope! Some members bring hands-on skills and equipment, others contribute money, design work, admin, or coordination. We build around everyone’s strengths.</p>
+    </div>
+
+    <div>
+      <h3 className="font-semibold text-blue-500">🏗 How are profits shared?</h3>
+      <p>Equally — if 10 people contribute evenly to a project, they all split profits evenly. You decide as a team how to run it.</p>
+    </div>
+  </div>
+</section>
+
+
       </main>
 
       <footer className="text-center text-gray-500 mt-12 py-4 border-t">
