@@ -56,6 +56,40 @@ const CBIWebsite = () => {
           </a>
         </section>
 
+
+        <button target="_blank"
+        style="font-family: sans-serif;
+        margin: 0 auto; outline: none;
+        display: block;
+        height: 45px;
+        width: 226px;
+        border-radius: 6px;
+        background: #6e9bcf;
+        color: white;
+        box-shadow: 1px 1px 3px 0 rgba(0,0,0,.03);
+        font-size: 18px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;"
+          class="lp6475702170157056 lpbtn" monthly="true">Pay Monthly €4.99</button>
+        <br/>
+        <button target="_blank"
+          style="font-family: sans-serif;
+          margin: 0 auto; outline: none;
+          display: block;
+          height: 45px;
+          width: 226px;
+          border-radius: 6px;
+          background: #6e9bcf;
+          color: white;
+          box-shadow: 1px 1px 3px 0 rgba(0,0,0,.03);
+          font-size: 18px;
+          font-weight: 700;
+          border: none;
+          cursor: pointer;"
+          class="lp6475702170157056 lpbtn" yearly="true">Pay Yearly €40.00</button>
+
+
 <section id="faqs" className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 mt-12 max-w-4xl mx-auto">
   <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">Frequently Asked Questions</h2>
 
@@ -82,6 +116,7 @@ const CBIWebsite = () => {
   </div>
 </section>
 
+<script async src="https://www.launchpass.com/co-operative-builders-network/access/v2/embed.js"></script>
 
       </main>
 
