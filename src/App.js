@@ -8,6 +8,7 @@ const CBIWebsite = () => {
     document.body.appendChild(script);
   }, []);
 
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-8">
       <header className="flex justify-between items-center py-6 px-4 md:px-8 bg-white shadow-md rounded-xl mb-8">
@@ -48,37 +49,20 @@ const CBIWebsite = () => {
         </section>
 
         <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
-          <h2 className="text-3xl font-bold text-blue-600 mb-4">Join the Community</h2>
-          <p className="text-lg text-gray-700 mb-4">
-            Become part of a community where everyone invests equally, works equally, and shares profits. 
-            Connect with like-minded professionals on Discord.
-          </p>
-          <a
-            className="launchpass-button inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
-            data-url="https://www.launchpass.com/co-operative-builders-network/access"
-            href="#"
-          >
-            Join Now
-          </a>
-        </section>
+  <h2 className="text-3xl font-bold text-blue-600 mb-4">Join the Community</h2>
+  <p className="text-lg text-gray-700 mb-6">
+    Become part of a community where everyone invests equally, works equally, and shares profits. 
+    Connect with like-minded professionals on Discord.
+  </p>
+  <button
+    target="_blank"
+    className="lp6475702170157056 lpbtn bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
+    yearly="true"
+  >
+    Join Now
+  </button>
+</section>
 
-        <div className="text-center mt-8 space-y-4">
-          <button
-            target="_blank"
-            className="lp6475702170157056 lpbtn bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold"
-            monthly="true"
-          >
-            Pay Monthly €4.99
-          </button>
-
-          <button
-            target="_blank"
-            className="lp6475702170157056 lpbtn bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold"
-            yearly="true"
-          >
-            Pay Yearly €40.00
-          </button>
-        </div>
 
         <section id="faqs" className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 mt-12 max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">Frequently Asked Questions</h2>
