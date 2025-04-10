@@ -8,19 +8,19 @@ const LaunchPassRedirect = () => {
     script.async = true;
 
     script.onload = () => {
-      // Wait a bit after script loads before trying to click
-      setTimeout(() => {
-        const clickInterval = setInterval(() => {
-          const iframe = document.querySelector("iframe[src*='launchpass']");
-          const button = document.querySelector(".lpbtn");
-          if (!iframe && button) {
-            button.click();
-          }
-        }, 1000);
+      // Wait until .lpbtn actually exists in the DOM
+      const waitForButton = setInterval(() => {
+        const button = document.querySelector(".lpbtn");
+        const iframe = document.querySelector("iframe[src*='launchpass']");
 
-        // Stop trying after 15 seconds
-        setTimeout(() => clearInterval(clickInterval), 15000);
-      }, 1500); // wait 1.5 seconds for DOM update
+        if (button && !iframe) {
+          button.click();
+          clearInterval(waitForButton); // Only click once
+        }
+      }, 1000); // Check every second
+
+      // Give up after 20 seconds
+      setTimeout(() => clearInterval(waitForButton), 20000);
     };
 
     document.body.appendChild(script);
