@@ -9,11 +9,13 @@ import {
 } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   // ✅ Check if this user's email is a paid LaunchPass member
   const verifyPayment = async (user) => {
@@ -24,13 +26,15 @@ const Dashboard = () => {
         `https://cbi-backend-l001.onrender.com/api/is-paid?email=${user.email}`
       );
       const data = await res.json();
+
       if (!data.paid) {
-        alert("Access denied: You must complete payment to use the dashboard.");
-        await signOut(auth);
-        setUser(null);
+        // Not paid? Redirect to LaunchPass payment-only screen
+        setTimeout(() => {
+          navigate("/launchpass-redirect");
+        }, 3000);
       }
     } catch (err) {
-      console.error("Payment check failed", err);
+      console.error("Error verifying payment:", err);
     }
   };
 
@@ -52,6 +56,7 @@ const Dashboard = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       await verifyPayment(result.user);
+      navigate("/launchpass");
     } catch (error) {
       console.error("Login error", error);
     }
