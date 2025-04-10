@@ -56,7 +56,7 @@ const Dashboard = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       await verifyPayment(result.user);
-      navigate("/launchpass");
+      navigate("/launchpass-redirect"); // Redirect to LaunchPass payment-only screen
     } catch (error) {
       console.error("Login error", error);
     }
