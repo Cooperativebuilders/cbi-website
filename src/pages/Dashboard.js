@@ -23,18 +23,21 @@ const Dashboard = () => {
 
     try {
       const res = await fetch(
-        `https://cbi-backend-l001.onrender.com/api/is-paid?email=${user.email}`
+        `https://cbi-backend-l001.onrender.com/api/is-paid?email=${encodeURIComponent(
+          user.email
+        )}`
       );
       const data = await res.json();
 
-      if (!data.paid) {
-        // Not paid? Redirect to LaunchPass payment-only screen
-        setTimeout(() => {
-          navigate("/launchpass-redirect");
-        }, 3000);
+      if (data?.paid === true) {
+        console.log("✅ Payment verified");
+      } else {
+        console.warn("❌ Payment not found, redirecting...");
+        navigate("/launchpass-redirect");
       }
     } catch (err) {
-      console.error("Error verifying payment:", err);
+      console.error("⚠️ Error verifying payment:", err);
+      alert("There was an error verifying your membership.");
     }
   };
 
