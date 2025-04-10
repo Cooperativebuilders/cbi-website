@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Signup from "./pages/Signup";
 import CBIWebsite from "./CBIWebsite";
 import Dashboard from "./pages/Dashboard";
-import LaunchPassRedirect from "./LaunchPassRedirect";
+import LaunchPassRedirect from "./pages/LaunchPassRedirect";
 
 function App() {
   return (
