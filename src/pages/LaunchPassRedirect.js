@@ -2,14 +2,25 @@ import React, { useEffect } from "react";
 
 const LaunchPassRedirect = () => {
   useEffect(() => {
+    // 1. Load LaunchPass script
     const script = document.createElement("script");
     script.src =
       "https://www.launchpass.com/co-operative-builders-network/access/v2/embed.js";
     script.async = true;
     document.body.appendChild(script);
 
+    // 2. Try to auto-click the LaunchPass button every second until popup opens
+    const interval = setInterval(() => {
+      const iframe = document.querySelector("iframe[src*='launchpass']");
+      const button = document.querySelector(".lpbtn");
+      if (!iframe && button) {
+        button.click();
+      }
+    }, 1000);
+
     return () => {
       document.body.removeChild(script);
+      clearInterval(interval);
     };
   }, []);
 
