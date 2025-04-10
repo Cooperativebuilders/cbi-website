@@ -42,7 +42,7 @@ const CBIWebsite = () => {
             and property investors to renovate, build, and thrive – as one.
           </p>
           <a
-            href="#join"
+            href="/signup"
             className="inline-block bg-white text-blue-700 font-bold py-3 px-6 rounded-lg hover:bg-gray-200 transition"
           >
             Get Involved

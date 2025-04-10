@@ -12,38 +12,37 @@ import { doc, setDoc } from "firebase/firestore";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
-  const [occupation, setOccupation] = useState("");
-  const [experience, setExperience] = useState("");
-  const [specializations, setSpecializations] = useState("");
-  const [locations, setLocations] = useState("");
-  const [readiness, setReadiness] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSave = async () => {
-    if (!user) return;
+  // ✅ Check if this user's email is a paid LaunchPass member
+  const verifyPayment = async (user) => {
+    if (!user || !user.email) return;
 
     try {
-      const docRef = doc(db, "profiles", user.uid);
-      await setDoc(docRef, {
-        occupation,
-        experience,
-        specializations,
-        locations,
-        readiness,
-        email: user.email,
-        name: user.displayName || "",
-      });
-      alert("Profile saved successfully!");
-    } catch (error) {
-      console.error("Error saving profile:", error);
-      alert("There was an error saving your profile.");
+      const res = await fetch(
+        `https://cbi-backend-l001.onrender.com/api/is-paid?email=${user.email}`
+      );
+      const data = await res.json();
+      if (!data.paid) {
+        alert("Access denied: You must complete payment to use the dashboard.");
+        await signOut(auth);
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("Payment check failed", err);
     }
   };
 
+  // 🔄 Track auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        await verifyPayment(currentUser); // <- 💰 Check LaunchPass
+      } else {
+        setUser(null);
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -51,7 +50,8 @@ const Dashboard = () => {
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      await verifyPayment(result.user);
     } catch (error) {
       console.error("Login error", error);
     }
@@ -59,7 +59,8 @@ const Dashboard = () => {
 
   const handleEmailLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      await verifyPayment(result.user);
     } catch (error) {
       console.error("Email login error", error);
       alert("Login failed. Check your credentials.");
@@ -74,7 +75,7 @@ const Dashboard = () => {
     }
   };
 
-  // Login screen
+  // 🔐 Show login screen
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
@@ -83,7 +84,6 @@ const Dashboard = () => {
           alt="CBI Logo"
           className="w-80 h-80 mb-6"
         />
-
         <motion.h1
           className="text-4xl font-bold text-blue-700 mb-6"
           initial={{ opacity: 0, y: -20 }}
@@ -134,7 +134,7 @@ const Dashboard = () => {
     );
   }
 
-  // Dashboard content for logged-in users
+  // ✅ Logged-in dashboard
   return (
     <div className="min-h-screen bg-white p-6">
       <motion.h1

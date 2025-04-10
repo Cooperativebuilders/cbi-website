@@ -18,7 +18,6 @@ const Signup = () => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
-  // Load LaunchPass Script
   useEffect(() => {
     const script = document.createElement("script");
     script.src =
@@ -30,24 +29,45 @@ const Signup = () => {
     };
   }, []);
 
-  // Observe DOM for popup closure
-  useEffect(() => {
-    if (!paid) {
-      const observer = new MutationObserver(() => {
-        const popup = document.querySelector("iframe[src*='launchpass']");
-        if (!popup) {
-          document.querySelector(".lpbtn")?.click(); // Reopen if closed
-        }
-      });
-
-      observer.observe(document.body, { childList: true, subtree: true });
-
-      return () => observer.disconnect();
+  const checkIfPaid = async () => {
+    if (!email) return;
+    try {
+      const res = await fetch(
+        `https://cbi-backend-l001.onrender.com/api/is-paid?email=${email}`
+      );
+      const data = await res.json();
+      if (data.paid) {
+        setPaid(true);
+      }
+    } catch (err) {
+      console.error("Error checking payment:", err);
     }
-  }, [paid]);
+  };
 
-  const handlePaymentComplete = () => {
-    setPaid(true);
+  useEffect(() => {
+    if (paid || !email) return;
+
+    let lastLaunch = 0;
+
+    const interval = setInterval(() => {
+      const iframe = document.querySelector("iframe[src*='launchpass']");
+      const now = Date.now();
+
+      if (!iframe && now - lastLaunch > 10000) {
+        document.querySelector(".lpbtn")?.click();
+        lastLaunch = now;
+      }
+
+      if (iframe) {
+        checkIfPaid();
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [paid, email]);
+
+  const handleLaunchPassClick = () => {
+    document.querySelector(".lpbtn")?.click();
   };
 
   const handleSignup = async (e) => {
@@ -93,26 +113,47 @@ const Signup = () => {
       </h1>
 
       {!paid ? (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-6 text-center">
-          <motion.h2
-            className="text-2xl font-bold text-blue-700 mb-4"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            CBI Membership Required
-          </motion.h2>
-          <p className="text-gray-600 mb-6 max-w-sm">
+        <div className="text-center space-y-4">
+          <p className="text-gray-600 mb-4">
             To create a member profile and access project opportunities, you
             must first pay the membership fee.
           </p>
-          <button
-            className="lp6475702170157056 lpbtn bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-            onClick={handlePaymentComplete}
-            yearly="true"
-          >
-            Pay Membership Fee
-          </button>
+          <input
+            type="email"
+            placeholder="Enter your email to continue"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={handleLaunchPassClick}
+              className="lp6475702170157056 lpbtn bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 flex items-center space-x-2"
+              yearly="true"
+            >
+              <span>Join the CBI Network</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 transform rotate-180"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 15l7-7 7 7"
+                />
+              </svg>
+            </button>
+          </div>
+          <p className="text-sm text-center text-gray-600 mt-4">
+            Already have an account?{" "}
+            <a href="/dashboard" className="text-blue-600 hover:underline">
+              Log in here
+            </a>
+          </p>
         </div>
       ) : (
         <>
@@ -133,23 +174,18 @@ const Signup = () => {
 
           <form onSubmit={handleSignup} className="space-y-4">
             <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded"
-            />
-            <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-2 border rounded"
+              required
             />
             <select
               className="w-full p-2 border rounded"
               value={occupation}
               onChange={(e) => setOccupation(e.target.value)}
+              required
             >
               <option value="">Occupation</option>
               <option>Tradesperson</option>
@@ -163,25 +199,29 @@ const Signup = () => {
               value={experience}
               onChange={(e) => setExperience(e.target.value)}
               className="w-full p-2 border rounded"
+              required
             />
             <input
               type="text"
-              placeholder="Specializations (e.g. underfloor heating)"
+              placeholder="Specializations"
               value={specializations}
               onChange={(e) => setSpecializations(e.target.value)}
               className="w-full p-2 border rounded"
+              required
             />
             <input
               type="text"
-              placeholder="Project Locations (e.g. Dublin, Cork)"
+              placeholder="Project Locations"
               value={locations}
               onChange={(e) => setLocations(e.target.value)}
               className="w-full p-2 border rounded"
+              required
             />
             <select
               className="w-full p-2 border rounded"
               value={readiness}
               onChange={(e) => setReadiness(e.target.value)}
+              required
             >
               <option value="">Ready to Go?</option>
               <option>Currently seeking projects</option>
@@ -196,6 +236,13 @@ const Signup = () => {
               Complete Signup
             </button>
           </form>
+
+          <p className="text-sm text-center text-gray-600 mt-6">
+            Already have an account?{" "}
+            <a href="/dashboard" className="text-blue-600 hover:underline">
+              Log in here
+            </a>
+          </p>
         </>
       )}
     </div>
