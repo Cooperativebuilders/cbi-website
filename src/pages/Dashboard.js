@@ -89,6 +89,7 @@ const Dashboard = () => {
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
         <img
           src={`${process.env.PUBLIC_URL}/big-text-logo.png`}
+          link="https://www.cooperativebuilders.ie/"
           alt="CBI Logo"
           className="w-80 h-80 mb-6"
         />
