@@ -7,20 +7,21 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Check if this user's email is a paid LaunchPass member
+  // 🔐 Verify payment status using backend
   const verifyPayment = async (user) => {
-    if (!user || !user.email) return;
+    if (!user?.email) return;
 
+    setIsVerifying(true);
     try {
       const res = await fetch(
         `https://cbi-backend-l001.onrender.com/api/is-paid?email=${encodeURIComponent(
@@ -29,26 +30,26 @@ const Dashboard = () => {
       );
       const data = await res.json();
 
-      if (data?.paid === true) {
-        console.log("✅ Payment verified");
+      if (data?.paid) {
+        console.log("✅ Payment verified for", user.email);
       } else {
-        console.warn("❌ Payment not found, redirecting...");
+        console.warn("❌ No payment found — redirecting to LaunchPass");
         navigate("/launchpass-redirect");
       }
     } catch (err) {
       console.error("⚠️ Error verifying payment:", err);
-      alert("There was an error verifying your membership.");
+      alert("There was an error checking your membership status.");
+    } finally {
+      setIsVerifying(false);
     }
   };
 
-  // 🔄 Track auth state changes
+  // 🔄 Auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
       if (currentUser) {
-        setUser(currentUser);
-        await verifyPayment(currentUser); // <- 💰 Check LaunchPass
-      } else {
-        setUser(null);
+        await verifyPayment(currentUser);
       }
     });
     return () => unsubscribe();
@@ -59,9 +60,8 @@ const Dashboard = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       await verifyPayment(result.user);
-      navigate("/launchpass-redirect"); // Redirect to LaunchPass payment-only screen
     } catch (error) {
-      console.error("Login error", error);
+      console.error("Google login error", error);
     }
   };
 
@@ -83,7 +83,7 @@ const Dashboard = () => {
     }
   };
 
-  // 🔐 Show login screen
+  // 🔐 If not logged in, show login screen
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
@@ -92,6 +92,7 @@ const Dashboard = () => {
           alt="CBI Logo"
           className="w-80 h-80 mb-6"
         />
+
         <motion.h1
           className="text-4xl font-bold text-blue-700 mb-6"
           initial={{ opacity: 0, y: -20 }}
@@ -142,7 +143,7 @@ const Dashboard = () => {
     );
   }
 
-  // ✅ Logged-in dashboard
+  // ✅ Main dashboard content for paid, logged-in users
   return (
     <div className="min-h-screen bg-white p-6">
       <motion.h1

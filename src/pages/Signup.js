@@ -18,6 +18,7 @@ const Signup = () => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
+  // 🔹 Load LaunchPass script
   useEffect(() => {
     const script = document.createElement("script");
     script.src =
@@ -29,21 +30,29 @@ const Signup = () => {
     };
   }, []);
 
+  // 🔹 Check paid status via backend
   const checkIfPaid = async () => {
     if (!email) return;
+
     try {
       const res = await fetch(
-        `https://cbi-backend-l001.onrender.com/api/is-paid?email=${email}`
+        `https://cbi-backend-l001.onrender.com/api/is-paid?email=${encodeURIComponent(
+          email
+        )}`
       );
       const data = await res.json();
       if (data.paid) {
         setPaid(true);
+        console.log("✅ Payment confirmed for:", email);
+      } else {
+        console.log("❌ Payment not found for:", email);
       }
     } catch (err) {
       console.error("Error checking payment:", err);
     }
   };
 
+  // 🔁 Watch for popup close and recheck payment every 3s
   useEffect(() => {
     if (paid || !email) return;
 
@@ -67,6 +76,10 @@ const Signup = () => {
   }, [paid, email]);
 
   const handleLaunchPassClick = () => {
+    if (!email) {
+      alert("Please enter your email first.");
+      return;
+    }
     document.querySelector(".lpbtn")?.click();
   };
 
