@@ -34,7 +34,7 @@ const Dashboard = () => {
         console.log("✅ Payment verified for", user.email);
       } else {
         console.warn("❌ No payment found — redirecting to LaunchPass");
-        navigate("/launchpass-redirect");
+        navigate("/membership-required");
       }
     } catch (err) {
       console.error("⚠️ Error verifying payment:", err);
