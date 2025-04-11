@@ -11,7 +11,6 @@ function App() {
       <Route path="/" element={<CBIWebsite />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/launchpass" element={<LaunchPassRedirect />} />
       <Route path="/membership-required" element={<MembershipRequired />} />
     </Routes>
   );
