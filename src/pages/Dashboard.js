@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -87,12 +88,13 @@ const Dashboard = () => {
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
-        <img
-          src={`${process.env.PUBLIC_URL}/big-text-logo.png`}
-          link="https://www.cooperativebuilders.ie/"
-          alt="CBI Logo"
-          className="w-80 h-80 mb-6"
-        />
+        <Link to="/">
+          <img
+            src={`${process.env.PUBLIC_URL}/big-text-logo.png`}
+            alt="CBI Logo"
+            className="w-80 h-80 mb-6"
+          />
+        </Link>
 
         <motion.h1
           className="text-4xl font-bold text-blue-700 mb-6"
