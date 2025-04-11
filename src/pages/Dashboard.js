@@ -92,7 +92,6 @@ const Dashboard = () => {
           alt="CBI Logo"
           className="w-80 h-80 mb-6"
         />
-        />
         <motion.h1
           className="text-4xl font-bold text-blue-700 mb-6"
           initial={{ opacity: 0, y: -20 }}
