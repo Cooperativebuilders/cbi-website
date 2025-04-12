@@ -25,7 +25,7 @@ const RoleGrid = () => {
   const [counts, setCounts] = useState({});
   const [displayedCounts, setDisplayedCounts] = useState({});
 
-  // 🔄 Fetch counts every 10s
+  // Fetch Discord role counts from backend
   useEffect(() => {
     const fetchCounts = async () => {
       try {
@@ -33,7 +33,6 @@ const RoleGrid = () => {
           "https://cbi-backend-l001.onrender.com/api/discord-role-counts"
         );
         const result = await res.json();
-        console.log("✅ Discord data fetched:", result);
         if (result.success && result.data) {
           setCounts(result.data);
         }
@@ -47,39 +46,37 @@ const RoleGrid = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // 👇 leave displayedCounts out intentionally, and disable ESLint warning
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Animate the count updates with sound + haptics
   useEffect(() => {
     professions.forEach((role, index) => {
       const target = counts[role] || 0;
       let current = displayedCounts[role] || 0;
+      if (target === current) return;
+
       const step = target > current ? 1 : -1;
-      const totalFlips = Math.abs(target - current);
+      const delay = 70 + index * 5;
 
-      if (totalFlips === 0) return;
+      const interval = setInterval(() => {
+        current += step;
+        setDisplayedCounts((prev) => ({
+          ...prev,
+          [role]: current,
+        }));
 
-      const staggerDelay = index * 150;
+        // Sound
+        const tickSound = new Audio("/tick.mp3");
+        tickSound.volume = 0.3;
+        tickSound.play().catch(() => {});
 
-      setTimeout(() => {
-        let flips = 0;
-        const interval = setInterval(() => {
-          current += step;
-          flips++;
+        // Haptic
+        if (navigator.vibrate) {
+          navigator.vibrate(10);
+        }
 
-          setDisplayedCounts((prev) => ({
-            ...prev,
-            [role]: current,
-          }));
-
-          const tick = new Audio("/tick.mp3");
-          tick.volume = 0.4;
-          tick.play().catch(() => {});
-
-          if (flips >= totalFlips) {
-            clearInterval(interval);
-          }
-        }, 70);
-      }, staggerDelay);
+        if (current === target) {
+          clearInterval(interval);
+        }
+      }, delay);
     });
   }, [counts]);
 
@@ -89,7 +86,7 @@ const RoleGrid = () => {
         <div key={role} className="grid-tile">
           <div className="role-title">{role}</div>
           <div className="flip-counter">
-            <span className="solari">{displayedCounts[role] || 0}</span>
+            <span className="solari">{displayedCounts[role] ?? 0}</span>
           </div>
         </div>
       ))}
