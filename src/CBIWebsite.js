@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import RoleGrid from "./components/RoleGrid";
 
+
 const CBIWebsite = () => {
   useEffect(() => {
     const script = document.createElement("script");
@@ -34,6 +35,13 @@ const CBIWebsite = () => {
       </header>
 
       <section className="mb-12">
+        <RoleGrid />
+      </section>
+
+      <section className="mt-12">
+        <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
+          Network by Profession
+        </h2>
         <RoleGrid />
       </section>
 

@@ -1,6 +1,8 @@
 // src/components/RoleGrid.js
 import React, { useEffect, useState } from "react";
-import "./RoleGrid.css"; // we'll create this next
+import { motion, AnimatePresence } from "framer-motion";
+import "./RoleGrid.css";
+const tickSound = new Audio("/tick.mp3"); // Place tick.mp3 in public folder
 
 const professions = [
   "Carpenter",
@@ -31,29 +33,48 @@ const RoleGrid = () => {
           "https://cbi-backend-l001.onrender.com/api/discord-role-counts"
         );
         const data = await res.json();
-        setCounts(data || {});
+        setCounts((prev) => {
+          Object.keys(data).forEach((role) => {
+            if (prev[role] !== data[role]) {
+              tickSound.play(); // play on change
+            }
+          });
+          return data;
+        });
       } catch (err) {
         console.error("Failed to fetch Discord role counts", err);
       }
     };
 
-    fetchCounts();
+    fetchCounts(); // Initial fetch
+    const interval = setInterval(fetchCounts, 15000); // Refresh every 15s
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="grid-container">
-      {professions.map((role) => (
-        <div key={role} className="grid-tile">
-          <div className="role-title">{role}</div>
-          <div className="flip-counter">
-            {counts[role] !== undefined ? (
-              <span className="solari">{counts[role]}</span>
-            ) : (
-              <span className="solari">0</span>
-            )}
+      {professions.map((role) => {
+        const count = counts[role] ?? 0;
+
+        return (
+          <div key={role} className="grid-tile">
+            <div className="role-title">{role}</div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={count}
+                className="flip-counter solari"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4 }}
+              >
+                {count}
+              </motion.div>
+            </AnimatePresence>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
