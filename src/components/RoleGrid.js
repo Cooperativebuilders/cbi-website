@@ -15,8 +15,8 @@ const professions = [
   "Roofer",
   "Architect",
   "Engineer",
-  "Quantity Surveyor",
-  "Construction Manager",
+  "Surveyor",
+  "Project Manager",
   "Skilled Labourer",
   "Supplier",
 ];
