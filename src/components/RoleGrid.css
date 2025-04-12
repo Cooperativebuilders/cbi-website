@@ -1,9 +1,9 @@
-/* RoleGrid.css */
+/* src/components/RoleGrid.css */
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(4, 1fr); /* fixed 4-column layout */
+  gap: 1rem;
   justify-items: center;
   max-width: 1000px;
   margin: 0 auto;
@@ -11,46 +11,70 @@
 }
 
 .grid-tile {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+  background: white;
+  border-radius: 0.75rem;
   padding: 1rem;
-  text-align: center;
   width: 100%;
-  max-width: 140px;
-  transition: transform 0.2s;
+  max-width: 220px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
 }
 
 .grid-tile:hover {
-  transform: scale(1.05);
+  transform: translateY(-4px);
 }
 
 .role-title {
-  font-weight: bold;
+  font-weight: 600;
   color: #1e3a8a;
-  font-size: 0.95rem;
+  font-size: 1rem;
   margin-bottom: 0.75rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .flip-counter {
-  font-family: monospace;
-  font-size: 1.5rem;
-  padding: 0.75rem;
-  background: #f0f4f8;
-  border-radius: 8px;
-  box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.05);
-  min-width: 50px;
+  font-size: 2rem;
+  font-weight: bold;
+  background: #f1f5f9;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  min-width: 60px;
 }
 
-/* Optional: slightly smaller text on very narrow screens */
-@media (max-width: 400px) {
-  .role-title {
-    font-size: 0.8rem;
+.solari {
+  display: inline-block;
+  font-family: monospace;
+  animation: flipIn 0.3s ease-out;
+}
+
+@keyframes flipIn {
+  from {
+    transform: rotateX(90deg);
+    opacity: 0;
   }
+  to {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+/* Ensure responsiveness and no overflow */
+@media (max-width: 480px) {
+  .grid-container {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .grid-tile {
+    padding: 0.75rem;
+    max-width: 100%;
+  }
+
+  .role-title {
+    font-size: 0.875rem;
+  }
+
   .flip-counter {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
 }
