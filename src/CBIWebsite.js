@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import RoleGrid from "./components/RoleGrid";
 
-
 const CBIWebsite = () => {
   useEffect(() => {
     const script = document.createElement("script");
@@ -181,8 +180,3 @@ const CBIWebsite = () => {
 };
 
 export default CBIWebsite;
-
-<section>
-  <RoleGrid /> import RoleGrid from "./components/RoleGrid"; // adjust path if
-  needed
-</section>;
