@@ -47,7 +47,8 @@ const RoleGrid = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // ⏱ Animate flip with cascading delay
+  // 👇 leave displayedCounts out intentionally, and disable ESLint warning
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     professions.forEach((role, index) => {
       const target = counts[role] || 0;
@@ -57,7 +58,6 @@ const RoleGrid = () => {
 
       if (totalFlips === 0) return;
 
-      // ⏱ Stagger each role’s start time
       const staggerDelay = index * 150;
 
       setTimeout(() => {
@@ -71,7 +71,6 @@ const RoleGrid = () => {
             [role]: current,
           }));
 
-          // 🔊 Tick sound
           const tick = new Audio("/tick.mp3");
           tick.volume = 0.4;
           tick.play().catch(() => {});
@@ -79,7 +78,7 @@ const RoleGrid = () => {
           if (flips >= totalFlips) {
             clearInterval(interval);
           }
-        }, 70); // speed per tick within each role
+        }, 70);
       }, staggerDelay);
     });
   }, [counts]);
