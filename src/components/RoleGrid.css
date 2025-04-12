@@ -12,7 +12,7 @@
 .grid-tile {
   background: white;
   border-radius: 0.75rem;
-  aspect-ratio: 1 / 1; /* always square */
+  aspect-ratio: 1 / 1;
   width: 100%;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -30,19 +30,20 @@
 .role-title {
   font-weight: 600;
   color: #1e3a8a;
-  font-size: min(1rem, 4vw);
-  line-height: 1.2;
+  font-size: clamp(0.6rem, 1.5vw, 0.9rem);
+  line-height: 1.1;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 2.5rem;
+  height: 2.4rem;
+  padding: 0 0.25rem;
   overflow-wrap: break-word;
   word-break: break-word;
 }
 
 .flip-counter {
-  font-size: min(2rem, 6vw);
+  font-size: clamp(1.2rem, 5vw, 2rem);
   font-weight: bold;
   background: #f1f5f9;
   padding: 0.5rem;
@@ -68,7 +69,7 @@
   }
 }
 
-/* Mobile tweaks to maintain 4 columns but scale down content */
+/* ✅ Mobile: maintain 4 columns and shrink content smoothly */
 @media (max-width: 768px) {
   .grid-container {
     grid-template-columns: repeat(4, 1fr);
@@ -81,12 +82,12 @@
   }
 
   .role-title {
-    font-size: min(0.75rem, 3vw);
+    font-size: clamp(0.5rem, 2.2vw, 0.75rem);
     height: 2.2rem;
   }
 
   .flip-counter {
-    font-size: min(1.5rem, 5vw);
+    font-size: clamp(1rem, 4vw, 1.5rem);
     padding: 0.4rem;
   }
 }
