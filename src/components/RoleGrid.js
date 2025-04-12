@@ -1,8 +1,7 @@
 // src/components/RoleGrid.js
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState, useRef } from "react";
 import "./RoleGrid.css";
-const tickSound = new Audio("/tick.mp3"); // Place tick.mp3 in public folder
+import tickSound from "../assets/tick.mp3"; // Make sure this file exists
 
 const professions = [
   "Carpenter",
@@ -24,7 +23,9 @@ const professions = [
 ];
 
 const RoleGrid = () => {
-  const [counts, setCounts] = useState({});
+  const [animatedCounts, setAnimatedCounts] = useState({});
+  const targetCounts = useRef({});
+  const audioRef = useRef(null);
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -33,49 +34,64 @@ const RoleGrid = () => {
           "https://cbi-backend-l001.onrender.com/api/discord-role-counts"
         );
         const data = await res.json();
-        setCounts((prev) => {
-          Object.keys(data).forEach((role) => {
-            if (prev[role] !== data[role]) {
-              tickSound.play(); // play on change
-            }
-          });
-          return data;
+
+        professions.forEach((role) => {
+          const raw = data[role] ?? 0;
+          const normalized = role.toLowerCase().trim();
+          targetCounts.current[normalized] = raw;
         });
+
+        animateAll();
       } catch (err) {
         console.error("Failed to fetch Discord role counts", err);
       }
     };
 
-    fetchCounts(); // Initial fetch
-    const interval = setInterval(fetchCounts, 15000); // Refresh every 15s
-
-    return () => clearInterval(interval);
+    fetchCounts();
   }, []);
 
-  return (
-    <div className="grid-container">
-      {professions.map((role) => {
-        const count = counts[role] ?? 0;
+  const animateAll = () => {
+    professions.forEach((role) => {
+      const key = role.toLowerCase().trim();
+      const target = targetCounts.current[key] || 0;
+      let current = 0;
 
-        return (
-          <div key={role} className="grid-tile">
-            <div className="role-title">{role}</div>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={count}
-                className="flip-counter solari"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4 }}
-              >
-                {count}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        );
-      })}
-    </div>
+      const interval = setInterval(() => {
+        setAnimatedCounts((prev) => ({
+          ...prev,
+          [key]: current,
+        }));
+
+        if (audioRef.current) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.play();
+        }
+
+        current++;
+        if (current > target) clearInterval(interval);
+      }, 75);
+    });
+  };
+
+  return (
+    <>
+      <audio ref={audioRef} src={tickSound} preload="auto" />
+      <div className="grid-container">
+        {professions.map((role) => {
+          const key = role.toLowerCase().trim();
+          const count = animatedCounts[key] ?? 0;
+
+          return (
+            <div key={role} className="grid-tile">
+              <div className="role-title">{role}</div>
+              <div className="flip-counter">
+                <span className="solari">{count}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 };
 
