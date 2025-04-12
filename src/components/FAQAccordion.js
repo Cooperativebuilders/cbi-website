@@ -1,3 +1,4 @@
+// src/components/FAQAccordion.js
 import React, { useState } from "react";
 
 const faqs = [
