@@ -25,7 +25,7 @@ const RoleGrid = () => {
   const [counts, setCounts] = useState({});
   const [displayedCounts, setDisplayedCounts] = useState({});
 
-  // ✅ Fetch role counts on load + every 10 seconds
+  // 🔄 Fetch counts every 10s
   useEffect(() => {
     const fetchCounts = async () => {
       try {
@@ -35,7 +35,7 @@ const RoleGrid = () => {
         const result = await res.json();
         console.log("✅ Discord data fetched:", result);
         if (result.success && result.data) {
-          setCounts(result.data); // <- This is key!
+          setCounts(result.data);
         }
       } catch (err) {
         console.error("❌ Failed to fetch Discord role counts", err);
@@ -47,34 +47,40 @@ const RoleGrid = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ Animate displayed count up/down with tick sound
+  // ⏱ Animate flip with cascading delay
   useEffect(() => {
-    professions.forEach((role) => {
+    professions.forEach((role, index) => {
       const target = counts[role] || 0;
       let current = displayedCounts[role] || 0;
-
-      if (target === current) return;
-
       const step = target > current ? 1 : -1;
-      let delay = 50;
+      const totalFlips = Math.abs(target - current);
 
-      const interval = setInterval(() => {
-        current += step;
+      if (totalFlips === 0) return;
 
-        setDisplayedCounts((prev) => ({
-          ...prev,
-          [role]: current,
-        }));
+      // ⏱ Stagger each role’s start time
+      const staggerDelay = index * 150;
 
-        // ✅ Play tick sound each time it flips
-        const tickSound = new Audio("/tick.mp3");
-        tickSound.volume = 0.3;
-        tickSound.play().catch(() => {});
+      setTimeout(() => {
+        let flips = 0;
+        const interval = setInterval(() => {
+          current += step;
+          flips++;
 
-        if (current === target) {
-          clearInterval(interval);
-        }
-      }, delay);
+          setDisplayedCounts((prev) => ({
+            ...prev,
+            [role]: current,
+          }));
+
+          // 🔊 Tick sound
+          const tick = new Audio("/tick.mp3");
+          tick.volume = 0.4;
+          tick.play().catch(() => {});
+
+          if (flips >= totalFlips) {
+            clearInterval(interval);
+          }
+        }, 70); // speed per tick within each role
+      }, staggerDelay);
     });
   }, [counts]);
 
@@ -84,9 +90,7 @@ const RoleGrid = () => {
         <div key={role} className="grid-tile">
           <div className="role-title">{role}</div>
           <div className="flip-counter">
-            <span className="solari">
-              {displayedCounts[role] !== undefined ? displayedCounts[role] : 0}
-            </span>
+            <span className="solari">{displayedCounts[role] || 0}</span>
           </div>
         </div>
       ))}
