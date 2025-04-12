@@ -30,17 +30,20 @@
 .role-title {
   font-weight: 600;
   color: #1e3a8a;
-  font-size: clamp(0.6rem, 1.4vw, 0.9rem);
-  line-height: 1.2;
+  font-size: clamp(0.6rem, 1.5vw, 0.9rem);
+  line-height: 1.1;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 2.6rem;
-  padding: 0 0.5rem;
-  word-break: break-word;
-  white-space: normal;
-  overflow-wrap: anywhere;
+  height: 2.4rem;
+  padding: 0 0.25rem;
+
+  /* ✅ prevent mid-word wrapping, allow shrink to fit */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-stretch: condensed;
 }
 
 .flip-counter {
@@ -70,7 +73,7 @@
   }
 }
 
-/* ✅ Mobile tweaks */
+/* ✅ Mobile-only tweaks */
 @media (max-width: 768px) {
   .grid-container {
     grid-template-columns: repeat(4, 1fr);
@@ -83,8 +86,8 @@
   }
 
   .role-title {
-    font-size: clamp(0.5rem, 2vw, 0.75rem);
-    height: 2.4rem;
+    font-size: clamp(0.5rem, 2.2vw, 0.75rem);
+    height: 2.2rem;
   }
 
   .flip-counter {
@@ -93,7 +96,7 @@
   }
 }
 
-/* ✅ Desktop tweaks */
+/* ✅ Desktop-only: reduce box size */
 @media (min-width: 1024px) {
   .grid-container {
     max-width: 800px;
