@@ -2,29 +2,25 @@
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Always 4 columns */
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-  justify-items: center;
-  max-width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
   padding: 1rem;
-  box-sizing: border-box;
 }
 
-/* Responsive shrink-to-fit behavior */
 .grid-tile {
   background: white;
   border-radius: 0.75rem;
   padding: 1rem;
+  height: 130px; /* fixed height */
   width: 100%;
-  max-width: 100%;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 120px; /* fixed height to make all tiles equal */
-  box-sizing: border-box;
 }
 
 .grid-tile:hover {
@@ -34,24 +30,26 @@
 .role-title {
   font-weight: 600;
   color: #1e3a8a;
-  font-size: clamp(0.65rem, 1.2vw, 0.85rem); /* responsive shrink */
+  font-size: 0.9rem;
   line-height: 1.2;
-  white-space: nowrap;
+  height: 2.5rem; /* force consistent space even for 2 lines */
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-wrap: wrap;
 }
 
 .flip-counter {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
   background: #f1f5f9;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  min-width: 40px;
-  line-height: 1.2;
+  min-width: 60px;
 }
 
-/* Animated number appearance */
 .solari {
   display: inline-block;
   font-family: monospace;
@@ -69,23 +67,25 @@
   }
 }
 
-/* ✅ Mobile adjustments but keep 4x4 */
+/* ✅ Responsive – keep 4x4 structure, scale tiles instead of collapsing */
 @media (max-width: 768px) {
   .grid-container {
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.5rem;
     padding: 0.5rem;
   }
 
   .grid-tile {
     padding: 0.75rem;
+    height: 110px;
   }
 
   .role-title {
     font-size: 0.75rem;
+    height: 2.25rem;
   }
 
   .flip-counter {
-    font-size: 1.2rem;
-    padding: 0.4rem;
+    font-size: 1.5rem;
   }
 }
