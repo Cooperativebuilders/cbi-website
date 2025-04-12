@@ -37,13 +37,6 @@ const CBIWebsite = () => {
         <RoleGrid />
       </section>
 
-      <section className="mt-12">
-        <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
-          Network by Profession
-        </h2>
-        <RoleGrid />
-      </section>
-
       <section className="relative bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl overflow-hidden mb-12">
         <div className="p-12 text-center">
           <h1 className="text-5xl font-extrabold mb-4">
