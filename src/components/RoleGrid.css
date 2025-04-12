@@ -12,8 +12,7 @@
 .grid-tile {
   background: white;
   border-radius: 0.75rem;
-  padding: 1rem;
-  height: 130px; /* fixed height */
+  aspect-ratio: 1 / 1; /* always square */
   width: 100%;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -21,6 +20,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 0.75rem;
 }
 
 .grid-tile:hover {
@@ -30,24 +30,25 @@
 .role-title {
   font-weight: 600;
   color: #1e3a8a;
-  font-size: 0.9rem;
+  font-size: min(1rem, 4vw);
   line-height: 1.2;
-  height: 2.5rem; /* force consistent space even for 2 lines */
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  flex-wrap: wrap;
+  height: 2.5rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .flip-counter {
-  font-size: 2rem;
+  font-size: min(2rem, 6vw);
   font-weight: bold;
   background: #f1f5f9;
   padding: 0.5rem;
   border-radius: 0.5rem;
   min-width: 60px;
+  margin: 0 auto;
 }
 
 .solari {
@@ -67,7 +68,7 @@
   }
 }
 
-/* ✅ Responsive – keep 4x4 structure, scale tiles instead of collapsing */
+/* Mobile tweaks to maintain 4 columns but scale down content */
 @media (max-width: 768px) {
   .grid-container {
     grid-template-columns: repeat(4, 1fr);
@@ -76,16 +77,16 @@
   }
 
   .grid-tile {
-    padding: 0.75rem;
-    height: 110px;
+    padding: 0.5rem;
   }
 
   .role-title {
-    font-size: 0.75rem;
-    height: 2.25rem;
+    font-size: min(0.75rem, 3vw);
+    height: 2.2rem;
   }
 
   .flip-counter {
-    font-size: 1.5rem;
+    font-size: min(1.5rem, 5vw);
+    padding: 0.4rem;
   }
 }
