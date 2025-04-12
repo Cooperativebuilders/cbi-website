@@ -2,25 +2,25 @@
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* always 4 columns */
+  grid-template-columns: repeat(4, 1fr); /* Always 4 columns */
   gap: 1rem;
   justify-items: center;
-  max-width: 1000px;
-  margin: 0 auto;
+  max-width: 100%;
   padding: 1rem;
-  overflow-x: auto; /* enable horizontal scroll on small screens */
+  box-sizing: border-box;
 }
 
+/* Responsive shrink-to-fit behavior */
 .grid-tile {
   background: white;
   border-radius: 0.75rem;
   padding: 1rem;
   width: 100%;
-  max-width: 220px;
+  max-width: 100%; /* Force to fill grid column */
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
-  min-width: 160px; /* helps maintain readable width in scroll view */
+  box-sizing: border-box;
 }
 
 .grid-tile:hover {
@@ -30,19 +30,22 @@
 .role-title {
   font-weight: 600;
   color: #1e3a8a;
-  font-size: 1rem;
+  font-size: 0.9rem;
   margin-bottom: 0.75rem;
+  line-height: 1.2;
 }
 
 .flip-counter {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
   background: #f1f5f9;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  min-width: 60px;
+  min-width: 40px;
+  line-height: 1.2;
 }
 
+/* Animated number appearance */
 .solari {
   display: inline-block;
   font-family: monospace;
@@ -60,9 +63,10 @@
   }
 }
 
-/* Adjust padding only (keep grid layout fixed) */
-@media (max-width: 480px) {
+/* ✅ Mobile adjustments but keep 4x4 */
+@media (max-width: 768px) {
   .grid-container {
+    gap: 0.5rem;
     padding: 0.5rem;
   }
 
@@ -71,10 +75,11 @@
   }
 
   .role-title {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
   }
 
   .flip-counter {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    padding: 0.4rem;
   }
 }
