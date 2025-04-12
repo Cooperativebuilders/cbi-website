@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import RoleGrid from "./components/RoleGrid";
 
 const CBIWebsite = () => {
   useEffect(() => {
@@ -31,6 +32,10 @@ const CBIWebsite = () => {
           </Link>
         </nav>
       </header>
+
+      <section className="mb-12">
+        <RoleGrid />
+      </section>
 
       <section className="relative bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl overflow-hidden mb-12">
         <div className="p-12 text-center">
@@ -168,3 +173,8 @@ const CBIWebsite = () => {
 };
 
 export default CBIWebsite;
+
+<section>
+  <RoleGrid /> import RoleGrid from "./components/RoleGrid"; // adjust path if
+  needed
+</section>;
