@@ -1,7 +1,6 @@
 // src/components/RoleGrid.js
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import "./RoleGrid.css";
-import tickSound from "../assets/tick.mp3"; // Make sure this file exists
 
 const professions = [
   "Carpenter",
@@ -23,9 +22,8 @@ const professions = [
 ];
 
 const RoleGrid = () => {
-  const [animatedCounts, setAnimatedCounts] = useState({});
-  const targetCounts = useRef({});
-  const audioRef = useRef(null);
+  const [counts, setCounts] = useState({});
+  const [displayedCounts, setDisplayedCounts] = useState({});
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -34,14 +32,7 @@ const RoleGrid = () => {
           "https://cbi-backend-l001.onrender.com/api/discord-role-counts"
         );
         const data = await res.json();
-
-        professions.forEach((role) => {
-          const raw = data[role] ?? 0;
-          const normalized = role.toLowerCase().trim();
-          targetCounts.current[normalized] = raw;
-        });
-
-        animateAll();
+        setCounts(data || {});
       } catch (err) {
         console.error("Failed to fetch Discord role counts", err);
       }
@@ -50,48 +41,47 @@ const RoleGrid = () => {
     fetchCounts();
   }, []);
 
-  const animateAll = () => {
+  useEffect(() => {
     professions.forEach((role) => {
-      const key = role.toLowerCase().trim();
-      const target = targetCounts.current[key] || 0;
-      let current = 0;
+      const target = counts[role] || 0;
+      let current = displayedCounts[role] || 0;
+
+      if (target === current) return;
+
+      const step = target > current ? 1 : -1;
+      let delay = 50;
 
       const interval = setInterval(() => {
-        setAnimatedCounts((prev) => ({
+        current += step;
+        setDisplayedCounts((prev) => ({
           ...prev,
-          [key]: current,
+          [role]: current,
         }));
 
-        if (audioRef.current) {
-          audioRef.current.currentTime = 0;
-          audioRef.current.play();
-        }
+        const tickSound = new Audio("/tick.mp3");
+        tickSound.volume = 0.3;
+        tickSound.play().catch(() => {});
 
-        current++;
-        if (current > target) clearInterval(interval);
-      }, 75);
+        if (current === target) {
+          clearInterval(interval);
+        }
+      }, delay);
     });
-  };
+  }, [counts]);
 
   return (
-    <>
-      <audio ref={audioRef} src={tickSound} preload="auto" />
-      <div className="grid-container">
-        {professions.map((role) => {
-          const key = role.toLowerCase().trim();
-          const count = animatedCounts[key] ?? 0;
-
-          return (
-            <div key={role} className="grid-tile">
-              <div className="role-title">{role}</div>
-              <div className="flip-counter">
-                <span className="solari">{count}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </>
+    <div className="grid-container">
+      {professions.map((role) => (
+        <div key={role} className="grid-tile">
+          <div className="role-title">{role}</div>
+          <div className="flip-counter">
+            <span className="solari">
+              {displayedCounts[role] !== undefined ? displayedCounts[role] : 0}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 
