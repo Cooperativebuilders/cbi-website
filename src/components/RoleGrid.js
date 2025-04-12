@@ -25,31 +25,29 @@ const RoleGrid = () => {
   const [counts, setCounts] = useState({});
   const [displayedCounts, setDisplayedCounts] = useState({});
 
+  // ✅ Fetch role counts on load + every 10 seconds
   useEffect(() => {
     const fetchCounts = async () => {
       try {
         const res = await fetch(
           "https://cbi-backend-l001.onrender.com/api/discord-role-counts"
         );
-        const data = await res.json();
-        console.log("✅ Role counts fetched:", data); // ✅ Debug log
-        if (data && Object.keys(data).length > 0) {
-          setCounts(data);
+        const result = await res.json();
+        console.log("✅ Discord data fetched:", result);
+        if (result.success && result.data) {
+          setCounts(result.data); // <- This is key!
         }
       } catch (err) {
         console.error("❌ Failed to fetch Discord role counts", err);
       }
     };
 
-    // Fetch immediately
     fetchCounts();
-
-    // Retry every 10 seconds just in case
     const interval = setInterval(fetchCounts, 10000);
-
     return () => clearInterval(interval);
   }, []);
 
+  // ✅ Animate displayed count up/down with tick sound
   useEffect(() => {
     professions.forEach((role) => {
       const target = counts[role] || 0;
@@ -62,11 +60,13 @@ const RoleGrid = () => {
 
       const interval = setInterval(() => {
         current += step;
+
         setDisplayedCounts((prev) => ({
           ...prev,
           [role]: current,
         }));
 
+        // ✅ Play tick sound each time it flips
         const tickSound = new Audio("/tick.mp3");
         tickSound.volume = 0.3;
         tickSound.play().catch(() => {});
