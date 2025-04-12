@@ -2,7 +2,7 @@
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* fixed 4-column layout */
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 1rem;
   justify-items: center;
   max-width: 1000px;
@@ -15,7 +15,7 @@
   border-radius: 0.75rem;
   padding: 1rem;
   width: 100%;
-  max-width: 220px;
+  max-width: 180px;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
@@ -30,6 +30,7 @@
   color: #1e3a8a;
   font-size: 1rem;
   margin-bottom: 0.75rem;
+  word-wrap: break-word;
 }
 
 .flip-counter {
@@ -58,13 +59,8 @@
   }
 }
 
-/* Ensure responsiveness and no overflow */
-@media (max-width: 480px) {
-  .grid-container {
-    padding: 0.5rem;
-    gap: 0.5rem;
-  }
-
+/* Optional: Adjust for really small phones */
+@media (max-width: 375px) {
   .grid-tile {
     padding: 0.75rem;
     max-width: 100%;
