@@ -35,11 +35,6 @@ const CBIWebsite = () => {
         </nav>
       </header>
 
-      {/* Solari Grid */}
-      <section className="mb-12">
-        <RoleGrid />
-      </section>
-
       {/* Hero */}
       <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl overflow-hidden mb-10 px-6 py-12 text-center">
         <h1 className="text-3xl sm:text-5xl font-extrabold mb-4">
@@ -55,6 +50,11 @@ const CBIWebsite = () => {
         >
           Get Involved
         </a>
+      </section>
+
+      {/* Solari Grid */}
+      <section className="mb-12">
+        <RoleGrid />
       </section>
 
       {/* Main content */}
