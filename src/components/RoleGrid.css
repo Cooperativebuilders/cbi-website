@@ -36,11 +36,11 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 2.6rem; /* slightly taller */
+  height: 2.6rem;
   padding: 0 0.5rem;
   word-break: break-word;
   white-space: normal;
-  overflow-wrap: anywhere; /* allows cleaner wrapping */
+  overflow-wrap: anywhere;
 }
 
 .flip-counter {
@@ -70,21 +70,21 @@
   }
 }
 
-/* ✅ Mobile-only tweaks */
+/* ✅ Mobile tweaks */
 @media (max-width: 768px) {
-  .role-title {
-    font-size: clamp(0.5rem, 2vw, 0.75rem);
-    height: 2.4rem;
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    padding: 0.5rem;
   }
-}
 
   .grid-tile {
     padding: 0.5rem;
   }
 
   .role-title {
-    font-size: clamp(0.5rem, 2.2vw, 0.75rem);
-    height: 2.2rem;
+    font-size: clamp(0.5rem, 2vw, 0.75rem);
+    height: 2.4rem;
   }
 
   .flip-counter {
@@ -93,7 +93,7 @@
   }
 }
 
-/* ✅ Desktop-only: reduce size of boxes and text */
+/* ✅ Desktop tweaks */
 @media (min-width: 1024px) {
   .grid-container {
     max-width: 800px;
