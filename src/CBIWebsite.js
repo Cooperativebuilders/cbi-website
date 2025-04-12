@@ -1,8 +1,7 @@
-// src/CBIWebsite.js
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import RoleGrid from "./components/RoleGrid";
-import { useState } from "react";
+import FAQAccordion from "./components/FAQAccordion";
 
 const CBIWebsite = () => {
   useEffect(() => {
@@ -63,15 +62,18 @@ const CBIWebsite = () => {
         {[
           {
             title: "About Us",
-            content: `CBI is a community-driven network of skilled trades and construction professionals. We work together as equal stakeholders to build, renovate, and profit collectively.`,
+            content:
+              "CBI is a community-driven network of skilled trades and construction professionals. We work together as equal stakeholders to build, renovate, and profit collectively.",
           },
           {
             title: "Membership Details",
-            content: `As a member of CBI, you’ll gain access to a vibrant network of tradespeople, professionals, and property investors. Members can propose and vote on new property ideas, forming self-managed project teams with shared profit.`,
+            content:
+              "As a member of CBI, you’ll gain access to a vibrant network of tradespeople, professionals, and property investors. Members can propose and vote on new property ideas, forming self-managed project teams with shared profit.",
           },
           {
             title: "Join the Community",
-            content: `Become part of a network where everyone invests equally, works equally, and shares profits. Join the Discord to start connecting.`,
+            content:
+              "Become part of a network where everyone invests equally, works equally, and shares profits. Join the Discord to start connecting.",
             button: true,
           },
         ].map((section, i) => (
@@ -98,46 +100,22 @@ const CBIWebsite = () => {
         ))}
 
         {/* FAQs */}
-        <div className="space-y-4">
-    {[
-      {
-        q: "💬 Who can join CBI?",
-        a: "Anyone interested in property development and construction — whether you're a skilled tradesperson, designer, or investor — is welcome.",
-      },
-      {
-        q: "💶 How much do I need to invest?",
-        a: "Projects vary, but many start with members contributing between €2,000–€5,000 each. Every project is its own entity, so members vote on structure and buy-in.",
-      },
-      {
-        q: "👷‍♂️ Do I need tools or experience?",
-        a: "Nope! Some members bring hands-on skills and equipment, others contribute money, design work, admin, or coordination. We build around everyone’s strengths.",
-      },
-      {
-        q: "🏗 How are profits shared?",
-        a: "Equally — if 10 people contribute evenly to a project, they all split profits evenly. You decide as a team how to run it.",
-      },
-    ].map((item, i) => {
-      const [open, setOpen] = useState(null);
-      const toggle = () => setOpen(open === i ? null : i);
-      return (
-        <div key={i} className="border rounded-lg overflow-hidden">
-          <button
-            onClick={() => setOpen(open === i ? null : i)}
-            className="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 font-medium text-blue-700 flex justify-between items-center"
-          >
-            <span>{item.q}</span>
-            <span className="text-xl">{open === i ? "−" : "+"}</span>
-          </button>
-          {open === i && (
-            <div className="px-4 py-3 text-gray-700 bg-white transition-all duration-300 ease-in-out">
-              {item.a}
-            </div>
-          )}
-        </div>
-      );
-    })}
-  </div>
-</section>
+        <section
+          id="faqs"
+          className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 mt-12 max-w-4xl mx-auto"
+        >
+          <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">
+            Frequently Asked Questions
+          </h2>
+          <FAQAccordion />
+          <p className="text-sm text-gray-500 text-center mt-4">
+            Have more questions?{" "}
+            <a href="/contact" className="text-blue-600 hover:underline">
+              Contact us
+            </a>
+            .
+          </p>
+        </section>
       </main>
 
       {/* Footer */}
