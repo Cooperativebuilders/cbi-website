@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import RoleGrid from "./components/RoleGrid";
+import { useState } from "react";
 
 const CBIWebsite = () => {
   useEffect(() => {
@@ -97,39 +98,46 @@ const CBIWebsite = () => {
         ))}
 
         {/* FAQs */}
-        <section
-          id="faqs"
-          className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 mt-12"
-        >
-          <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-6 text-center">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6 text-base sm:text-lg text-gray-700">
-            {[
-              {
-                q: "💬 Who can join CBI?",
-                a: "Anyone interested in property development and construction — whether you're a skilled tradesperson, designer, or investor — is welcome.",
-              },
-              {
-                q: "💶 How much do I need to invest?",
-                a: "Projects vary, but many start with members contributing between €2,000–€5,000 each. Every project is its own entity, so members vote on structure and buy-in.",
-              },
-              {
-                q: "👷‍♂️ Do I need tools or experience?",
-                a: "Nope! Some members bring hands-on skills and equipment, others contribute money, design work, admin, or coordination. We build around everyone’s strengths.",
-              },
-              {
-                q: "🏗 How are profits shared?",
-                a: "Equally — if 10 people contribute evenly to a project, they all split profits evenly. You decide as a team how to run it.",
-              },
-            ].map(({ q, a }) => (
-              <div key={q}>
-                <h3 className="font-semibold text-blue-500">{q}</h3>
-                <p>{a}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <div className="space-y-4">
+    {[
+      {
+        q: "💬 Who can join CBI?",
+        a: "Anyone interested in property development and construction — whether you're a skilled tradesperson, designer, or investor — is welcome.",
+      },
+      {
+        q: "💶 How much do I need to invest?",
+        a: "Projects vary, but many start with members contributing between €2,000–€5,000 each. Every project is its own entity, so members vote on structure and buy-in.",
+      },
+      {
+        q: "👷‍♂️ Do I need tools or experience?",
+        a: "Nope! Some members bring hands-on skills and equipment, others contribute money, design work, admin, or coordination. We build around everyone’s strengths.",
+      },
+      {
+        q: "🏗 How are profits shared?",
+        a: "Equally — if 10 people contribute evenly to a project, they all split profits evenly. You decide as a team how to run it.",
+      },
+    ].map((item, i) => {
+      const [open, setOpen] = useState(null);
+      const toggle = () => setOpen(open === i ? null : i);
+      return (
+        <div key={i} className="border rounded-lg overflow-hidden">
+          <button
+            onClick={() => setOpen(open === i ? null : i)}
+            className="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 font-medium text-blue-700 flex justify-between items-center"
+          >
+            <span>{item.q}</span>
+            <span className="text-xl">{open === i ? "−" : "+"}</span>
+          </button>
+          {open === i && (
+            <div className="px-4 py-3 text-gray-700 bg-white transition-all duration-300 ease-in-out">
+              {item.a}
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</section>
       </main>
 
       {/* Footer */}
