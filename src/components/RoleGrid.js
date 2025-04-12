@@ -32,13 +32,22 @@ const RoleGrid = () => {
           "https://cbi-backend-l001.onrender.com/api/discord-role-counts"
         );
         const data = await res.json();
-        setCounts(data || {});
+        console.log("✅ Role counts fetched:", data); // ✅ Debug log
+        if (data && Object.keys(data).length > 0) {
+          setCounts(data);
+        }
       } catch (err) {
-        console.error("Failed to fetch Discord role counts", err);
+        console.error("❌ Failed to fetch Discord role counts", err);
       }
     };
 
+    // Fetch immediately
     fetchCounts();
+
+    // Retry every 10 seconds just in case
+    const interval = setInterval(fetchCounts, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
