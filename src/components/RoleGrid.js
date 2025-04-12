@@ -46,6 +46,10 @@ const RoleGrid = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty("--title-font-size", "0.72rem");
+  }, []);
+
   // Animate the count updates with sound + haptics
   useEffect(() => {
     professions.forEach((role, index) => {
