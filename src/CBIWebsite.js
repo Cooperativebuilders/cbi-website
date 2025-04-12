@@ -1,3 +1,4 @@
+// src/CBIWebsite.js
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import RoleGrid from "./components/RoleGrid";
@@ -12,15 +13,16 @@ const CBIWebsite = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-8">
-      <header className="flex justify-between items-center py-6 px-4 md:px-8 bg-white shadow-md rounded-xl mb-8">
-        <div className="flex items-center space-x-4">
-          <img src="/CB Text Logo.png" alt="CBI Logo" className="w-12 h-12" />
-          <h1 className="text-2xl font-bold text-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 sm:p-6">
+      {/* Header */}
+      <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 px-4 bg-white shadow-md rounded-xl mb-6">
+        <div className="flex items-center space-x-3 mb-4 sm:mb-0">
+          <img src="/CB Text Logo.png" alt="CBI Logo" className="w-10 h-10" />
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
             Co-operative Builders Ireland
           </h1>
         </div>
-        <nav className="space-x-6 text-blue-600 font-medium text-lg">
+        <nav className="flex justify-center sm:justify-end space-x-4 text-blue-600 text-base sm:text-lg font-medium">
           <Link to="/" className="hover:text-blue-800 transition">
             Home
           </Link>
@@ -33,138 +35,104 @@ const CBIWebsite = () => {
         </nav>
       </header>
 
+      {/* Solari Grid */}
       <section className="mb-12">
         <RoleGrid />
       </section>
 
-      <section className="relative bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl overflow-hidden mb-12">
-        <div className="p-12 text-center">
-          <h1 className="text-5xl font-extrabold mb-4">
-            Build Together. Profit Together.
-          </h1>
-          <p className="text-xl text-white/90 mb-6 max-w-xl mx-auto">
-            Co-operative Builders Ireland (CBI) connects skilled tradespeople
-            and property investors to renovate, build, and thrive – as one.
-          </p>
-          <a
-            href="/signup"
-            className="inline-block bg-white text-blue-700 font-bold py-3 px-6 rounded-lg hover:bg-gray-200 transition"
-          >
-            Get Involved
-          </a>
-        </div>
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl overflow-hidden mb-10 px-6 py-12 text-center">
+        <h1 className="text-3xl sm:text-5xl font-extrabold mb-4">
+          Build Together. Profit Together.
+        </h1>
+        <p className="text-lg sm:text-xl text-white/90 mb-6 max-w-2xl mx-auto">
+          Co-operative Builders Ireland (CBI) connects skilled tradespeople and
+          property investors to renovate, build, and thrive – as one.
+        </p>
+        <a
+          href="/signup"
+          className="inline-block bg-white text-blue-700 font-bold py-3 px-6 rounded-lg hover:bg-gray-200 transition"
+        >
+          Get Involved
+        </a>
       </section>
 
-      <main id="home" className="max-w-4xl mx-auto space-y-8">
-        <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
-          <h2 className="text-3xl font-bold text-blue-600 mb-4">About Us</h2>
-          <p className="text-lg text-gray-700">
-            Co-operative Builders Ireland (CBI) is a community-driven network of
-            skilled trades and construction professionals. We work together as
-            equal stakeholders to build, renovate, and profit collectively.
-          </p>
-        </section>
-
-        <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
-          <h2 className="text-3xl font-bold text-blue-600 mb-4">
-            Membership Details
-          </h2>
-          <p className="text-lg text-gray-700">
-            As a member of Co-operative Builders Ireland (CBI), you’ll gain
-            access to a vibrant network of tradespeople, construction
-            professionals, and eager property investors. Whether you're a
-            skilled builder or just getting started, CBI connects you with
-            likeminded individuals ready to collaborate on real development
-            projects.
-          </p>
-          <p className="text-lg text-gray-700 mt-4">
-            Every member has the power to pitch new property ideas to the entire
-            network. Got a vision for a renovation or new build? Share it, rally
-            support, and build it together. With CBI, you're never building
-            alone – you're building together.
-          </p>
-          <p className="text-lg text-gray-700 mt-4">
-            Each project operates as its own independent entity. When a group
-            forms around a proposal, they decide how it’s structured – from the
-            number of participants to roles, responsibilities, and investment
-            amounts. You’ll be part of a self-directed team where decisions are
-            made collectively, and everyone shares the risk and the reward.
-          </p>
-        </section>
-
-        <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
-          <h2 className="text-3xl font-bold text-blue-600 mb-4">
-            Join the Community
-          </h2>
-          <p className="text-lg text-gray-700 mb-6">
-            Become part of a community where everyone invests equally, works
-            equally, and shares profits. Connect with like-minded professionals
-            on Discord.
-          </p>
-          <button
-            target="_blank"
-            className="lp6475702170157056 lpbtn bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
-            yearly="true"
+      {/* Main content */}
+      <main id="home" className="space-y-8">
+        {[
+          {
+            title: "About Us",
+            content: `CBI is a community-driven network of skilled trades and construction professionals. We work together as equal stakeholders to build, renovate, and profit collectively.`,
+          },
+          {
+            title: "Membership Details",
+            content: `As a member of CBI, you’ll gain access to a vibrant network of tradespeople, professionals, and property investors. Members can propose and vote on new property ideas, forming self-managed project teams with shared profit.`,
+          },
+          {
+            title: "Join the Community",
+            content: `Become part of a network where everyone invests equally, works equally, and shares profits. Join the Discord to start connecting.`,
+            button: true,
+          },
+        ].map((section, i) => (
+          <section
+            key={i}
+            className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300"
           >
-            Join Now
-          </button>
-        </section>
+            <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">
+              {section.title}
+            </h2>
+            <p className="text-base sm:text-lg text-gray-700 mb-4">
+              {section.content}
+            </p>
+            {section.button && (
+              <button
+                target="_blank"
+                className="lp6475702170157056 lpbtn bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
+                yearly="true"
+              >
+                Join Now
+              </button>
+            )}
+          </section>
+        ))}
 
+        {/* FAQs */}
         <section
           id="faqs"
-          className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 mt-12 max-w-4xl mx-auto"
+          className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 mt-12"
         >
-          <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-6 text-center">
             Frequently Asked Questions
           </h2>
-
-          <div className="space-y-6 text-gray-700 text-lg">
-            <div>
-              <h3 className="font-semibold text-blue-500">
-                💬 Who can join CBI?
-              </h3>
-              <p>
-                Anyone interested in property development and construction —
-                whether you're a skilled tradesperson, designer, or investor —
-                is welcome.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-blue-500">
-                💶 How much do I need to invest?
-              </h3>
-              <p>
-                Projects vary, but many start with members contributing between
-                €2,000–€5,000 each. Every project is its own entity, so members
-                vote on structure and buy-in.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-blue-500">
-                👷‍♂️ Do I need tools or experience?
-              </h3>
-              <p>
-                Nope! Some members bring hands-on skills and equipment, others
-                contribute money, design work, admin, or coordination. We build
-                around everyone’s strengths.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-blue-500">
-                🏗 How are profits shared?
-              </h3>
-              <p>
-                Equally — if 10 people contribute evenly to a project, they all
-                split profits evenly. You decide as a team how to run it.
-              </p>
-            </div>
+          <div className="space-y-6 text-base sm:text-lg text-gray-700">
+            {[
+              {
+                q: "💬 Who can join CBI?",
+                a: "Anyone interested in property development and construction — whether you're a skilled tradesperson, designer, or investor — is welcome.",
+              },
+              {
+                q: "💶 How much do I need to invest?",
+                a: "Projects vary, but many start with members contributing between €2,000–€5,000 each. Every project is its own entity, so members vote on structure and buy-in.",
+              },
+              {
+                q: "👷‍♂️ Do I need tools or experience?",
+                a: "Nope! Some members bring hands-on skills and equipment, others contribute money, design work, admin, or coordination. We build around everyone’s strengths.",
+              },
+              {
+                q: "🏗 How are profits shared?",
+                a: "Equally — if 10 people contribute evenly to a project, they all split profits evenly. You decide as a team how to run it.",
+              },
+            ].map(({ q, a }) => (
+              <div key={q}>
+                <h3 className="font-semibold text-blue-500">{q}</h3>
+                <p>{a}</p>
+              </div>
+            ))}
           </div>
         </section>
       </main>
 
+      {/* Footer */}
       <footer className="text-center text-gray-500 mt-12 py-4 border-t">
         <p>© 2025 Co-operative Builders Ireland. All rights reserved.</p>
       </footer>
