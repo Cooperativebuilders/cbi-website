@@ -209,21 +209,6 @@ const MemberForm = () => {
         <option value="Industrial">Industrial</option>
       </select>
 
-      <label className="block text-sm font-medium text-gray-700">
-        Project Type{" "}
-        <span className="text-xs text-gray-500">
-          (Hold Ctrl or Cmd to select multiple)
-        </span>
-      </label>
-      <label className="block text-sm font-medium text-gray-700">
-        Project Type{" "}
-        <span className="text-xs text-gray-500">
-          (Hold Ctrl or Cmd to select multiple)
-        </span>
-      </label>
-      <label className="block text-sm font-medium text-gray-700">
-        Project Type
-      </label>
       <select
         name="projectType"
         value={formData.projectType}
