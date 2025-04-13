@@ -1,3 +1,4 @@
+// src/pages/Dashboard.js
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
@@ -10,6 +11,7 @@ import {
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import MemberCard from "../components/MemberCard";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -18,7 +20,6 @@ const Dashboard = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const navigate = useNavigate();
 
-  // 🔐 Verify payment status using backend
   const verifyPayment = async (user) => {
     if (!user?.email) return;
 
@@ -45,7 +46,6 @@ const Dashboard = () => {
     }
   };
 
-  // 🔄 Auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
@@ -84,7 +84,6 @@ const Dashboard = () => {
     }
   };
 
-  // 🔐 If not logged in, show login screen
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
@@ -144,7 +143,6 @@ const Dashboard = () => {
     );
   }
 
-  // ✅ Main dashboard content for paid, logged-in users
   return (
     <div className="min-h-screen bg-white p-6">
       <motion.h1
@@ -188,6 +186,15 @@ const Dashboard = () => {
         <li>Submit or support project ideas</li>
         <li>Join project groups when ready</li>
       </motion.ul>
+
+      {/* ✅ Member Profile Card */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+      >
+        <MemberCard />
+      </motion.div>
     </div>
   );
 };
