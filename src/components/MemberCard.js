@@ -1,104 +1,103 @@
 // src/components/MemberCard.js
-import React, { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
+import { db, auth } from "../firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const MemberCard = () => {
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState({
-    occupation: "",
-    experience: "",
-    specializations: "",
-    locations: "",
-    readiness: "Currently seeking",
-  });
-  const [loading, setLoading] = useState(true);
-  const [saved, setSaved] = useState(false);
+  const [occupation, setOccupation] = useState("");
+  const [experience, setExperience] = useState("");
+  const [specializations, setSpecializations] = useState("");
+  const [locations, setLocations] = useState("");
+  const [readiness, setReadiness] = useState("Currently seeking");
+  const [status, setStatus] = useState("");
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        const docRef = doc(db, "profiles", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setProfile(docSnap.data());
-        }
-        setLoading(false);
-      }
-    });
+    const fetchData = async () => {
+      const uid = auth.currentUser?.uid;
+      if (!uid) return;
 
-    return () => unsubscribe();
+      const ref = doc(db, "members", uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const data = snap.data();
+        setOccupation(data.occupation || "");
+        setExperience(data.experience || "");
+        setSpecializations(data.specializations || "");
+        setLocations(data.locations || "");
+        setReadiness(data.readiness || "Currently seeking");
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const handleChange = (field, value) => {
-    setProfile((prev) => ({ ...prev, [field]: value }));
-  };
-
   const handleSave = async () => {
-    if (!user) return;
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+
     try {
-      const docRef = doc(db, "profiles", user.uid);
-      await setDoc(docRef, {
-        ...profile,
-        email: user.email,
-        name: user.displayName || "",
+      const ref = doc(db, "members", uid);
+      await setDoc(ref, {
+        occupation,
+        experience,
+        specializations,
+        locations,
+        readiness,
+        email: auth.currentUser.email,
+        displayName: auth.currentUser.displayName || "",
+        updatedAt: new Date().toISOString(),
       });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      setStatus("✅ Saved!");
+      setTimeout(() => setStatus(""), 3000);
     } catch (err) {
-      console.error("Failed to save profile:", err);
+      console.error("Error saving member data:", err);
+      setStatus("❌ Error saving.");
     }
   };
 
-  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
-
   return (
-    <div className="bg-blue-50 p-6 rounded-xl shadow-md mt-8 max-w-2xl mx-auto">
+    <div className="bg-blue-50 p-6 rounded-xl shadow-md mt-8 max-w-2xl">
       <h2 className="text-2xl font-bold text-blue-600 mb-4">
         Your Member Profile
       </h2>
-      <p className="text-sm text-gray-600 mb-4">
-        Logged in as <strong>{user.email}</strong>
-      </p>
 
       <div className="space-y-4">
         <input
           type="text"
           placeholder="Occupation (e.g. Plumber, Investor)"
           className="w-full p-3 border rounded"
-          value={profile.occupation}
-          onChange={(e) => handleChange("occupation", e.target.value)}
+          value={occupation}
+          onChange={(e) => setOccupation(e.target.value)}
         />
 
         <input
           type="number"
           placeholder="Years of Experience"
           className="w-full p-3 border rounded"
-          value={profile.experience}
-          onChange={(e) => handleChange("experience", e.target.value)}
+          value={experience}
+          onChange={(e) => setExperience(e.target.value)}
         />
 
         <input
           type="text"
-          placeholder="Specializations (e.g. Underfloor Heating)"
+          placeholder="Specializations (e.g. Underfloor Heating, Planning, 1st Fix)"
           className="w-full p-3 border rounded"
-          value={profile.specializations}
-          onChange={(e) => handleChange("specializations", e.target.value)}
+          value={specializations}
+          onChange={(e) => setSpecializations(e.target.value)}
         />
 
         <input
           type="text"
-          placeholder="Preferred Project Locations (e.g. Dublin, Cork)"
+          placeholder="Preferred Project Locations (e.g. Dublin, Cork, remote)"
           className="w-full p-3 border rounded"
-          value={profile.locations}
-          onChange={(e) => handleChange("locations", e.target.value)}
+          value={locations}
+          onChange={(e) => setLocations(e.target.value)}
         />
 
         <select
           className="w-full p-3 border rounded"
-          value={profile.readiness}
-          onChange={(e) => handleChange("readiness", e.target.value)}
+          value={readiness}
+          onChange={(e) => setReadiness(e.target.value)}
         >
           <option value="Currently seeking">Currently seeking projects</option>
           <option value="Currently developing">Currently developing</option>
@@ -107,14 +106,12 @@ const MemberCard = () => {
 
         <button
           onClick={handleSave}
-          className="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white font-bold px-4 py-2 rounded hover:bg-blue-700 transition"
         >
           Save Profile
         </button>
 
-        {saved && (
-          <p className="text-green-600 text-center mt-2">✅ Profile saved!</p>
-        )}
+        {status && <p className="text-sm text-green-600 mt-2">{status}</p>}
       </div>
     </div>
   );
