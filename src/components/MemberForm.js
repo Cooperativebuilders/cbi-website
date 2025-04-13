@@ -236,6 +236,9 @@ const MemberForm = () => {
         className="w-full"
       />
 
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Available for my next project from...
+      </label>
       <input
         type="date"
         name="availability"
