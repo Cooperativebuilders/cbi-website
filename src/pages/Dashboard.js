@@ -8,21 +8,22 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import MemberCard from "../components/MemberCard";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [loading, setLoading] = useState(true); // NEW
   const navigate = useNavigate();
 
   const verifyPayment = async (user) => {
     if (!user?.email) return;
-
     setIsVerifying(true);
     try {
       const res = await fetch(
@@ -31,28 +32,46 @@ const Dashboard = () => {
         )}`
       );
       const data = await res.json();
-
-      if (data?.paid) {
-        console.log("✅ Payment verified for", user.email);
-      } else {
-        console.warn("❌ No payment found — redirecting to LaunchPass");
+      if (!data?.paid) {
         navigate("/membership-required");
       }
     } catch (err) {
-      console.error("⚠️ Error verifying payment:", err);
-      alert("There was an error checking your membership status.");
+      console.error("Error verifying payment:", err);
+      alert("Error checking membership status.");
     } finally {
       setIsVerifying(false);
     }
   };
 
+  // 🔄 Listen for login and check Firestore profile
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
         await verifyPayment(currentUser);
+
+        // 🔍 Firestore profile check
+        const userRef = doc(db, "members", currentUser.uid);
+        const docSnap = await getDoc(userRef);
+
+        if (!docSnap.exists()) {
+          // 🆕 Create default profile
+          await setDoc(userRef, {
+            uid: currentUser.uid,
+            email: currentUser.email,
+            name: currentUser.displayName || "",
+            occupation: "",
+            experience: "",
+            specializations: "",
+            locations: "",
+            readiness: "Currently seeking",
+          });
+        }
+
+        setLoading(false); // ✅ Done loading
       }
     });
+
     return () => unsubscribe();
   }, []);
 
@@ -84,6 +103,7 @@ const Dashboard = () => {
     }
   };
 
+  // 🔐 If not logged in, show login screen
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
@@ -143,6 +163,15 @@ const Dashboard = () => {
     );
   }
 
+  // 🕐 Still verifying or checking Firestore
+  if (loading || isVerifying) {
+    return (
+      <div className="flex items-center justify-center h-screen text-blue-600 text-lg">
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white p-6">
       <motion.h1
@@ -166,8 +195,11 @@ const Dashboard = () => {
         </button>
       </div>
 
+      {/* ✅ Member Profile Card */}
+      <MemberCard />
+
       <motion.p
-        className="text-lg text-gray-600 mb-8"
+        className="text-lg text-gray-600 mt-10 mb-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -181,20 +213,10 @@ const Dashboard = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
-        <li>Update your CBI card</li>
         <li>Track project participants</li>
         <li>Submit or support project ideas</li>
         <li>Join project groups when ready</li>
       </motion.ul>
-
-      {/* ✅ Member Profile Card */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-      >
-        <MemberCard />
-      </motion.div>
     </div>
   );
 };
