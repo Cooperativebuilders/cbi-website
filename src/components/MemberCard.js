@@ -1,12 +1,13 @@
 // src/components/MemberCard.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase";
 
 const MemberCard = () => {
   const [user] = useAuthState(auth);
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -23,18 +24,38 @@ const MemberCard = () => {
     availability: "",
   });
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
+      const docRef = doc(db, "members", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setFormData(docSnap.data());
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [user]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const saveProfile = async () => {
-    if (!user) return alert("Not logged in");
-
-    const userRef = doc(db, "members", user.uid);
-    await setDoc(userRef, { ...formData, email: user.email }, { merge: true });
-    alert("Profile saved successfully!");
+    if (!user) return;
+    try {
+      await setDoc(doc(db, "members", user.uid), formData);
+      alert("✅ Profile saved!");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      alert("Error saving profile");
+    }
   };
+
+  if (loading)
+    return <p className="text-center text-gray-500">Loading profile...</p>;
 
   return (
     <div className="bg-blue-50 p-6 rounded-xl shadow-md mt-8 max-w-2xl">
@@ -44,7 +65,6 @@ const MemberCard = () => {
 
       <div className="space-y-4">
         <input
-          type="text"
           name="firstName"
           placeholder="First Name"
           value={formData.firstName}
@@ -53,16 +73,14 @@ const MemberCard = () => {
         />
 
         <input
-          type="text"
           name="profession"
-          placeholder="Profession"
+          placeholder="Profession (e.g. Plumber, Investor)"
           value={formData.profession}
           onChange={handleChange}
           className="w-full p-3 border rounded"
         />
 
         <input
-          type="number"
           name="experience"
           placeholder="Years of Experience"
           value={formData.experience}
@@ -71,7 +89,6 @@ const MemberCard = () => {
         />
 
         <input
-          type="text"
           name="specialisations"
           placeholder="Specialisations (if any)"
           value={formData.specialisations}
@@ -80,7 +97,6 @@ const MemberCard = () => {
         />
 
         <input
-          type="text"
           name="licences"
           placeholder="Licences & Tickets (if any)"
           value={formData.licences}
@@ -89,7 +105,6 @@ const MemberCard = () => {
         />
 
         <input
-          type="text"
           name="tools"
           placeholder="Tools, Equipment & Machinery"
           value={formData.tools}
@@ -98,9 +113,8 @@ const MemberCard = () => {
         />
 
         <input
-          type="text"
           name="location"
-          placeholder="Preferred project Location"
+          placeholder="Preferred Project Location"
           value={formData.location}
           onChange={handleChange}
           className="w-full p-3 border rounded"
@@ -127,22 +141,20 @@ const MemberCard = () => {
           <option value="B2L">Build to Let (B2L)</option>
         </select>
 
-        <div className="flex gap-4">
+        <div className="flex space-x-2">
           <input
-            type="number"
             name="buyInMin"
-            placeholder="Buy-in from (€)"
+            placeholder="Buy-in € Min"
             value={formData.buyInMin}
             onChange={handleChange}
-            className="w-full p-3 border rounded"
+            className="w-1/2 p-3 border rounded"
           />
           <input
-            type="number"
             name="buyInMax"
-            placeholder="Buy-in to (€)"
+            placeholder="Buy-in € Max"
             value={formData.buyInMax}
             onChange={handleChange}
-            className="w-full p-3 border rounded"
+            className="w-1/2 p-3 border rounded"
           />
         </div>
 
@@ -153,14 +165,14 @@ const MemberCard = () => {
           onChange={handleChange}
           className="w-full p-3 border rounded"
         />
-
-        <button
-          onClick={saveProfile}
-          className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition"
-        >
-          Save Profile
-        </button>
       </div>
+
+      <button
+        onClick={saveProfile}
+        className="mt-4 bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
+      >
+        Save Profile
+      </button>
     </div>
   );
 };
