@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import MemberForm from "../components/MemberForm";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import DashboardNav from "../components/DashboardNav";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -171,6 +172,8 @@ const Dashboard = () => {
       </div>
     );
   }
+
+  <DashboardNav />;
 
   return (
     <div className="min-h-screen bg-white p-6">
