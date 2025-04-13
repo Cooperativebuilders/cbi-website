@@ -4,7 +4,27 @@ import { doc, setDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-const professionsList = [
+const provinces = {
+  Ulster: ["Donegal", "Cavan", "Monaghan"],
+  Munster: ["Clare", "Cork", "Kerry", "Limerick", "Tipperary", "Waterford"],
+  Connacht: ["Galway", "Leitrim", "Mayo", "Roscommon", "Sligo"],
+  Leinster: [
+    "Carlow",
+    "Dublin",
+    "Kildare",
+    "Kilkenny",
+    "Laois",
+    "Longford",
+    "Louth",
+    "Meath",
+    "Offaly",
+    "Westmeath",
+    "Wexford",
+    "Wicklow",
+  ],
+};
+
+const professions = [
   "Carpenter",
   "Electrician",
   "Plumber-RGI",
@@ -18,14 +38,13 @@ const professionsList = [
   "Architect",
   "Engineer",
   "Surveyor",
-  "PM",
+  "Project Manager",
   "Skilled Labourer",
   "Supplier",
 ];
 
 const MemberForm = () => {
   const [user] = useAuthState(auth);
-
   const [formData, setFormData] = useState({
     firstName: "",
     profession: "",
@@ -33,25 +52,26 @@ const MemberForm = () => {
     specialisations: "",
     licences: "",
     tools: "",
-    location: "",
+    province: "All Ireland",
+    county: "",
     propertyType: "Residential",
-    projectType: "Build to Sell",
-    buyIn: 5000,
+    projectType: [],
+    buyIn: 0,
     availability: "",
   });
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSliderChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      buyIn: parseInt(e.target.value),
-    }));
+    const { name, value, type, checked } = e.target;
+    if (type === "checkbox") {
+      setFormData((prev) => ({
+        ...prev,
+        projectType: checked
+          ? [...prev.projectType, value]
+          : prev.projectType.filter((v) => v !== value),
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -74,7 +94,7 @@ const MemberForm = () => {
       onSubmit={handleSubmit}
       className="space-y-4 bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto"
     >
-      <h2 className="text-xl font-bold text-blue-700 mb-4">Your Member Tile</h2>
+      <h2 className="text-xl font-bold text-blue-700">Your Member Tile</h2>
 
       <input
         name="firstName"
@@ -90,9 +110,10 @@ const MemberForm = () => {
         value={formData.profession}
         onChange={handleChange}
         className="w-full p-2 border rounded"
+        required
       >
         <option value="">Select Profession</option>
-        {professionsList.map((role) => (
+        {professions.map((role) => (
           <option key={role} value={role}>
             {role}
           </option>
@@ -106,11 +127,12 @@ const MemberForm = () => {
         value={formData.yearsExperience}
         onChange={handleChange}
         className="w-full p-2 border rounded"
+        required
       />
 
       <input
         name="specialisations"
-        placeholder="Specialisations (if any)"
+        placeholder="Specialisations"
         value={formData.specialisations}
         onChange={handleChange}
         className="w-full p-2 border rounded"
@@ -118,7 +140,7 @@ const MemberForm = () => {
 
       <input
         name="licences"
-        placeholder="Licences & Tickets (if any)"
+        placeholder="Licences & Tickets"
         value={formData.licences}
         onChange={handleChange}
         className="w-full p-2 border rounded"
@@ -132,13 +154,36 @@ const MemberForm = () => {
         className="w-full p-2 border rounded"
       />
 
-      <input
-        name="location"
-        placeholder="Preferred project Location"
-        value={formData.location}
+      {/* Province and County Dropdowns */}
+      <select
+        name="province"
+        value={formData.province}
         onChange={handleChange}
         className="w-full p-2 border rounded"
-      />
+      >
+        <option value="All Ireland">All Ireland</option>
+        {Object.keys(provinces).map((prov) => (
+          <option key={prov} value={prov}>
+            {prov}
+          </option>
+        ))}
+      </select>
+
+      {formData.province !== "All Ireland" && (
+        <select
+          name="county"
+          value={formData.county}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        >
+          <option value="">Select County</option>
+          {provinces[formData.province].map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      )}
 
       <select
         name="propertyType"
@@ -151,39 +196,49 @@ const MemberForm = () => {
         <option value="Industrial">Industrial</option>
       </select>
 
-      <select
-        name="projectType"
-        value={formData.projectType}
-        onChange={handleChange}
-        className="w-full p-2 border rounded"
-      >
-        <option value="Build to Sell">Build to Sell</option>
-        <option value="Build to Let">Build to Let</option>
-      </select>
+      <div className="text-gray-700 font-semibold">Project Type</div>
+      <div className="flex space-x-4">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            value="Build to Sell"
+            checked={formData.projectType.includes("Build to Sell")}
+            onChange={handleChange}
+          />
+          <span className="ml-2">Build to Sell</span>
+        </label>
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            value="Build to Let"
+            checked={formData.projectType.includes("Build to Let")}
+            onChange={handleChange}
+          />
+          <span className="ml-2">Build to Let</span>
+        </label>
+      </div>
 
-      <label className="block text-sm font-medium text-gray-700">
-        Buy-in Amount (€{formData.buyIn.toLocaleString()})
+      <label className="block font-semibold text-gray-700">
+        Buy-in Range: €{formData.buyIn.toLocaleString()}
       </label>
       <input
         type="range"
-        name="buyIn"
         min={0}
         max={1000000}
         step={5000}
         value={formData.buyIn}
-        onChange={handleSliderChange}
+        name="buyIn"
+        onChange={handleChange}
         className="w-full"
       />
 
-      <label className="block text-sm font-medium text-gray-700">
-        Start Date
-      </label>
       <input
         type="date"
         name="availability"
         value={formData.availability}
         onChange={handleChange}
         className="w-full p-2 border rounded"
+        placeholder="Start Date"
       />
 
       <button
