@@ -1,58 +1,39 @@
 // src/components/MemberCard.js
-import React, { useState, useEffect } from "react";
-import { db, auth } from "../firebase";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import React, { useState } from "react";
+import { db } from "../firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase";
 
 const MemberCard = () => {
-  const [occupation, setOccupation] = useState("");
-  const [experience, setExperience] = useState("");
-  const [specializations, setSpecializations] = useState("");
-  const [locations, setLocations] = useState("");
-  const [readiness, setReadiness] = useState("Currently seeking");
-  const [status, setStatus] = useState("");
+  const [user] = useAuthState(auth);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const uid = auth.currentUser?.uid;
-      if (!uid) return;
+  const [formData, setFormData] = useState({
+    firstName: "",
+    profession: "",
+    experience: "",
+    specialisations: "",
+    licences: "",
+    tools: "",
+    location: "",
+    propertyType: "Residential",
+    projectType: "B2S",
+    buyInMin: "",
+    buyInMax: "",
+    availability: "",
+  });
 
-      const ref = doc(db, "members", uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        const data = snap.data();
-        setOccupation(data.occupation || "");
-        setExperience(data.experience || "");
-        setSpecializations(data.specializations || "");
-        setLocations(data.locations || "");
-        setReadiness(data.readiness || "Currently seeking");
-      }
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    fetchData();
-  }, []);
+  const saveProfile = async () => {
+    if (!user) return alert("Not logged in");
 
-  const handleSave = async () => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) return;
-
-    try {
-      const ref = doc(db, "members", uid);
-      await setDoc(ref, {
-        occupation,
-        experience,
-        specializations,
-        locations,
-        readiness,
-        email: auth.currentUser.email,
-        displayName: auth.currentUser.displayName || "",
-        updatedAt: new Date().toISOString(),
-      });
-      setStatus("✅ Saved!");
-      setTimeout(() => setStatus(""), 3000);
-    } catch (err) {
-      console.error("Error saving member data:", err);
-      setStatus("❌ Error saving.");
-    }
+    const userRef = doc(db, "members", user.uid);
+    await setDoc(userRef, { ...formData, email: user.email }, { merge: true });
+    alert("Profile saved successfully!");
   };
 
   return (
@@ -64,54 +45,121 @@ const MemberCard = () => {
       <div className="space-y-4">
         <input
           type="text"
-          placeholder="Occupation (e.g. Plumber, Investor)"
+          name="firstName"
+          placeholder="First Name"
+          value={formData.firstName}
+          onChange={handleChange}
           className="w-full p-3 border rounded"
-          value={occupation}
-          onChange={(e) => setOccupation(e.target.value)}
+        />
+
+        <input
+          type="text"
+          name="profession"
+          placeholder="Profession"
+          value={formData.profession}
+          onChange={handleChange}
+          className="w-full p-3 border rounded"
         />
 
         <input
           type="number"
+          name="experience"
           placeholder="Years of Experience"
+          value={formData.experience}
+          onChange={handleChange}
           className="w-full p-3 border rounded"
-          value={experience}
-          onChange={(e) => setExperience(e.target.value)}
         />
 
         <input
           type="text"
-          placeholder="Specializations (e.g. Underfloor Heating, Planning, 1st Fix)"
+          name="specialisations"
+          placeholder="Specialisations (if any)"
+          value={formData.specialisations}
+          onChange={handleChange}
           className="w-full p-3 border rounded"
-          value={specializations}
-          onChange={(e) => setSpecializations(e.target.value)}
         />
 
         <input
           type="text"
-          placeholder="Preferred Project Locations (e.g. Dublin, Cork, remote)"
+          name="licences"
+          placeholder="Licences & Tickets (if any)"
+          value={formData.licences}
+          onChange={handleChange}
           className="w-full p-3 border rounded"
-          value={locations}
-          onChange={(e) => setLocations(e.target.value)}
+        />
+
+        <input
+          type="text"
+          name="tools"
+          placeholder="Tools, Equipment & Machinery"
+          value={formData.tools}
+          onChange={handleChange}
+          className="w-full p-3 border rounded"
+        />
+
+        <input
+          type="text"
+          name="location"
+          placeholder="Preferred project Location"
+          value={formData.location}
+          onChange={handleChange}
+          className="w-full p-3 border rounded"
         />
 
         <select
+          name="propertyType"
+          value={formData.propertyType}
+          onChange={handleChange}
           className="w-full p-3 border rounded"
-          value={readiness}
-          onChange={(e) => setReadiness(e.target.value)}
         >
-          <option value="Currently seeking">Currently seeking projects</option>
-          <option value="Currently developing">Currently developing</option>
-          <option value="Not ready">Not ready</option>
+          <option value="Residential">Residential</option>
+          <option value="Commercial">Commercial</option>
+          <option value="Industrial">Industrial</option>
         </select>
 
+        <select
+          name="projectType"
+          value={formData.projectType}
+          onChange={handleChange}
+          className="w-full p-3 border rounded"
+        >
+          <option value="B2S">Build to Sell (B2S)</option>
+          <option value="B2L">Build to Let (B2L)</option>
+        </select>
+
+        <div className="flex gap-4">
+          <input
+            type="number"
+            name="buyInMin"
+            placeholder="Buy-in from (€)"
+            value={formData.buyInMin}
+            onChange={handleChange}
+            className="w-full p-3 border rounded"
+          />
+          <input
+            type="number"
+            name="buyInMax"
+            placeholder="Buy-in to (€)"
+            value={formData.buyInMax}
+            onChange={handleChange}
+            className="w-full p-3 border rounded"
+          />
+        </div>
+
+        <input
+          type="date"
+          name="availability"
+          value={formData.availability}
+          onChange={handleChange}
+          className="w-full p-3 border rounded"
+        />
+
         <button
-          onClick={handleSave}
-          className="bg-blue-600 text-white font-bold px-4 py-2 rounded hover:bg-blue-700 transition"
+          onClick={saveProfile}
+          className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition"
         >
           Save Profile
         </button>
-
-        {status && <p className="text-sm text-green-600 mt-2">{status}</p>}
       </div>
     </div>
   );
