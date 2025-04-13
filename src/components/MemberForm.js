@@ -4,27 +4,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-const provinces = {
-  Ulster: ["Donegal", "Cavan", "Monaghan"],
-  Munster: ["Clare", "Cork", "Kerry", "Limerick", "Tipperary", "Waterford"],
-  Connacht: ["Galway", "Leitrim", "Mayo", "Roscommon", "Sligo"],
-  Leinster: [
-    "Carlow",
-    "Dublin",
-    "Kildare",
-    "Kilkenny",
-    "Laois",
-    "Longford",
-    "Louth",
-    "Meath",
-    "Offaly",
-    "Westmeath",
-    "Wexford",
-    "Wicklow",
-  ],
-};
-
-const professions = [
+const solariRoles = [
   "Carpenter",
   "Electrician",
   "Plumber-RGI",
@@ -43,8 +23,39 @@ const professions = [
   "Supplier",
 ];
 
+const provinces = {
+  Ulster: [
+    "Cavan",
+    "Donegal",
+    "Monaghan",
+    "Antrim",
+    "Armagh",
+    "Derry",
+    "Down",
+    "Fermanagh",
+    "Tyrone",
+  ],
+  Munster: ["Clare", "Cork", "Kerry", "Limerick", "Tipperary", "Waterford"],
+  Connacht: ["Galway", "Leitrim", "Mayo", "Roscommon", "Sligo"],
+  Leinster: [
+    "Carlow",
+    "Dublin",
+    "Kildare",
+    "Kilkenny",
+    "Laois",
+    "Longford",
+    "Louth",
+    "Meath",
+    "Offaly",
+    "Westmeath",
+    "Wexford",
+    "Wicklow",
+  ],
+};
+
 const MemberForm = () => {
   const [user] = useAuthState(auth);
+
   const [formData, setFormData] = useState({
     firstName: "",
     profession: "",
@@ -52,31 +63,36 @@ const MemberForm = () => {
     specialisations: "",
     licences: "",
     tools: "",
-    province: "All Ireland",
+    location: "All Ireland",
     county: "",
     propertyType: "Residential",
     projectType: [],
-    buyIn: 0,
+    buyInFrom: 0,
+    buyInTo: 50000,
     availability: "",
   });
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox") {
+    const { name, value, type } = e.target;
+
+    if (name === "projectType") {
+      const values = Array.from(
+        e.target.selectedOptions,
+        (option) => option.value
+      );
+      setFormData((prev) => ({ ...prev, projectType: values }));
+    } else {
       setFormData((prev) => ({
         ...prev,
-        projectType: checked
-          ? [...prev.projectType, value]
-          : prev.projectType.filter((v) => v !== value),
+        [name]: type === "number" ? parseInt(value, 10) : value,
       }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return alert("Please log in first.");
+
     try {
       await setDoc(doc(db, "profiles", user.uid), {
         ...formData,
@@ -113,7 +129,7 @@ const MemberForm = () => {
         required
       >
         <option value="">Select Profession</option>
-        {professions.map((role) => (
+        {solariRoles.map((role) => (
           <option key={role} value={role}>
             {role}
           </option>
@@ -123,11 +139,9 @@ const MemberForm = () => {
       <input
         name="yearsExperience"
         placeholder="Years Experience"
-        type="number"
         value={formData.yearsExperience}
         onChange={handleChange}
         className="w-full p-2 border rounded"
-        required
       />
 
       <input
@@ -154,22 +168,21 @@ const MemberForm = () => {
         className="w-full p-2 border rounded"
       />
 
-      {/* Province and County Dropdowns */}
       <select
-        name="province"
-        value={formData.province}
+        name="location"
+        value={formData.location}
         onChange={handleChange}
         className="w-full p-2 border rounded"
       >
-        <option value="All Ireland">All Ireland</option>
-        {Object.keys(provinces).map((prov) => (
-          <option key={prov} value={prov}>
-            {prov}
+        {["All Ireland", ...Object.keys(provinces)].map((province) => (
+          <option key={province} value={province}>
+            {province}
           </option>
         ))}
       </select>
 
-      {formData.province !== "All Ireland" && (
+      {/* Show county dropdown if a specific province is selected */}
+      {formData.location !== "All Ireland" && (
         <select
           name="county"
           value={formData.county}
@@ -177,9 +190,9 @@ const MemberForm = () => {
           className="w-full p-2 border rounded"
         >
           <option value="">Select County</option>
-          {provinces[formData.province].map((c) => (
-            <option key={c} value={c}>
-              {c}
+          {provinces[formData.location].map((county) => (
+            <option key={county} value={county}>
+              {county}
             </option>
           ))}
         </select>
@@ -196,41 +209,42 @@ const MemberForm = () => {
         <option value="Industrial">Industrial</option>
       </select>
 
-      <div className="text-gray-700 font-semibold">Project Type</div>
-      <div className="flex space-x-4">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            value="Build to Sell"
-            checked={formData.projectType.includes("Build to Sell")}
-            onChange={handleChange}
-          />
-          <span className="ml-2">Build to Sell</span>
-        </label>
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            value="Build to Let"
-            checked={formData.projectType.includes("Build to Let")}
-            onChange={handleChange}
-          />
-          <span className="ml-2">Build to Let</span>
-        </label>
-      </div>
-
-      <label className="block font-semibold text-gray-700">
-        Buy-in Range: €{formData.buyIn.toLocaleString()}
-      </label>
-      <input
-        type="range"
-        min={0}
-        max={1000000}
-        step={5000}
-        value={formData.buyIn}
-        name="buyIn"
+      <select
+        multiple
+        name="projectType"
+        value={formData.projectType}
         onChange={handleChange}
-        className="w-full"
-      />
+        className="w-full p-2 border rounded"
+      >
+        <option value="Build to Sell">Build to Sell</option>
+        <option value="Build to Let">Build to Let</option>
+      </select>
+
+      <label className="block text-sm font-medium text-gray-700">
+        Buy-In Range (€{formData.buyInFrom} - €{formData.buyInTo})
+      </label>
+      <div className="flex space-x-2">
+        <input
+          type="range"
+          name="buyInFrom"
+          min={0}
+          max={1000000}
+          step={5000}
+          value={formData.buyInFrom}
+          onChange={handleChange}
+          className="w-1/2"
+        />
+        <input
+          type="range"
+          name="buyInTo"
+          min={0}
+          max={1000000}
+          step={5000}
+          value={formData.buyInTo}
+          onChange={handleChange}
+          className="w-1/2"
+        />
+      </div>
 
       <input
         type="date"
@@ -238,7 +252,6 @@ const MemberForm = () => {
         value={formData.availability}
         onChange={handleChange}
         className="w-full p-2 border rounded"
-        placeholder="Start Date"
       />
 
       <button
