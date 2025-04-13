@@ -222,31 +222,19 @@ const MemberForm = () => {
         <option value="All Types">All Types</option>
       </select>
 
-      <label className="block text-sm font-medium text-gray-700">
-        Buy-In Range (€{formData.buyInFrom} - €{formData.buyInTo})
+      <label className="block text-sm font-medium text-gray-700 mt-4">
+        Max Buy-In (€{formData.buyInTo})
       </label>
-      <div className="flex space-x-2">
-        <input
-          type="range"
-          name="buyInFrom"
-          min={0}
-          max={1000000}
-          step={5000}
-          value={formData.buyInFrom}
-          onChange={handleChange}
-          className="w-1/2"
-        />
-        <input
-          type="range"
-          name="buyInTo"
-          min={0}
-          max={1000000}
-          step={5000}
-          value={formData.buyInTo}
-          onChange={handleChange}
-          className="w-1/2"
-        />
-      </div>
+      <input
+        type="range"
+        name="buyInTo"
+        min={0}
+        max={1000000}
+        step={5000}
+        value={formData.buyInTo}
+        onChange={handleChange}
+        className="w-full"
+      />
 
       <input
         type="date"
