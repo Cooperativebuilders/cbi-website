@@ -55,7 +55,7 @@ const RoleGrid = () => {
       if (target === current) return;
 
       const step = target > current ? 1 : -1;
-      let delay = 100 + i * 20;
+      let delay = 120 + i * 24; // ⬅️ 20% slower (increase both base and step delay by 20%)
 
       const interval = setInterval(() => {
         current += step;

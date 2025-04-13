@@ -1,67 +1,70 @@
-import React, { useEffect } from "react";
+// src/pages/MembershipRequired.js (or wherever you're verifying)
+import React, { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { getAuth, signOut } from "firebase/auth";
 
 const MembershipRequired = () => {
   const navigate = useNavigate();
+  const auth = getAuth();
+  const [checking, setChecking] = useState(true);
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src =
-      "https://www.launchpass.com/co-operative-builders-network/access/v2/embed.js";
-    script.async = true;
-
-    script.onload = () => {
-      const waitForButton = setInterval(() => {
-        const button = document.querySelector(".lpbtn");
-        const iframe = document.querySelector("iframe[src*='launchpass']");
-        if (button && !iframe) {
-          button.click();
-          clearInterval(waitForButton);
-        }
-      }, 1000);
-
-      setTimeout(() => clearInterval(waitForButton), 20000);
-    };
-
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  const handleLogoutAndRedirect = async () => {
-    try {
-      await signOut(auth);
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Logout error", error);
+  // ✅ Stable verifyPayment function
+  const verifyPayment = useCallback(async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      navigate("/login");
+      return;
     }
+
+    try {
+      const res = await fetch(
+        `https://cbi-backend-l001.onrender.com/api/is-paid?email=${encodeURIComponent(
+          user.email
+        )}`
+      );
+      const data = await res.json();
+
+      if (data.paid) {
+        navigate("/dashboard");
+      } else {
+        setChecking(false);
+      }
+    } catch (err) {
+      console.error("Error checking payment status:", err);
+      setChecking(false);
+    }
+  }, [auth, navigate]);
+
+  // ✅ Properly referenced in useEffect
+  useEffect(() => {
+    verifyPayment();
+  }, [verifyPayment]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    navigate("/login");
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6 text-center">
-      <h1 className="text-2xl font-semibold text-blue-700 mb-6">
-        Complete Your Membership
+    <div className="min-h-screen flex flex-col justify-center items-center bg-blue-50 px-6 text-center">
+      <h1 className="text-3xl font-bold text-blue-700 mb-4">
+        Membership Required
       </h1>
-      <button
-        className="lp6475702170157056 lpbtn bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
-        yearly="true"
-      >
-        Open LaunchPass Portal
-      </button>
-
-      <p className="text-sm text-gray-600 mt-6">
-        Try another way to log in?{" "}
-        <button
-          onClick={handleLogoutAndRedirect}
-          className="text-blue-600 hover:underline"
-        >
-          Click here
-        </button>
-      </p>
+      {checking ? (
+        <p className="text-gray-600">Checking your subscription status...</p>
+      ) : (
+        <>
+          <p className="text-gray-600 mb-4">
+            You must be a paid member to access this content.
+          </p>
+          <button
+            onClick={handleLogout}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Try another way to log in?
+          </button>
+        </>
+      )}
     </div>
   );
 };
