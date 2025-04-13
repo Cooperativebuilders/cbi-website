@@ -217,7 +217,7 @@ const MemberForm = () => {
         className="w-full p-2 border rounded"
         required
       >
-        <option value="">Select Project Type</option>
+        <option value="">Select Structure</option>
         <option value="Build to Sell">Build to Sell</option>
         <option value="Build to Let">Build to Let</option>
         <option value="All Types">All Types</option>
