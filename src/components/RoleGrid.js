@@ -55,34 +55,35 @@ const RoleGrid = () => {
     professions.forEach((role, index) => {
       const target = counts[role] || 0;
       let current = displayedCounts[role] || 0;
+    
       if (target === current) return;
-
+    
       const step = target > current ? 1 : -1;
-      const delay = 70 + index * 5;
-
-      const interval = setInterval(() => {
-        current += step;
-        setDisplayedCounts((prev) => ({
-          ...prev,
-          [role]: current,
-        }));
-
-        // Sound
-        const tickSound = new Audio("/tick.mp3");
-        tickSound.volume = 0.3;
-        tickSound.play().catch(() => {});
-
-        // Haptic
-        if (navigator.vibrate) {
-          navigator.vibrate(10);
-        }
-
-        if (current === target) {
-          clearInterval(interval);
-        }
-      }, delay);
+    
+      // ⏱ Delay per number flip
+      const tickDelay = 80;
+    
+      // ⏳ Stagger start per tile for cascade effect
+      const tileDelay = index * 200;
+    
+      setTimeout(() => {
+        const interval = setInterval(() => {
+          current += step;
+          setDisplayedCounts((prev) => ({
+            ...prev,
+            [role]: current,
+          }));
+    
+          const tickSound = new Audio("/tick.mp3");
+          tickSound.volume = 0.3;
+          tickSound.play().catch(() => {});
+    
+          if (current === target) {
+            clearInterval(interval);
+          }
+        }, tickDelay);
+      }, tileDelay);
     });
-  }, [counts]);
 
   return (
     <div className="grid-container">
