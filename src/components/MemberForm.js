@@ -207,6 +207,7 @@ const MemberForm = () => {
         <option value="Residential">Residential</option>
         <option value="Commercial">Commercial</option>
         <option value="Industrial">Industrial</option>
+        <option value="All Types">All Types</option>
       </select>
 
       <select
