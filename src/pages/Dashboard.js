@@ -11,7 +11,7 @@ import {
 import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import MemberCard from "../components/MemberCard";
+import MemberForm from "../components/MemberForm";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const Dashboard = () => {
@@ -55,7 +55,7 @@ const Dashboard = () => {
         const docSnap = await getDoc(userRef);
 
         if (!docSnap.exists()) {
-          // 🆕 Create default profile
+          console.log("🆕 Creating new member profile in Firestore...");
           await setDoc(userRef, {
             uid: currentUser.uid,
             email: currentUser.email,
@@ -196,7 +196,7 @@ const Dashboard = () => {
       </div>
 
       {/* ✅ Member Profile Card */}
-      <MemberCard />
+      <MemberForm />
 
       <motion.p
         className="text-lg text-gray-600 mt-10 mb-4"
