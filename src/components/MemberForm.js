@@ -221,15 +221,20 @@ const MemberForm = () => {
           (Hold Ctrl or Cmd to select multiple)
         </span>
       </label>
+      <label className="block text-sm font-medium text-gray-700">
+        Project Type
+      </label>
       <select
-        multiple
         name="projectType"
         value={formData.projectType}
         onChange={handleChange}
         className="w-full p-2 border rounded"
+        required
       >
+        <option value="">Select Project Type</option>
         <option value="Build to Sell">Build to Sell</option>
         <option value="Build to Let">Build to Let</option>
+        <option value="All Types">All Types</option>
       </select>
 
       <label className="block text-sm font-medium text-gray-700">
