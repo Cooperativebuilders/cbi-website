@@ -4,6 +4,7 @@ import Signup from "./pages/Signup";
 import CBIWebsite from "./CBIWebsite";
 import Dashboard from "./pages/Dashboard";
 import MembershipRequired from "./pages/MembershipRequired";
+import MembersPage from "./pages/MembersPage"; // ✅ Add this line
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/membership-required" element={<MembershipRequired />} />
+      <Route path="/members" element={<MembersPage />} />
     </Routes>
   );
 }
