@@ -215,6 +215,12 @@ const MemberForm = () => {
           (Hold Ctrl or Cmd to select multiple)
         </span>
       </label>
+      <label className="block text-sm font-medium text-gray-700">
+        Project Type{" "}
+        <span className="text-xs text-gray-500">
+          (Hold Ctrl or Cmd to select multiple)
+        </span>
+      </label>
       <select
         multiple
         name="projectType"
