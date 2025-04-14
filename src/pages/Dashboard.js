@@ -45,14 +45,15 @@ const Dashboard = () => {
   };
 
   const verifyPayment = async (user) => {
-    if (!user?.email || !user?.uid) return;
+    if (!user?.email) return;
+    setIsVerifying(true);
 
+    // ✅ Admin bypass
     if (adminUIDs.includes(user.uid)) {
-      setLoading(false); // ✅ tell the UI we’re done
+      setLoading(false); // ← this is what stops the infinite loading
       return;
     }
 
-    setIsVerifying(true);
     try {
       const res = await fetch(
         `https://cbi-backend-l001.onrender.com/api/is-paid?email=${encodeURIComponent(
@@ -60,14 +61,18 @@ const Dashboard = () => {
         )}`
       );
       const data = await res.json();
+
       if (!data?.paid) {
         navigate("/membership-required");
+      } else {
+        setLoading(false); // ✅ set loading to false if paid
       }
     } catch (err) {
       console.error("Error verifying payment:", err);
       alert("Error checking membership status.");
+      setLoading(false); // ✅ avoid eternal spinner on failure
     } finally {
-      setIsVerifying(false);
+      setIsVerifying(false); // ✅ always clear verifying
     }
   };
 
