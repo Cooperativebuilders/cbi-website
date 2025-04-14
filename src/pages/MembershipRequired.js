@@ -12,12 +12,13 @@ const MembershipRequired = () => {
   const verifyPayment = useCallback(async () => {
     const user = auth.currentUser;
     if (!user) {
-      navigate("/dashboard");
+      setChecking(false);
       return;
     }
 
-    // ✅ Bypass for admins
+    // ✅ Admin bypass
     if (adminUIDs.includes(user.uid)) {
+      console.log("✅ Admin bypass triggered");
       navigate("/dashboard");
       return;
     }
@@ -31,15 +32,17 @@ const MembershipRequired = () => {
       const data = await res.json();
 
       if (data.paid) {
+        console.log("✅ Paid member detected");
         navigate("/dashboard");
       } else {
+        console.warn("❌ Not paid");
         setChecking(false);
       }
     } catch (err) {
-      console.error("Error checking payment status:", err);
+      console.error("Error checking payment:", err);
       setChecking(false);
     }
-  }, [auth, navigate]);
+  }, [navigate, auth]);
 
   useEffect(() => {
     verifyPayment();
@@ -59,6 +62,7 @@ const MembershipRequired = () => {
       <h1 className="text-3xl font-bold text-blue-700 mb-4">
         Membership Required
       </h1>
+
       {checking ? (
         <p className="text-gray-600">Checking your subscription status...</p>
       ) : (
@@ -70,7 +74,7 @@ const MembershipRequired = () => {
             onClick={handleLogoutAndRedirect}
             className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
           >
-            Become a CBI member today
+            Become a CBI Member Today
           </button>
         </>
       )}
