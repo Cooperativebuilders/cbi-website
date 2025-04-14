@@ -2,6 +2,7 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
+import { adminUIDs } from "../constants/admins";
 
 const MembershipRequired = () => {
   const navigate = useNavigate();
@@ -11,6 +12,12 @@ const MembershipRequired = () => {
   const verifyPayment = useCallback(async () => {
     const user = auth.currentUser;
     if (!user) {
+      navigate("/dashboard");
+      return;
+    }
+
+    // ✅ Bypass for admins
+    if (adminUIDs.includes(user.uid)) {
       navigate("/dashboard");
       return;
     }
