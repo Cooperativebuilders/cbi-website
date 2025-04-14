@@ -175,7 +175,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-white p-6">
-      <DashboardNav />;
+      <DashboardNav />
+
       <motion.h1
         className="text-4xl font-bold text-blue-700 mb-6"
         initial={{ opacity: 0, y: -20 }}
@@ -184,6 +185,22 @@ const Dashboard = () => {
       >
         Member Dashboard
       </motion.h1>
+
+      <nav className="flex space-x-4 mb-8">
+        <Link
+          to="/edit-profile"
+          className="text-blue-600 hover:underline font-medium"
+        >
+          Edit My Tile Info
+        </Link>
+        <Link
+          to="/members"
+          className="text-blue-600 hover:underline font-medium"
+        >
+          View Members
+        </Link>
+      </nav>
+
       <div className="flex justify-between items-center mb-8">
         <p className="text-gray-600">
           Logged in as <strong>{user.displayName || user.email}</strong>
@@ -195,8 +212,10 @@ const Dashboard = () => {
           Logout
         </button>
       </div>
+
       {/* ✅ Member Profile Card */}
       <MemberForm />
+
       <motion.p
         className="text-lg text-gray-600 mt-10 mb-4"
         initial={{ opacity: 0 }}
