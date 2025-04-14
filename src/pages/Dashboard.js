@@ -87,6 +87,10 @@ const Dashboard = () => {
       if (currentUser) {
         await verifyPayment(currentUser);
 
+        // ✅ Exit early for admin accounts
+        if (adminUIDs.includes(currentUser.uid)) return;
+
+        // 🔍 Firestore profile check
         const userRef = doc(db, "members", currentUser.uid);
         const docSnap = await getDoc(userRef);
 
