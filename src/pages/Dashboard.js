@@ -50,7 +50,8 @@ const Dashboard = () => {
 
     // ✅ Admin bypass
     if (adminUIDs.includes(user.uid)) {
-      setLoading(false); // ← this is what stops the infinite loading
+      console.log("✅ Admin bypass triggered");
+      setLoading(false);
       return;
     }
 
@@ -62,17 +63,21 @@ const Dashboard = () => {
       );
       const data = await res.json();
 
-      if (!data?.paid) {
-        navigate("/membership-required");
+      console.log("✅ Payment check response:", data);
+
+      if (data.paid) {
+        console.log("✅ Member is paid");
+        setLoading(false);
       } else {
-        setLoading(false); // ✅ set loading to false if paid
+        console.log("❌ Member is unpaid");
+        navigate("/membership-required");
       }
     } catch (err) {
-      console.error("Error verifying payment:", err);
+      console.error("❌ Error verifying payment:", err);
       alert("Error checking membership status.");
-      setLoading(false); // ✅ avoid eternal spinner on failure
+      setLoading(false); // 🔧 Prevent eternal load on error
     } finally {
-      setIsVerifying(false); // ✅ always clear verifying
+      setIsVerifying(false);
     }
   };
 
