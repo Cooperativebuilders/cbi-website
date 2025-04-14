@@ -2,7 +2,6 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
-import { adminUIDs } from "../constants/admins";
 
 const MembershipRequired = () => {
   const navigate = useNavigate();
@@ -12,13 +11,6 @@ const MembershipRequired = () => {
   const verifyPayment = useCallback(async () => {
     const user = auth.currentUser;
     if (!user) {
-      setChecking(false);
-      return;
-    }
-
-    // ✅ Admin bypass
-    if (adminUIDs.includes(user.uid)) {
-      console.log("✅ Admin bypass triggered");
       navigate("/dashboard");
       return;
     }
@@ -32,17 +24,15 @@ const MembershipRequired = () => {
       const data = await res.json();
 
       if (data.paid) {
-        console.log("✅ Paid member detected");
         navigate("/dashboard");
       } else {
-        console.warn("❌ Not paid");
         setChecking(false);
       }
     } catch (err) {
-      console.error("Error checking payment:", err);
+      console.error("Error checking payment status:", err);
       setChecking(false);
     }
-  }, [navigate, auth]);
+  }, [auth, navigate]);
 
   useEffect(() => {
     verifyPayment();
@@ -62,7 +52,6 @@ const MembershipRequired = () => {
       <h1 className="text-3xl font-bold text-blue-700 mb-4">
         Membership Required
       </h1>
-
       {checking ? (
         <p className="text-gray-600">Checking your subscription status...</p>
       ) : (
@@ -74,7 +63,7 @@ const MembershipRequired = () => {
             onClick={handleLogoutAndRedirect}
             className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
           >
-            Become a CBI Member Today
+            Become a CBI member today
           </button>
         </>
       )}

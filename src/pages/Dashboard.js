@@ -12,7 +12,6 @@ import { auth, db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import DashboardSidebar from "../components/DashboardSidebar";
-import { adminUIDs } from "../constants/admins";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -20,19 +19,33 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // For login
+  // ✅ Login state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const handleEmailLogin = async () => {
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      await verifyPayment(result.user);
+    } catch (error) {
+      console.error("Email login error", error);
+      alert("Login failed. Check your credentials.");
+    }
+  };
+
+  const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      await verifyPayment(result.user);
+    } catch (error) {
+      console.error("Google login error", error);
+    }
+  };
+
   const verifyPayment = async (user) => {
     if (!user?.email) return;
-
-    // ✅ Admins bypass
-    if (adminUIDs.includes(user.uid)) {
-      console.log("✅ Admin bypass");
-      return true;
-    }
-
+    setIsVerifying(true);
     try {
       const res = await fetch(
         `https://cbi-backend-l001.onrender.com/api/is-paid?email=${encodeURIComponent(
@@ -40,31 +53,22 @@ const Dashboard = () => {
         )}`
       );
       const data = await res.json();
-
-      if (data.paid) {
-        return true;
-      } else {
-        return false;
+      if (!data?.paid) {
+        navigate("/membership-required");
       }
     } catch (err) {
-      console.error("❌ Error during payment check:", err);
-      return false;
+      console.error("Error verifying payment:", err);
+      alert("Error checking membership status.");
+    } finally {
+      setIsVerifying(false);
     }
   };
 
-  // 🔁 Auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-
       if (currentUser) {
-        setIsVerifying(true);
-        const paid = await verifyPayment(currentUser);
-
-        if (!paid) {
-          navigate("/membership-required");
-          return;
-        }
+        await verifyPayment(currentUser);
 
         const userRef = doc(db, "members", currentUser.uid);
         const docSnap = await getDoc(userRef);
@@ -78,9 +82,6 @@ const Dashboard = () => {
           });
         }
 
-        setIsVerifying(false);
-        setLoading(false);
-      } else {
         setLoading(false);
       }
     });
@@ -88,35 +89,14 @@ const Dashboard = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleEmailLogin = async () => {
-    try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      await verifyPayment(result.user);
-    } catch (err) {
-      console.error("Email login error", err);
-      alert("Login failed");
-    }
-  };
-
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      await verifyPayment(result.user);
-    } catch (err) {
-      console.error("Google login error", err);
-    }
-  };
-
   const handleLogout = async () => {
     try {
       await signOut(auth);
-    } catch (err) {
-      console.error("Logout error", err);
+    } catch (error) {
+      console.error("Logout error", error);
     }
   };
 
-  // ⏳ Not logged in yet
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
@@ -136,9 +116,7 @@ const Dashboard = () => {
         >
           Member Dashboard
         </motion.h1>
-
         <p className="text-lg text-gray-600 mb-6">Please log in:</p>
-
         <div className="space-y-4 w-full max-w-sm">
           <input
             type="email"
@@ -156,16 +134,23 @@ const Dashboard = () => {
           />
           <button
             onClick={handleEmailLogin}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
           >
             Login with Email
           </button>
+          <hr className="my-4" />
           <button
             onClick={handleLogin}
-            className="w-full bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300"
+            className="w-full bg-gray-100 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-200 transition"
           >
             Sign in with Google
           </button>
+          <p className="text-sm text-gray-600 mt-4 text-center">
+            Don’t have an account?{" "}
+            <a href="/signup" className="text-blue-600 hover:underline">
+              Sign up here
+            </a>
+          </p>
         </div>
       </div>
     );
@@ -191,14 +176,25 @@ const Dashboard = () => {
         >
           Member Dashboard
         </motion.h1>
+
         <p className="text-gray-600 mb-6">
           Logged in as <strong>{user.displayName || user.email}</strong>
         </p>
-        <motion.ul
-          className="list-disc list-inside text-gray-700 space-y-2"
+
+        <motion.p
+          className="text-lg text-gray-600 mt-6 mb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2 }}
+        >
+          Welcome to your CBI dashboard. Soon you'll be able to:
+        </motion.p>
+
+        <motion.ul
+          className="list-disc list-inside text-gray-700 space-y-2 mb-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
         >
           <li>Track project participants</li>
           <li>Submit or support project ideas</li>
