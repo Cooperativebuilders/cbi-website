@@ -2,35 +2,50 @@
 import React from "react";
 
 const ProjectTile = ({ project }) => {
-  return (
-    <div className="bg-white shadow-md rounded-lg p-4">
-      <h3 className="text-xl font-bold text-blue-700 mb-2">
-        {project.location}
-      </h3>
+  const participantCount = project.participants?.length || 0;
+  const buyIn = project.buyIn || 1; // prevent divide by zero
+  const capacity = Math.floor((project.budget || 0) / buyIn);
+  const percentFunded = Math.min(
+    Math.round((participantCount / capacity) * 100),
+    100
+  );
 
-      <p className="text-sm text-gray-500 mb-1">
+  return (
+    <div className="bg-white shadow-md rounded-lg p-4 space-y-2">
+      <h3 className="text-xl font-bold text-blue-700">{project.location}</h3>
+
+      <p className="text-sm text-gray-600">
         <strong>Type:</strong> {project.propertyType} / {project.projectType}
       </p>
 
-      <p className="text-sm text-gray-500 mb-1">
+      <p className="text-sm text-gray-600">
         <strong>Budget:</strong> €{project.budget?.toLocaleString()}
       </p>
 
-      <p className="text-sm text-gray-500 mb-1">
+      <p className="text-sm text-gray-600">
+        <strong>Buy-in:</strong> €{project.buyIn?.toLocaleString()}
+      </p>
+
+      <p className="text-sm text-gray-600">
+        <strong>Open to Passive Investors:</strong> {project.openToPassive}
+      </p>
+
+      <p className="text-sm text-gray-600">
         <strong>Target Start:</strong> {project.startDate}
       </p>
 
-      <p className="text-sm text-gray-500 mb-1">
-        <strong>Submitted by:</strong> {project.submittedBy}
-      </p>
+      <div className="text-sm text-gray-600">
+        <strong>Funding:</strong> {participantCount}/{capacity} slots filled (
+        <span className="text-green-600 font-semibold">{percentFunded}%</span>)
+      </div>
 
       {project.notes && (
-        <div className="mt-3 bg-blue-50 p-3 rounded">
-          <p className="text-sm text-gray-700">
-            <strong>Notes:</strong> {project.notes.slice(0, 500)}
-          </p>
-        </div>
+        <p className="text-sm text-gray-500 italic">"{project.notes}"</p>
       )}
+
+      <p className="text-sm text-gray-500">
+        <strong>Submitted by:</strong> {project.submittedBy}
+      </p>
     </div>
   );
 };
