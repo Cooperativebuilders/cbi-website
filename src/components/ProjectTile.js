@@ -3,12 +3,12 @@ import React from "react";
 import { doc, deleteDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { adminUIDs } from "../constants/admins";
 
 const ProjectTile = ({ project }) => {
   const [user] = useAuthState(auth);
 
   // Set your admin UIDs here
-  const adminUIDs = ["YOUR_ADMIN_UID_HERE"]; // <-- Replace with actual UID(s)
 
   const handleDelete = async () => {
     const confirm = window.confirm(
