@@ -12,6 +12,7 @@ import { auth, db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import DashboardSidebar from "../components/DashboardSidebar";
+import { adminUIDs } from "../constants/admins";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -44,7 +45,13 @@ const Dashboard = () => {
   };
 
   const verifyPayment = async (user) => {
-    if (!user?.email) return;
+    if (!user?.email || !user?.uid) return;
+
+    if (adminUIDs.includes(user.uid)) {
+      navigate("/dashboard");
+      return;
+    }
+
     setIsVerifying(true);
     try {
       const res = await fetch(
