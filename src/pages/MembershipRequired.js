@@ -12,7 +12,7 @@ const MembershipRequired = () => {
   const verifyPayment = useCallback(async () => {
     const user = auth.currentUser;
     if (!user) {
-      navigate("/login");
+      navigate("/dashboard");
       return;
     }
 
