@@ -1,6 +1,6 @@
-// src/pages/MembershipRequired.js (or wherever you're verifying)
+// src/pages/MembershipRequired.js
 import React, { useEffect, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
 
 const MembershipRequired = () => {
@@ -8,7 +8,6 @@ const MembershipRequired = () => {
   const auth = getAuth();
   const [checking, setChecking] = useState(true);
 
-  // ✅ Stable verifyPayment function
   const verifyPayment = useCallback(async () => {
     const user = auth.currentUser;
     if (!user) {
@@ -35,7 +34,6 @@ const MembershipRequired = () => {
     }
   }, [auth, navigate]);
 
-  // ✅ Properly referenced in useEffect
   useEffect(() => {
     verifyPayment();
   }, [verifyPayment]);
@@ -57,12 +55,12 @@ const MembershipRequired = () => {
           <p className="text-gray-600 mb-4">
             You must be a paid member to access this content.
           </p>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-blue-600 hover:underline"
+          <Link
+            to="/signup"
+            className="text-sm text-blue-600 hover:underline font-medium"
           >
-            Try another way to log in?
-          </button>
+            Become a CBI member today
+          </Link>
         </>
       )}
     </div>
