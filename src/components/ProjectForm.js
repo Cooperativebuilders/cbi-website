@@ -1,19 +1,22 @@
 // src/components/ProjectForm.js
 import React, { useState } from "react";
-import { doc, setDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 
 const ProjectForm = () => {
   const [user] = useAuthState(auth);
+
   const [formData, setFormData] = useState({
     location: "",
     propertyType: "Residential",
     projectType: "Build to Sell",
-    budget: "",
     startDate: "",
+    budget: "",
+    buyIn: "",
     notes: "",
+    openToPassive: "Yes",
   });
 
   const handleChange = (e) => {
@@ -23,41 +26,35 @@ const ProjectForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return alert("Please log in first.");
+    if (!user) return alert("Please log in.");
 
+    const projectId = uuidv4();
     try {
-      const id = uuidv4();
-      await setDoc(doc(db, "projects", id), {
+      await setDoc(doc(db, "projects", projectId), {
         ...formData,
-        budget: parseInt(formData.budget, 10),
+        budget: parseInt(formData.budget),
+        buyIn: parseInt(formData.buyIn),
         submittedBy: user.email,
         createdAt: new Date().toISOString(),
+        participants: [],
       });
       alert("✅ Project submitted!");
-      setFormData({
-        location: "",
-        propertyType: "Residential",
-        projectType: "Build to Sell",
-        budget: "",
-        startDate: "",
-        notes: "",
-      });
     } catch (err) {
-      console.error("Error saving project:", err);
-      alert("❌ Error saving project.");
+      console.error("Error submitting project:", err);
+      alert("❌ Error submitting project.");
     }
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto"
+      className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto space-y-4"
     >
-      <h2 className="text-xl font-bold text-blue-700 mb-4">Submit a Project</h2>
+      <h2 className="text-xl font-bold text-blue-700">Submit a Project</h2>
 
       <input
         name="location"
-        placeholder="Location"
+        placeholder="Project Location"
         value={formData.location}
         onChange={handleChange}
         className="w-full p-2 border rounded"
@@ -69,11 +66,10 @@ const ProjectForm = () => {
         value={formData.propertyType}
         onChange={handleChange}
         className="w-full p-2 border rounded"
-        required
       >
-        <option value="Residential">Residential</option>
-        <option value="Commercial">Commercial</option>
-        <option value="Industrial">Industrial</option>
+        <option>Residential</option>
+        <option>Commercial</option>
+        <option>Industrial</option>
       </select>
 
       <select
@@ -81,16 +77,24 @@ const ProjectForm = () => {
         value={formData.projectType}
         onChange={handleChange}
         className="w-full p-2 border rounded"
-        required
       >
-        <option value="Build to Sell">Build to Sell</option>
-        <option value="Build to Let">Build to Let</option>
+        <option>Build to Sell</option>
+        <option>Build to Let</option>
       </select>
 
       <input
+        type="date"
+        name="startDate"
+        value={formData.startDate}
+        onChange={handleChange}
+        className="w-full p-2 border rounded"
+        required
+      />
+
+      <input
         name="budget"
+        placeholder="Project Budget (€)"
         type="number"
-        placeholder="Budget (€)"
         value={formData.budget}
         onChange={handleChange}
         className="w-full p-2 border rounded"
@@ -98,13 +102,24 @@ const ProjectForm = () => {
       />
 
       <input
-        name="startDate"
-        type="date"
-        value={formData.startDate}
+        name="buyIn"
+        placeholder="Buy-in Amount (€)"
+        type="number"
+        value={formData.buyIn}
         onChange={handleChange}
         className="w-full p-2 border rounded"
         required
       />
+
+      <select
+        name="openToPassive"
+        value={formData.openToPassive}
+        onChange={handleChange}
+        className="w-full p-2 border rounded"
+      >
+        <option value="Yes">Open to Passive Investors?</option>
+        <option value="No">Not Open to Passive Investors</option>
+      </select>
 
       <textarea
         name="notes"
@@ -113,7 +128,6 @@ const ProjectForm = () => {
         onChange={handleChange}
         maxLength={500}
         className="w-full p-2 border rounded"
-        rows={4}
       />
 
       <button
