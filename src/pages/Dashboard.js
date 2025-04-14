@@ -40,9 +40,9 @@ const Dashboard = () => {
       if (currentUser) {
         await verifyPayment(currentUser);
 
-        // Create Firestore doc if it doesn’t exist
         const userRef = doc(db, "members", currentUser.uid);
         const docSnap = await getDoc(userRef);
+
         if (!docSnap.exists()) {
           await setDoc(userRef, {
             uid: currentUser.uid,
@@ -69,11 +69,25 @@ const Dashboard = () => {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-blue-600">
-        Not logged in.{" "}
-        <Link to="/signup" className="ml-2 underline">
-          Sign up here
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
+        <Link to="/">
+          <img
+            src={`${process.env.PUBLIC_URL}/big-text-logo.png`}
+            alt="CBI Logo"
+            className="w-80 h-80 mb-6"
+          />
         </Link>
+        <motion.h1
+          className="text-4xl font-bold text-blue-700 mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          Member Dashboard
+        </motion.h1>
+        <p className="text-lg text-gray-600">
+          Please log in from the homepage.
+        </p>
       </div>
     );
   }
