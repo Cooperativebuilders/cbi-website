@@ -5,7 +5,8 @@ import CBIWebsite from "./CBIWebsite";
 import Dashboard from "./pages/Dashboard";
 import MembershipRequired from "./pages/MembershipRequired";
 import MembersPage from "./pages/MembersPage";
-import EditProfile from "./pages/EditProfile"; // ✅ Add this line
+import EditProfile from "./pages/EditProfile";
+import ProjectsPage from "./pages/ProjectsPage"; // ✅ Add this line
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/membership-required" element={<MembershipRequired />} />
       <Route path="/members" element={<MembersPage />} />
       <Route path="/edit-profile" element={<EditProfile />} />
+      <Route path="/projects" element={<ProjectsPage />} />
     </Routes>
   );
 }
