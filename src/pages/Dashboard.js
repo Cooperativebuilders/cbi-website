@@ -1,7 +1,13 @@
 // src/pages/Dashboard.js
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { signOut, onAuthStateChanged } from "firebase/auth";
+import {
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth, db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -12,6 +18,30 @@ const Dashboard = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // ✅ Login state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleEmailLogin = async () => {
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      await verifyPayment(result.user);
+    } catch (error) {
+      console.error("Email login error", error);
+      alert("Login failed. Check your credentials.");
+    }
+  };
+
+  const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      await verifyPayment(result.user);
+    } catch (error) {
+      console.error("Google login error", error);
+    }
+  };
 
   const verifyPayment = async (user) => {
     if (!user?.email) return;
@@ -137,7 +167,6 @@ const Dashboard = () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <DashboardSidebar onLogout={handleLogout} />
-
       <main className="flex-1 p-6">
         <motion.h1
           className="text-4xl font-bold text-blue-700 mb-6"
