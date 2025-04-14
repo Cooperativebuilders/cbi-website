@@ -1,5 +1,6 @@
 // src/components/ProjectTile.js
 import React from "react";
+import { Link } from "react-router-dom";
 
 const ProjectTile = ({ project }) => {
   const participantCount = project.participants?.length || 0;
@@ -12,6 +13,16 @@ const ProjectTile = ({ project }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 space-y-2">
+      {/* Dashboard Nav */}
+      <nav className="flex justify-between items-center mb-8">
+        <Link to="/dashboard" className="text-blue-600 font-bold text-xl">
+          ← Back to Dashboard
+        </Link>
+        <Link to="/members" className="text-sm text-blue-500 hover:underline">
+          View All Members
+        </Link>
+      </nav>
+
       <h3 className="text-xl font-bold text-blue-700">{project.location}</h3>
 
       <p className="text-sm text-gray-600">
