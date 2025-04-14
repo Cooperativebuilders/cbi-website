@@ -33,6 +33,9 @@ const DashboardSidebar = ({ onLogout }) => {
         <Link to="/members" className={linkClass("/members")}>
           <FaUsers /> <span>View Members</span>
         </Link>
+        <Link to="/submit-project" className={linkClass("/submit-project")}>
+          <FaProjectDiagram /> <span>Submit Project</span>
+        </Link>
         <Link to="/projects" className={linkClass("/projects")}>
           <FaProjectDiagram /> <span>View Projects</span>
         </Link>
