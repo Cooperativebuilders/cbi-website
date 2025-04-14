@@ -48,7 +48,7 @@ const Dashboard = () => {
     if (!user?.email || !user?.uid) return;
 
     if (adminUIDs.includes(user.uid)) {
-      navigate("/dashboard");
+      setLoading(false); // ✅ tell the UI we’re done
       return;
     }
 
