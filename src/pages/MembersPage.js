@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
-import BackToDashboardButton from "../components/BackToDashboardButton";
+import { Link } from "react-router-dom";
 
 const MembersPage = () => {
   const [members, setMembers] = useState([]);
@@ -34,7 +34,16 @@ const MembersPage = () => {
 
   return (
     <div className="min-h-screen bg-blue-50 p-6">
-      <BackToDashboardButton />
+      {/* Dashboard Nav */}
+      <nav className="flex justify-between items-center mb-8">
+        <Link to="/dashboard" className="text-blue-600 font-bold text-xl">
+          ← Back to Dashboard
+        </Link>
+        <Link to="/members" className="text-sm text-blue-500 hover:underline">
+          View All Members
+        </Link>
+      </nav>
+
       <h1 className="text-3xl font-bold text-blue-700 mb-6 text-center">
         CBI Member Directory
       </h1>
