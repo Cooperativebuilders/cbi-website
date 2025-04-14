@@ -77,6 +77,7 @@ const Dashboard = () => {
             className="w-80 h-80 mb-6"
           />
         </Link>
+
         <motion.h1
           className="text-4xl font-bold text-blue-700 mb-6"
           initial={{ opacity: 0, y: -20 }}
@@ -85,9 +86,42 @@ const Dashboard = () => {
         >
           Member Dashboard
         </motion.h1>
-        <p className="text-lg text-gray-600">
-          Please log in from the homepage.
-        </p>
+        <p className="text-lg text-gray-600 mb-6">Please log in:</p>
+        <div className="space-y-4 w-full max-w-sm">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full p-2 border rounded-lg"
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="w-full p-2 border rounded-lg"
+          />
+          <button
+            onClick={handleEmailLogin}
+            className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Login with Email
+          </button>
+          <hr className="my-4" />
+          <button
+            onClick={handleLogin}
+            className="w-full bg-gray-100 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-200 transition"
+          >
+            Sign in with Google
+          </button>
+          <p className="text-sm text-gray-600 mt-4 text-center">
+            Don’t have an account?{" "}
+            <a href="/signup" className="text-blue-600 hover:underline">
+              Sign up here
+            </a>
+          </p>
+        </div>
       </div>
     );
   }
