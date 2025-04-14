@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import ProjectTile from "../components/ProjectTile";
+import { Link } from "react-router-dom";
 
 const ProjectsPage = () => {
   const [projects, setProjects] = useState([]);
@@ -29,6 +30,16 @@ const ProjectsPage = () => {
 
   return (
     <div className="min-h-screen p-6 bg-gray-50">
+      {/* Dashboard Nav */}
+      <nav className="flex justify-between items-center mb-8">
+        <Link to="/dashboard" className="text-blue-600 font-bold text-xl">
+          ← Back to Dashboard
+        </Link>
+        <Link to="/members" className="text-sm text-blue-500 hover:underline">
+          View All Members
+        </Link>
+      </nav>
+
       <h1 className="text-3xl font-bold text-blue-700 mb-6">All Projects</h1>
 
       {loading ? (
