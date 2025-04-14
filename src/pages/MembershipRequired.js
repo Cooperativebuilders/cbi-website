@@ -1,6 +1,6 @@
 // src/pages/MembershipRequired.js
 import React, { useEffect, useCallback, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
 
 const MembershipRequired = () => {
@@ -38,9 +38,13 @@ const MembershipRequired = () => {
     verifyPayment();
   }, [verifyPayment]);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate("/login");
+  const handleLogoutAndRedirect = async () => {
+    try {
+      await signOut(auth);
+      navigate("/signup");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   };
 
   return (
@@ -55,12 +59,12 @@ const MembershipRequired = () => {
           <p className="text-gray-600 mb-4">
             You must be a paid member to access this content.
           </p>
-          <Link
-            to="/signup"
-            className="text-sm text-blue-600 hover:underline font-medium"
+          <button
+            onClick={handleLogoutAndRedirect}
+            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
           >
             Become a CBI member today
-          </Link>
+          </button>
         </>
       )}
     </div>
