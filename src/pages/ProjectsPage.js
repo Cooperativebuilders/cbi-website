@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import ProjectTile from "../components/ProjectTile";
-import BackToDashboardButton from "../components/BackToDashboardButton";
 
 const ProjectsPage = () => {
   const [projects, setProjects] = useState([]);
@@ -30,7 +29,6 @@ const ProjectsPage = () => {
 
   return (
     <div className="min-h-screen p-6 bg-gray-50">
-      <BackToDashboardButton />
       <h1 className="text-3xl font-bold text-blue-700 mb-6">All Projects</h1>
 
       {loading ? (
