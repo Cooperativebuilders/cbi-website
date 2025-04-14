@@ -14,6 +14,8 @@ import { Link } from "react-router-dom";
 import MemberForm from "../components/MemberForm";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import DashboardNav from "../components/DashboardNav";
+import DashboardSidebar from "../components/DashboardSidebar";
+
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -174,68 +176,45 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      <DashboardNav />
-
-      <motion.h1
-        className="text-4xl font-bold text-blue-700 mb-6"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        Member Dashboard
-      </motion.h1>
-
-      <nav className="flex space-x-4 mb-8">
-        <Link
-          to="/edit-profile"
-          className="text-blue-600 hover:underline font-medium"
+    <div className="flex min-h-screen bg-gray-50">
+      <DashboardSidebar onLogout={handleLogout} />
+  
+      <main className="flex-1 p-6">
+        <motion.h1
+          className="text-4xl font-bold text-blue-700 mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          Edit My Tile Info
-        </Link>
-        <Link
-          to="/members"
-          className="text-blue-600 hover:underline font-medium"
-        >
-          View Members
-        </Link>
-      </nav>
-
-      <div className="flex justify-between items-center mb-8">
-        <p className="text-gray-600">
+          Member Dashboard
+        </motion.h1>
+  
+        <p className="text-gray-600 mb-6">
           Logged in as <strong>{user.displayName || user.email}</strong>
         </p>
-        <button
-          onClick={handleLogout}
-          className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition"
+  
+        <motion.p
+          className="text-lg text-gray-600 mt-6 mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
         >
-          Logout
-        </button>
-      </div>
-
-      {/* ✅ Member Profile Card */}
-      <MemberForm />
-
-      <motion.p
-        className="text-lg text-gray-600 mt-10 mb-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        Welcome to your CBI dashboard. Soon you'll be able to:
-      </motion.p>
-      <motion.ul
-        className="list-disc list-inside text-gray-700 space-y-2 mb-12"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        <li>Track project participants</li>
-        <li>Submit or support project ideas</li>
-        <li>Join project groups when ready</li>
-      </motion.ul>
+          Welcome to your CBI dashboard. Soon you'll be able to:
+        </motion.p>
+  
+        <motion.ul
+          className="list-disc list-inside text-gray-700 space-y-2 mb-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <li>Track project participants</li>
+          <li>Submit or support project ideas</li>
+          <li>Join project groups when ready</li>
+        </motion.ul>
+      </main>
     </div>
   );
-};
+  
 
 export default Dashboard;
