@@ -1,70 +1,72 @@
 // src/components/ProjectTile.js
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   doc,
   deleteDoc,
   collection,
   getDocs,
   addDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { adminUIDs } from "../constants/admins";
 
-const ProjectTile = ({ project, projectId }) => {
+const ProjectTile = ({ project }) => {
   const [user] = useAuthState(auth);
-  const [participantCount, setParticipantCount] = useState(0);
-  const isAdmin = user && adminUIDs.includes(user.uid);
+  const [participants, setParticipants] = useState([]);
+  const [hasJoined, setHasJoined] = useState(false);
 
-  // 🔄 Fetch number of participants on load
+  const projectRef = doc(db, "projects", project.id);
+
   useEffect(() => {
     const fetchParticipants = async () => {
-      const snap = await getDocs(
-        collection(db, "projects", projectId, "participants")
-      );
-      setParticipantCount(snap.size);
+      const snapshot = await getDocs(collection(projectRef, "participants"));
+      const list = snapshot.docs.map((doc) => doc.data());
+      setParticipants(list);
+      setHasJoined(list.some((p) => p.uid === user?.uid));
     };
 
-    fetchParticipants();
-  }, [projectId]);
+    if (user) fetchParticipants();
+  }, [project.id, user]);
+
+  const handleJoin = async () => {
+    if (!user || hasJoined) return;
+    try {
+      await addDoc(collection(projectRef, "participants"), {
+        uid: user.uid,
+        email: user.email,
+        joinedAt: new Date().toISOString(),
+      });
+      setHasJoined(true);
+      setParticipants((prev) => [...prev, { uid: user.uid }]);
+    } catch (err) {
+      console.error("Error joining project:", err);
+      alert("Failed to join the project.");
+    }
+  };
 
   const percentFunded =
     project.buyIn > 0
       ? Math.min(
           Math.round(
-            ((participantCount * project.buyIn) / project.budget) * 100
+            ((participants.length * project.buyIn) / project.budget) * 100
           ),
           100
         )
       : 0;
 
-  const handleJoin = async () => {
-    if (!user) return alert("Please log in to join a project.");
-    try {
-      await addDoc(collection(db, "projects", projectId, "participants"), {
-        uid: user.uid,
-        email: user.email,
-        joinedAt: new Date().toISOString(),
-      });
-      setParticipantCount((prev) => prev + 1);
-    } catch (err) {
-      console.error("Error joining project:", err);
-      alert("Failed to join project.");
-    }
-  };
+  const isAdmin = user?.email === "admin@cooperativebuilders.ie";
 
   const handleDelete = async () => {
-    const confirm = window.confirm(
-      "Are you sure you want to delete this project?"
-    );
-    if (!confirm) return;
-
+    if (!window.confirm("Are you sure you want to delete this project?"))
+      return;
     try {
-      await deleteDoc(doc(db, "projects", projectId));
+      await deleteDoc(projectRef);
       alert("✅ Project deleted.");
       window.location.reload();
     } catch (err) {
-      console.error("❌ Failed to delete project:", err);
+      console.error("Error deleting project:", err);
     }
   };
 
@@ -73,35 +75,39 @@ const ProjectTile = ({ project, projectId }) => {
       <h3 className="text-xl font-bold text-blue-700 mb-2">
         {project.location}
       </h3>
-
       <p className="text-sm text-gray-500 mb-1">
         <strong>Type:</strong> {project.propertyType} / {project.projectType}
       </p>
       <p className="text-sm text-gray-500 mb-1">
-        <strong>Budget:</strong> €{project.budget?.toLocaleString()}
+        <strong>Project Budget:</strong> €{project.budget?.toLocaleString()}
       </p>
       <p className="text-sm text-gray-500 mb-1">
         <strong>Buy-in:</strong> €{project.buyIn?.toLocaleString()} —{" "}
         <strong>{percentFunded}% funded</strong>
       </p>
+      <p className="text-sm text-gray-500 mb-1">
+        <strong>Open to Passive Investors:</strong>{" "}
+        {project.passiveOpen === "Yes" ? "✅ Yes" : "❌ No"}
+      </p>
+      <p className="text-sm text-gray-500 mb-1">
+        <strong>Target Start:</strong> {project.startDate}
+      </p>
       <p className="text-sm text-gray-500 mb-2">
         <strong>Submitted by:</strong> {project.submittedBy}
       </p>
-      <p className="text-sm text-gray-500 italic">
+      <p className="text-sm text-gray-600 italic">
         <strong>Notes:</strong> {project.notes || "No notes added."}
       </p>
 
-      {/* 🔘 Join Project */}
-      {!isAdmin && (
+      {!isAdmin && user && !hasJoined && (
         <button
           onClick={handleJoin}
-          className="mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="mt-3 bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 transition text-sm"
         >
           Join Project
         </button>
       )}
 
-      {/* 🗑️ Admin Delete */}
       {isAdmin && (
         <button
           onClick={handleDelete}
