@@ -76,7 +76,7 @@ const RoleGrid = () => {
         }
       }, delay);
     });
-  }, [counts]);
+  }, [counts, displayedCounts]);
 
   return (
     <div className="grid-container">

@@ -4,10 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 
-const ADMIN_EMAILS = [
-  "admin@cooperativebuilders.ie",
-  "yourotheradmin@example.com",
-];
+const ADMIN_EMAILS = ["admin@cooperativebuilders.ie"];
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
