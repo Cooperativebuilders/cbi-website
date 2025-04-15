@@ -12,6 +12,7 @@ import { auth, db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import DashboardSidebar from "../components/DashboardSidebar";
+import { adminUIDs } from "../constants/admins";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -46,6 +47,15 @@ const Dashboard = () => {
   const verifyPayment = async (user) => {
     if (!user?.email) return;
     setIsVerifying(true);
+
+    // ✅ Admin Bypass (skip paywall for admin UIDs)
+    if (adminUIDs.includes(user.uid)) {
+      console.log("✅ Admin bypass: Access granted for", user.email);
+      setLoading(false);
+      setIsVerifying(false);
+      return;
+    }
+
     try {
       const res = await fetch(
         `https://cbi-backend-l001.onrender.com/api/is-paid?email=${encodeURIComponent(
@@ -53,12 +63,18 @@ const Dashboard = () => {
         )}`
       );
       const data = await res.json();
-      if (!data?.paid) {
+
+      if (data.paid) {
+        console.log("✅ Paid member verified:", user.email);
+        setLoading(false);
+      } else {
+        console.warn("❌ Not a paid member:", user.email);
         navigate("/membership-required");
       }
     } catch (err) {
-      console.error("Error verifying payment:", err);
+      console.error("❌ Error verifying payment:", err);
       alert("Error checking membership status.");
+      navigate("/membership-required");
     } finally {
       setIsVerifying(false);
     }
