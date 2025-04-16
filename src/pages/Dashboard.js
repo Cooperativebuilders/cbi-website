@@ -8,11 +8,20 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, getDocs, collection } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  collection,
+} from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import DashboardSidebar from "../components/DashboardSidebar";
 import { adminUIDs } from "../constants/admins";
+
+// RECHARTS IMPORTS
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
 const Dashboard = () => {
   // ---------------------------
@@ -29,10 +38,10 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   // ---------------------------
-  // NEW: MY PROJECTS STATE
+  // MY PROJECTS STATES
   // ---------------------------
-  const [myProjects, setMyProjects] = useState([]); // array of { projectData, userBuyIn }
-  const [totalInvestment, setTotalInvestment] = useState(0); // sum of userBuyIn across projects
+  const [myProjects, setMyProjects] = useState([]); // array of { projectId, projectData, userBuyIn }
+  const [totalInvestment, setTotalInvestment] = useState(0);
 
   // ---------------------------
   // LOGIN METHODS
@@ -136,57 +145,54 @@ const Dashboard = () => {
   };
 
   // ---------------------------
-  // FETCH USER'S JOINED PROJECTS
+  // REAL-TIME FETCH OF ALL PROJECTS & FILTER
   // ---------------------------
   useEffect(() => {
     if (!user) return;
 
-    // We only fetch user's projects after we've verified the user is logged in
-    const fetchMyProjects = async () => {
-      try {
-        const projSnap = await getDocs(collection(db, "projects"));
-        const joinedProjects = [];
+    // We only fetch user’s projects after verifying user is logged in
+    const unsub = onSnapshot(collection(db, "projects"), async (snapshot) => {
+      const joinedProjects = [];
 
-        for (const projDoc of projSnap.docs) {
-          const projectData = projDoc.data();
-          const projectId = projDoc.id;
+      // We'll iterate each doc and check participants
+      for (const projDoc of snapshot.docs) {
+        const projectData = projDoc.data();
+        const projectId = projDoc.id;
 
-          // Check if there's a participant sub-doc for this user
-          const participantRef = doc(
-            db,
-            "projects",
+        // participant sub-doc
+        const participantRef = doc(
+          db,
+          "projects",
+          projectId,
+          "participants",
+          user.uid
+        );
+        const participantSnap = await getDoc(participantRef);
+
+        if (participantSnap.exists()) {
+          // user joined this project
+          const participantData = participantSnap.data();
+          const userBuyIn = parseInt(participantData.buyIn || "0", 10);
+
+          joinedProjects.push({
             projectId,
-            "participants",
-            user.uid
-          );
-          const participantSnap = await getDoc(participantRef);
-
-          if (participantSnap.exists()) {
-            // The user joined this project
-            const participantData = participantSnap.data();
-            const userBuyIn = parseInt(participantData.buyIn || "0", 10);
-            joinedProjects.push({
-              projectId,
-              projectData,
-              userBuyIn,
-            });
-          }
+            projectData,
+            userBuyIn,
+          });
         }
-
-        setMyProjects(joinedProjects);
-
-        // Calculate total investment
-        let total = 0;
-        for (const jp of joinedProjects) {
-          total += jp.userBuyIn;
-        }
-        setTotalInvestment(total);
-      } catch (err) {
-        console.error("Error fetching user's joined projects:", err);
       }
-    };
 
-    fetchMyProjects();
+      setMyProjects(joinedProjects);
+
+      // compute total
+      let total = 0;
+      for (const jp of joinedProjects) {
+        total += jp.userBuyIn;
+      }
+      setTotalInvestment(total);
+    });
+
+    return () => unsub(); // unsubscribe on unmount
   }, [user]);
 
   // ---------------------------
@@ -262,6 +268,28 @@ const Dashboard = () => {
   }
 
   // ---------------------------
+  // PREP DATA FOR PIE CHART
+  // ---------------------------
+  // Example: an array of { name: projectLocation, value: userBuyIn }
+  const chartData = myProjects.map((jp) => {
+    const location = jp.projectData.location || "Untitled";
+    return {
+      name: location,
+      value: jp.userBuyIn,
+    };
+  });
+
+  // Some color palette for the chart slices
+  const COLORS = [
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#d0ed57",
+    "#a4de6c",
+    "#8dd1e1",
+  ];
+
+  // ---------------------------
   // DASHBOARD LAYOUT
   // ---------------------------
   return (
@@ -300,7 +328,7 @@ const Dashboard = () => {
           ) : (
             <ul className="space-y-3">
               {myProjects.map(({ projectId, projectData, userBuyIn }) => {
-                // parse budget from project data
+                // parse data to show funded % or anything else
                 const budget = parseInt(projectData.budget || "0", 10);
                 const fundedSoFar = parseInt(
                   projectData.fundedSoFar || "0",
@@ -321,7 +349,7 @@ const Dashboard = () => {
                       {projectData.projectType})
                     </p>
                     <p className="text-sm text-gray-600 mb-1">
-                      Budget: €{budget.toLocaleString()} – Funded:{" "}
+                      Budget: €{budget.toLocaleString()} — Funded:{" "}
                       {percentFunded}%
                     </p>
                     <p className="text-sm text-gray-600">
@@ -335,7 +363,7 @@ const Dashboard = () => {
           )}
         </section>
 
-        {/* ============== Funding Breakdown ============== */}
+        {/* ============== Funding Breakdown Text ============== */}
         <section className="mb-10">
           <motion.h2
             className="text-2xl font-semibold text-blue-800 mb-3"
@@ -357,7 +385,43 @@ const Dashboard = () => {
           </div>
         </section>
 
-        {/* Existing placeholder content */}
+        {/* ============== Funding Breakdown Pie Chart ============== */}
+        {myProjects.length > 0 && (
+          <section className="mb-10">
+            <motion.h2
+              className="text-2xl font-semibold text-blue-800 mb-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Investment Distribution
+            </motion.h2>
+            <div className="bg-white shadow p-4 rounded-md inline-block">
+              <PieChart width={300} height={300}>
+                <Pie
+                  data={chartData}
+                  cx={150}
+                  cy={150}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </div>
+          </section>
+        )}
+
+        {/* ============= Existing Placeholder Content ============= */}
         <motion.p
           className="text-lg text-gray-600 mt-6 mb-4"
           initial={{ opacity: 0 }}
@@ -366,6 +430,7 @@ const Dashboard = () => {
         >
           Welcome to your CBI dashboard. Soon you'll be able to:
         </motion.p>
+
         <motion.ul
           className="list-disc list-inside text-gray-700 space-y-2 mb-12"
           initial={{ opacity: 0 }}
