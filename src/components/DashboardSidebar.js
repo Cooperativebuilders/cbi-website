@@ -9,7 +9,7 @@ import {
   FaHome,
   FaBook,
 } from "react-icons/fa";
-import logo from "../public/big-text-logo.png"; // <-- Adjust path if needed
+import logo from "/public/big-text-logo.png"; // <-- Adjust path if needed
 
 const DashboardSidebar = ({ onLogout }) => {
   const location = useLocation();
