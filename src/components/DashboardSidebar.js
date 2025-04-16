@@ -40,6 +40,9 @@ const DashboardSidebar = ({ onLogout }) => {
         <Link to="/projects" className={linkClass("/projects")}>
           <FaProjectDiagram /> <span>View Projects</span>
         </Link>
+        <Link to="/guidance" className={linkClass("/guidance")}>
+          <FaBook /> <span>Guidance Notes</span>
+        </Link>
         <button
           onClick={onLogout}
           className="flex items-center space-x-2 p-3 w-full text-left text-red-600 hover:bg-red-100 transition rounded-md"

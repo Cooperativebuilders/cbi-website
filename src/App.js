@@ -8,6 +8,7 @@ import MembersPage from "./pages/MembersPage";
 import EditProfile from "./pages/EditProfile";
 import ProjectsPage from "./pages/ProjectsPage";
 import ProjectForm from "./components/ProjectForm";
+import Guidance from "./pages/Guidance";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/edit-profile" element={<EditProfile />} />
       <Route path="/projects" element={<ProjectsPage />} />
       <Route path="/submit-project" element={<ProjectForm />} />
+      <Route path="/guidance" element={<Guidance />} />
     </Routes>
   );
 }

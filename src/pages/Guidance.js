@@ -1,0 +1,48 @@
+// src/pages/Guidance.js
+import React from "react";
+import { Link } from "react-router-dom";
+import guidanceList from "../data/guidanceList";
+
+const Guidance = () => {
+  return (
+    <div className="min-h-screen bg-gray-100 p-6">
+      <nav className="mb-6">
+        <Link
+          to="/dashboard"
+          className="text-blue-600 font-bold text-xl hover:underline"
+        >
+          ← Back to Dashboard
+        </Link>
+      </nav>
+
+      <h1 className="text-3xl font-bold text-blue-700 mb-6">Guidance Notes</h1>
+
+      {guidanceList.length === 0 ? (
+        <p className="text-gray-500">No guidance notes available yet.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {guidanceList.map((doc) => (
+            <div key={doc.id} className="bg-white rounded shadow p-4">
+              <h2 className="text-xl font-semibold text-blue-800 mb-2">
+                {doc.title}
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">{doc.description}</p>
+              {doc.pdfUrl && (
+                <a
+                  href={doc.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline text-sm"
+                >
+                  View PDF
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Guidance;
