@@ -20,17 +20,12 @@ const DashboardSidebar = ({ onLogout }) => {
 
   return (
     <aside className="w-60 bg-white shadow-lg min-h-screen px-4 py-6">
-      {/* Logo + Title Section */}
-      <div className="flex items-center space-x-2 mb-8">
-        {/* 
-          The logo file MUST be in your public folder as `public/big-text-logo.png`. 
-          The slash `/` at the start means: "Host root/public"
-        */}
-        <img src="/big-text-logo.png" alt="CBI Logo" className="h-10 w-auto" />
-        <span className="text-2xl font-bold text-blue-700">CBI Dashboard</span>
+      {/* Logo only (no title text) */}
+      <div className="flex items-center justify-center mb-8">
+        {/* Ensure your logo is in public/big-text-logo.png */}
+        <img src="/big-text-logo.png" alt="CBI Logo" className="h-14 w-auto" />
       </div>
 
-      {/* Navigation Links */}
       <nav className="space-y-4">
         <Link to="/dashboard" className={linkClass("/dashboard")}>
           <FaHome /> <span>Dashboard Home</span>
