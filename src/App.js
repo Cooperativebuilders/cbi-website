@@ -8,7 +8,7 @@ import MembersPage from "./pages/MembersPage";
 import EditProfile from "./pages/EditProfile";
 import ProjectsPage from "./pages/ProjectsPage";
 import ProjectForm from "./components/ProjectForm";
-import GuidancePage from "./pages/GuidancePage"; // ✅ Add this line
+import GuidancePage from "./pages/GuidancePage";
 
 function App() {
   return (
