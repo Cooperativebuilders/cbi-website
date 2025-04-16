@@ -11,7 +11,7 @@ const GuidancePage = () => {
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "guidance"));
+        const snapshot = await getDocs(collection(db, "guidanceNotes")); // ← ✅ updated
         const docs = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
