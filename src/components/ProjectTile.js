@@ -86,6 +86,7 @@ function ProjectTile({ project, projectId }) {
     try {
       await deleteDoc(doc(db, "projects", projectId));
       alert("✅ Project deleted.");
+      window.location.reload();
     } catch (err) {
       console.error("Error deleting project:", err);
       alert("❌ Failed to delete project.");
