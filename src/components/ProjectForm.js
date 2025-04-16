@@ -37,6 +37,7 @@ const ProjectForm = () => {
         timestamp: Timestamp.now(),
       });
       alert("✅ Project submitted!");
+      window.location.reload();
     } catch (err) {
       console.error("Error submitting project:", err);
       alert("❌ Error submitting project.");
