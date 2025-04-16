@@ -1,13 +1,7 @@
 // src/pages/ProjectsPage.js
 import React, { useEffect, useState } from "react";
 import { db, auth } from "../firebase";
-import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-  arrayUnion,
-} from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore"; // Removed unused imports
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "react-router-dom";
 import ProjectTile from "../components/ProjectTile";
@@ -16,11 +10,13 @@ const ProjectsPage = () => {
   const [projects, setProjects] = useState([]);
   const [user] = useAuthState(auth);
 
+  // Fetch all projects
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "projects"));
         const data = querySnapshot.docs.map((doc) => ({
+          // Preserve Firestore doc.id in our object
           id: doc.id,
           ...doc.data(),
         }));
@@ -32,21 +28,6 @@ const ProjectsPage = () => {
 
     fetchProjects();
   }, []);
-
-  const handleJoinProject = async (projectId) => {
-    if (!user) return alert("You must be logged in to join a project.");
-    try {
-      const projectRef = doc(db, "projects", projectId);
-      await updateDoc(projectRef, {
-        participants: arrayUnion(user.uid),
-      });
-      alert("✅ You’ve joined the project!");
-      window.location.reload();
-    } catch (err) {
-      console.error("Error joining project:", err);
-      alert("There was an issue joining the project.");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -70,7 +51,8 @@ const ProjectsPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
             <div key={project.id} className="relative">
-              <ProjectTile project={project} />
+              {/* Pass both the project data and its doc ID */}
+              <ProjectTile project={project} projectId={project.id} />
             </div>
           ))}
         </div>
