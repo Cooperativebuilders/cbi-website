@@ -20,12 +20,12 @@ const DashboardSidebar = ({ onLogout }) => {
 
   return (
     <aside className="w-60 bg-white shadow-lg min-h-screen px-4 py-6">
-      {/* Logo only (twice as large: h-28) */}
+      {/* Logo only (now h-56 for double the previous h-28 size) */}
       <div className="flex items-center justify-center mb-8">
         <img
           src="/big-text-logo.png"
           alt="CBI Logo"
-          className="h-28 w-auto" // <-- bigger logo
+          className="h-56 w-auto" // doubled from h-28 to h-56
         />
       </div>
 
