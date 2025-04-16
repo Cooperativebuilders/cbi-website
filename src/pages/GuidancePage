@@ -1,46 +1,31 @@
 // src/pages/GuidancePage.js
 import React from "react";
 import { Link } from "react-router-dom";
-import guidanceDocs from "../data/guidanceDocs";
 
 const GuidancePage = () => {
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <nav className="mb-6">
-        <Link
-          to="/dashboard"
-          className="text-blue-600 font-bold text-xl hover:underline"
-        >
-          ← Back to Dashboard
-        </Link>
-      </nav>
+    <div
+      style={{
+        padding: "2rem",
+        backgroundColor: "#f0f4f8",
+        minHeight: "100vh",
+      }}
+    >
+      <h1 style={{ fontSize: "2rem", color: "#1d4ed8", marginBottom: "1rem" }}>
+        Guidance Page Test ✅
+      </h1>
 
-      <h1 className="text-3xl font-bold text-blue-700 mb-6">Guidance Notes</h1>
+      <p style={{ fontSize: "1rem", color: "#374151" }}>
+        If you're seeing this text, the routing is working and the page is
+        loading!
+      </p>
 
-      {guidanceDocs.length === 0 ? (
-        <p className="text-gray-500">No guidance documents available.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {guidanceDocs.map((doc) => (
-            <div key={doc.id} className="bg-white rounded shadow p-4">
-              <h2 className="text-xl font-semibold text-blue-800 mb-2">
-                {doc.title}
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">{doc.description}</p>
-              {doc.pdfUrl && (
-                <a
-                  href={doc.pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline text-sm"
-                >
-                  View PDF
-                </a>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+      <Link
+        to="/dashboard"
+        style={{ marginTop: "2rem", display: "inline-block", color: "#2563eb" }}
+      >
+        ← Back to Dashboard
+      </Link>
     </div>
   );
 };
