@@ -52,11 +52,6 @@ const CBIWebsite = () => {
         </a>
       </section>
 
-      {/* Solari Grid */}
-      <section className="mb-12">
-        <RoleGrid />
-      </section>
-
       {/* Main content */}
       <main id="home" className="space-y-8">
         {[
@@ -115,6 +110,11 @@ const CBIWebsite = () => {
             </a>
             .
           </p>
+        </section>
+
+        {/* Solari Grid */}
+        <section className="mb-12">
+          <RoleGrid />
         </section>
       </main>
 
