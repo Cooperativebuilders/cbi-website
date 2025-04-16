@@ -67,6 +67,7 @@ function ProjectTile({ project, projectId }) {
       alert(
         `You contributed €${buyIn.toLocaleString()} to ${project.location}!`
       );
+      window.location.reload();
     } catch (error) {
       console.error("Error joining project:", error);
       alert("❌ Failed to join this project. Please try again later.");
