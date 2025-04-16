@@ -16,6 +16,7 @@ const GuidancePage = () => {
           id: doc.id,
           ...doc.data(),
         }));
+        console.log("docsData:", docsData);
         setGuidanceDocs(docsData);
         setLoading(false);
       } catch (err) {
