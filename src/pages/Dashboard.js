@@ -420,27 +420,6 @@ const Dashboard = () => {
             </div>
           </section>
         )}
-
-        {/* ============= Existing Placeholder Content ============= */}
-        <motion.p
-          className="text-lg text-gray-600 mt-6 mb-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          Welcome to your CBI dashboard. Soon you'll be able to:
-        </motion.p>
-
-        <motion.ul
-          className="list-disc list-inside text-gray-700 space-y-2 mb-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          <li>Track project participants</li>
-          <li>Submit or support project ideas</li>
-          <li>Join project groups when ready</li>
-        </motion.ul>
       </main>
     </div>
   );
