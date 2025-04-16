@@ -8,22 +8,35 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { doc, getDoc, setDoc, getDocs, collection } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 import DashboardSidebar from "../components/DashboardSidebar";
 import { adminUIDs } from "../constants/admins";
 
 const Dashboard = () => {
+  // ---------------------------
+  // AUTH & LOADING STATES
+  // ---------------------------
   const [user, setUser] = useState(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
-  // ✅ Login state
+  // For email login
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate();
+
+  // ---------------------------
+  // NEW: MY PROJECTS STATE
+  // ---------------------------
+  const [myProjects, setMyProjects] = useState([]); // array of { projectData, userBuyIn }
+  const [totalInvestment, setTotalInvestment] = useState(0); // sum of userBuyIn across projects
+
+  // ---------------------------
+  // LOGIN METHODS
+  // ---------------------------
   const handleEmailLogin = async () => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
@@ -44,11 +57,14 @@ const Dashboard = () => {
     }
   };
 
+  // ---------------------------
+  // PAYMENT CHECK
+  // ---------------------------
   const verifyPayment = async (user) => {
     if (!user?.email) return;
     setIsVerifying(true);
 
-    // ✅ Admin Bypass (skip paywall for admin UIDs)
+    // Admin bypass
     if (adminUIDs.includes(user.uid)) {
       console.log("✅ Admin bypass: Access granted for", user.email);
       setLoading(false);
@@ -80,15 +96,18 @@ const Dashboard = () => {
     }
   };
 
+  // ---------------------------
+  // onAuthStateChanged
+  // ---------------------------
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
         await verifyPayment(currentUser);
 
+        // Create doc in 'members' if not exists
         const userRef = doc(db, "members", currentUser.uid);
         const docSnap = await getDoc(userRef);
-
         if (!docSnap.exists()) {
           await setDoc(userRef, {
             uid: currentUser.uid,
@@ -105,6 +124,9 @@ const Dashboard = () => {
     return () => unsubscribe();
   }, []);
 
+  // ---------------------------
+  // LOGOUT
+  // ---------------------------
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -113,7 +135,65 @@ const Dashboard = () => {
     }
   };
 
+  // ---------------------------
+  // FETCH USER'S JOINED PROJECTS
+  // ---------------------------
+  useEffect(() => {
+    if (!user) return;
+
+    // We only fetch user's projects after we've verified the user is logged in
+    const fetchMyProjects = async () => {
+      try {
+        const projSnap = await getDocs(collection(db, "projects"));
+        const joinedProjects = [];
+
+        for (const projDoc of projSnap.docs) {
+          const projectData = projDoc.data();
+          const projectId = projDoc.id;
+
+          // Check if there's a participant sub-doc for this user
+          const participantRef = doc(
+            db,
+            "projects",
+            projectId,
+            "participants",
+            user.uid
+          );
+          const participantSnap = await getDoc(participantRef);
+
+          if (participantSnap.exists()) {
+            // The user joined this project
+            const participantData = participantSnap.data();
+            const userBuyIn = parseInt(participantData.buyIn || "0", 10);
+            joinedProjects.push({
+              projectId,
+              projectData,
+              userBuyIn,
+            });
+          }
+        }
+
+        setMyProjects(joinedProjects);
+
+        // Calculate total investment
+        let total = 0;
+        for (const jp of joinedProjects) {
+          total += jp.userBuyIn;
+        }
+        setTotalInvestment(total);
+      } catch (err) {
+        console.error("Error fetching user's joined projects:", err);
+      }
+    };
+
+    fetchMyProjects();
+  }, [user]);
+
+  // ---------------------------
+  // LOADING STATES
+  // ---------------------------
   if (!user) {
+    // Not logged in, show login UI
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
         <Link to="/">
@@ -132,6 +212,7 @@ const Dashboard = () => {
         >
           Member Dashboard
         </motion.h1>
+
         <p className="text-lg text-gray-600 mb-6">Please log in:</p>
         <div className="space-y-4 w-full max-w-sm">
           <input
@@ -180,9 +261,13 @@ const Dashboard = () => {
     );
   }
 
+  // ---------------------------
+  // DASHBOARD LAYOUT
+  // ---------------------------
   return (
     <div className="flex min-h-screen bg-gray-50">
       <DashboardSidebar onLogout={handleLogout} />
+
       <main className="flex-1 p-6">
         <motion.h1
           className="text-4xl font-bold text-blue-700 mb-6"
@@ -197,6 +282,82 @@ const Dashboard = () => {
           Logged in as <strong>{user.displayName || user.email}</strong>
         </p>
 
+        {/* ============== Projects Overview ============== */}
+        <section className="mb-10">
+          <motion.h2
+            className="text-2xl font-semibold text-blue-800 mb-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            Projects Overview
+          </motion.h2>
+
+          {myProjects.length === 0 ? (
+            <p className="text-gray-600">
+              You haven't joined any projects yet.
+            </p>
+          ) : (
+            <ul className="space-y-3">
+              {myProjects.map(({ projectId, projectData, userBuyIn }) => {
+                // parse budget from project data
+                const budget = parseInt(projectData.budget || "0", 10);
+                const fundedSoFar = parseInt(
+                  projectData.fundedSoFar || "0",
+                  10
+                );
+                const percentFunded =
+                  budget > 0
+                    ? Math.min(Math.round((fundedSoFar / budget) * 100), 100)
+                    : 0;
+
+                return (
+                  <li
+                    key={projectId}
+                    className="bg-white rounded-md shadow p-4"
+                  >
+                    <p className="font-bold text-blue-700">
+                      {projectData.location} ({projectData.propertyType} /{" "}
+                      {projectData.projectType})
+                    </p>
+                    <p className="text-sm text-gray-600 mb-1">
+                      Budget: €{budget.toLocaleString()} – Funded:{" "}
+                      {percentFunded}%
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong>Your Buy-In:</strong> €
+                      {userBuyIn.toLocaleString()}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        {/* ============== Funding Breakdown ============== */}
+        <section className="mb-10">
+          <motion.h2
+            className="text-2xl font-semibold text-blue-800 mb-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            Funding Breakdown
+          </motion.h2>
+
+          <div className="bg-white shadow p-4 rounded-md">
+            <p className="text-gray-700">
+              <strong>Total Projects Joined:</strong> {myProjects.length}
+            </p>
+            <p className="text-gray-700">
+              <strong>Total Investment:</strong> €
+              {totalInvestment.toLocaleString()}
+            </p>
+          </div>
+        </section>
+
+        {/* Existing placeholder content */}
         <motion.p
           className="text-lg text-gray-600 mt-6 mb-4"
           initial={{ opacity: 0 }}
@@ -205,7 +366,6 @@ const Dashboard = () => {
         >
           Welcome to your CBI dashboard. Soon you'll be able to:
         </motion.p>
-
         <motion.ul
           className="list-disc list-inside text-gray-700 space-y-2 mb-12"
           initial={{ opacity: 0 }}
