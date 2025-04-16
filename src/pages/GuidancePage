@@ -12,11 +12,15 @@ const GuidancePage = () => {
     const fetchGuidance = async () => {
       try {
         const snapshot = await getDocs(collection(db, "guidance"));
-        const docsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        console.log("docsData:", docsData); // <-- Check this in DevTools
+        // Log the raw documents data to see what we're getting
+        const docsData = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          console.log("Fetched doc:", { id: doc.id, ...data });
+          return {
+            id: doc.id,
+            ...data,
+          };
+        });
         setGuidanceDocs(docsData);
         setLoading(false);
       } catch (err) {
@@ -46,8 +50,8 @@ const GuidancePage = () => {
                 {doc.title}
               </h2>
               <p className="text-sm text-gray-600 mb-2">{doc.description}</p>
-              {/* Only render the PDF link if pdfUrl exists and starts with "https://" */}
-              {doc.pdfUrl &&
+              {/* Temporarily remove pdfUrl link rendering to test if it's causing the error */}
+              {/* {doc.pdfUrl &&
                 typeof doc.pdfUrl === "string" &&
                 doc.pdfUrl.startsWith("https://") && (
                   <a
@@ -58,7 +62,7 @@ const GuidancePage = () => {
                   >
                     View PDF
                   </a>
-                )}
+                )} */}
             </li>
           ))}
         </ul>
