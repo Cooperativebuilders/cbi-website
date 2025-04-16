@@ -7,8 +7,9 @@ import {
   FaProjectDiagram,
   FaSignOutAlt,
   FaHome,
+  FaBook,
 } from "react-icons/fa";
-import { FaBook } from "react-icons/fa";
+import logo from "../public/big-text-logo.png"; // <-- Adjust path if needed
 
 const DashboardSidebar = ({ onLogout }) => {
   const location = useLocation();
@@ -20,10 +21,13 @@ const DashboardSidebar = ({ onLogout }) => {
 
   return (
     <aside className="w-60 bg-white shadow-lg min-h-screen px-4 py-6">
-      <div className="text-2xl font-bold text-blue-700 mb-10">
-        CBI Dashboard
+      {/* Logo + Title Section */}
+      <div className="flex items-center space-x-2 mb-8">
+        <img src={logo} alt="CBI Logo" className="h-10 w-auto" />
+        <span className="text-2xl font-bold text-blue-700">CBI Dashboard</span>
       </div>
 
+      {/* Navigation Links */}
       <nav className="space-y-4">
         <Link to="/dashboard" className={linkClass("/dashboard")}>
           <FaHome /> <span>Dashboard Home</span>
