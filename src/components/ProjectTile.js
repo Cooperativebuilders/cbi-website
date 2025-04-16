@@ -22,7 +22,9 @@ const ProjectTile = ({ project, projectId }) => {
     try {
       await deleteDoc(doc(db, "projects", projectId));
       alert("✅ Project deleted.");
-      window.location.reload();
+      // Instead of refreshing the page, this just alerts success.
+      // If you want an immediate page refresh, uncomment below:
+      // window.location.reload();
     } catch (err) {
       console.error("Error deleting project:", err);
       alert("❌ Failed to delete project.");
@@ -63,10 +65,12 @@ const ProjectTile = ({ project, projectId }) => {
         <strong>Notes:</strong> {project.notes || "No notes added."}
       </p>
 
+      {/* Show button only if user is admin */}
       {isAdmin && (
         <button
           onClick={handleDelete}
-          className="absolute top-2 right-2 text-red-600 text-xs border border-red-600 px-2 py-1 rounded hover:bg-red-100"
+          // Removed "absolute top-2 right-2" and added z-50 for clarity
+          className="z-50 text-red-600 text-xs border border-red-600 px-2 py-1 rounded hover:bg-red-100"
         >
           Delete
         </button>
