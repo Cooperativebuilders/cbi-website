@@ -1,89 +1,33 @@
 // src/pages/GuidancePage.js
-import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import React from "react";
 import { Link } from "react-router-dom";
+import guidanceDocs from "../data/guidanceDocs";
 
 const GuidancePage = () => {
-  const [guides, setGuides] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(null);
-
-  useEffect(() => {
-    const fetchGuides = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "guidanceNotes")); // ✅ this must match the real collection name exactly
-        const data = snapshot.docs.map((doc) => {
-          const item = doc.data();
-          return {
-            id: doc.id,
-            title: item.title || "Untitled Document",
-            description: item.description || "No description available.",
-            pdfUrl: item.pdfUrl || "",
-          };
-        });
-        setGuides(data);
-      } catch (err) {
-        console.error("🔥 Failed to fetch guidance notes:", err);
-        setLoadError(
-          "Error loading guidance notes. Check console for details."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGuides();
-  }, []);
-
-  useEffect(() => {
-    const fake = [
-      {
-        id: "123",
-        title: "Test Doc",
-        description: "This is a test guidance note",
-        pdfUrl: "https://example.com/sample.pdf",
-      },
-    ];
-    setGuides(fake);
-    setLoading(false);
-  }, []);
-
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mb-6">
+    <div className="min-h-screen bg-gray-100 p-6">
+      <nav className="mb-6">
         <Link
           to="/dashboard"
-          className="inline-block text-blue-600 hover:underline"
+          className="text-blue-600 font-bold text-xl hover:underline"
         >
           ← Back to Dashboard
         </Link>
-      </div>
+      </nav>
 
-      <h1 className="text-3xl font-bold text-blue-700 mb-4">Guidance Notes</h1>
+      <h1 className="text-3xl font-bold text-blue-700 mb-6">Guidance Notes</h1>
 
-      {loading && <p className="text-gray-500">Loading...</p>}
-
-      {loadError && (
-        <div className="text-red-600 bg-red-50 border border-red-200 p-4 rounded">
-          {loadError}
-        </div>
-      )}
-
-      {!loading && !loadError && guides.length === 0 && (
-        <p className="text-gray-500">No guidance documents found.</p>
-      )}
-
-      {!loading && !loadError && guides.length > 0 && (
-        <ul className="space-y-4">
-          {guides.map((doc) => (
-            <li key={doc.id} className="bg-white rounded shadow p-4">
-              <h2 className="text-xl font-semibold text-blue-800">
+      {guidanceDocs.length === 0 ? (
+        <p className="text-gray-500">No guidance documents available.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {guidanceDocs.map((doc) => (
+            <div key={doc.id} className="bg-white rounded shadow p-4">
+              <h2 className="text-xl font-semibold text-blue-800 mb-2">
                 {doc.title}
               </h2>
-              <p className="text-sm text-gray-600 mb-2">{doc.description}</p>
-
-              {doc.pdfUrl.startsWith("https://") ? (
+              <p className="text-sm text-gray-600 mb-4">{doc.description}</p>
+              {doc.pdfUrl && (
                 <a
                   href={doc.pdfUrl}
                   target="_blank"
@@ -92,14 +36,10 @@ const GuidancePage = () => {
                 >
                   View PDF
                 </a>
-              ) : (
-                <p className="text-sm text-gray-400 italic">
-                  No PDF link available.
-                </p>
               )}
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
