@@ -1,30 +1,61 @@
-import React, { useState, useEffect } from "react";
+// src/pages/Guidance.js
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import guidanceListData from "../data/guidanceList";
-import { auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, db } from "../firebase"; // <-- from your firebase.js
 import { adminUIDs } from "../constants/admins";
+import {
+  collection,
+  onSnapshot,
+  updateDoc,
+  doc,
+  query,
+  orderBy,
+} from "firebase/firestore";
 
 const Guidance = () => {
   const [user] = useAuthState(auth);
   const isAdmin = user && adminUIDs.includes(user.uid);
 
-  // Clone guidance list into local state so we can toggle visibility
-  const [guidanceList, setGuidanceList] = useState([]);
+  // We'll store all guidance docs here
+  const [guidanceDocs, setGuidanceDocs] = useState([]);
 
+  // Fetch real-time from Firestore
   useEffect(() => {
-    // Load static list into local state
-    setGuidanceList(guidanceListData);
+    // Reference to 'guidanceNotes' collection
+    const colRef = collection(db, "guidanceNotes");
+    // Optional: we can sort by 'title' or 'createdAt' if you have that field
+    const q = query(colRef, orderBy("title", "asc"));
+
+    // Listen for real-time updates
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const docsData = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id, // Firestore doc ID
+        ...docSnap.data(),
+      }));
+      setGuidanceDocs(docsData);
+    });
+
+    // Clean up listener on unmount
+    return () => unsubscribe();
   }, []);
 
-  const toggleVisibility = (id) => {
-    const updated = guidanceList.map((doc) =>
-      doc.id === id ? { ...doc, visible: !doc.visible } : doc
-    );
-    setGuidanceList(updated);
+  // Toggle the 'visible' field in Firestore
+  const toggleVisibility = async (docId, currentVisible) => {
+    try {
+      await updateDoc(doc(db, "guidanceNotes", docId), {
+        visible: !currentVisible,
+      });
+      // No need to manually update local state, onSnapshot will refresh
+    } catch (err) {
+      console.error("Failed to toggle visibility:", err);
+    }
   };
 
-  const visibleGuides = guidanceList.filter((doc) => doc.visible);
+  // Filter for visible docs if user is NOT admin
+  const displayDocs = isAdmin
+    ? guidanceDocs // Admin sees all
+    : guidanceDocs.filter((doc) => doc.visible);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -39,19 +70,20 @@ const Guidance = () => {
 
       <h1 className="text-3xl font-bold text-blue-700 mb-6">Guidance Notes</h1>
 
+      {/* If admin, show toggle panel */}
       {isAdmin && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-blue-800 mb-2">
             Admin Controls
           </h2>
-          {guidanceList.map((doc) => (
+          {guidanceDocs.map((doc) => (
             <div
               key={doc.id}
               className="flex justify-between items-center bg-white p-3 rounded shadow mb-2"
             >
               <span className="font-medium">{doc.title}</span>
               <button
-                onClick={() => toggleVisibility(doc.id)}
+                onClick={() => toggleVisibility(doc.id, doc.visible)}
                 className={`px-3 py-1 text-sm rounded ${
                   doc.visible
                     ? "bg-red-100 text-red-600"
@@ -65,11 +97,11 @@ const Guidance = () => {
         </div>
       )}
 
-      {visibleGuides.length === 0 ? (
-        <p className="text-gray-500">No guidance notes available yet.</p>
+      {displayDocs.length === 0 ? (
+        <p className="text-gray-500">No guidance notes available.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {visibleGuides.map((doc) => (
+          {displayDocs.map((doc) => (
             <div key={doc.id} className="bg-white rounded shadow p-4">
               <h2 className="text-xl font-semibold text-blue-800 mb-2">
                 {doc.title}
