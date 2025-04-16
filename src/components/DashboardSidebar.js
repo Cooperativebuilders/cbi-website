@@ -20,10 +20,13 @@ const DashboardSidebar = ({ onLogout }) => {
 
   return (
     <aside className="w-60 bg-white shadow-lg min-h-screen px-4 py-6">
-      {/* Logo only (no title text) */}
+      {/* Logo only (twice as large: h-28) */}
       <div className="flex items-center justify-center mb-8">
-        {/* Ensure your logo is in public/big-text-logo.png */}
-        <img src="/big-text-logo.png" alt="CBI Logo" className="h-14 w-auto" />
+        <img
+          src="/big-text-logo.png"
+          alt="CBI Logo"
+          className="h-28 w-auto" // <-- bigger logo
+        />
       </div>
 
       <nav className="space-y-4">
