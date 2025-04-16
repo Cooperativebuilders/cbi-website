@@ -1,7 +1,7 @@
 // src/pages/GuidancePage.js
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase"; // Adjust import if needed
+import { db } from "../firebase";
 import BackToDashboardButton from "../components/BackToDashboardButton";
 
 const GuidancePage = () => {
@@ -45,18 +45,19 @@ const GuidancePage = () => {
                 {doc.title}
               </h2>
               <p className="text-sm text-gray-600 mb-2">{doc.description}</p>
-
-              {/* If doc.pdfUrl is a PDF link, open in a new tab */}
-              {doc.pdfUrl && (
-                <a
-                  href={doc.pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline text-sm"
-                >
-                  View PDF
-                </a>
-              )}
+              {/* Only render the PDF link if pdfUrl exists and starts with "https://" */}
+              {doc.pdfUrl &&
+                typeof doc.pdfUrl === "string" &&
+                doc.pdfUrl.startsWith("https://") && (
+                  <a
+                    href={doc.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    View PDF
+                  </a>
+                )}
             </li>
           ))}
         </ul>
