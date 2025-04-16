@@ -9,7 +9,6 @@ import {
   FaHome,
   FaBook,
 } from "react-icons/fa";
-import logo from "/public/big-text-logo.png"; // <-- Adjust path if needed
 
 const DashboardSidebar = ({ onLogout }) => {
   const location = useLocation();
@@ -23,7 +22,11 @@ const DashboardSidebar = ({ onLogout }) => {
     <aside className="w-60 bg-white shadow-lg min-h-screen px-4 py-6">
       {/* Logo + Title Section */}
       <div className="flex items-center space-x-2 mb-8">
-        <img src={logo} alt="CBI Logo" className="h-10 w-auto" />
+        {/* 
+          The logo file MUST be in your public folder as `public/big-text-logo.png`. 
+          The slash `/` at the start means: "Host root/public"
+        */}
+        <img src="/big-text-logo.png" alt="CBI Logo" className="h-10 w-auto" />
         <span className="text-2xl font-bold text-blue-700">CBI Dashboard</span>
       </div>
 
