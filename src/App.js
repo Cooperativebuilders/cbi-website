@@ -7,7 +7,8 @@ import MembershipRequired from "./pages/MembershipRequired";
 import MembersPage from "./pages/MembersPage";
 import EditProfile from "./pages/EditProfile";
 import ProjectsPage from "./pages/ProjectsPage";
-import ProjectForm from "./components/ProjectForm"; // ✅ Add this line
+import ProjectForm from "./components/ProjectForm";
+import GuidancePage from "./pages/GuidancePage"; // ✅ Add this line
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/edit-profile" element={<EditProfile />} />
       <Route path="/projects" element={<ProjectsPage />} />
       <Route path="/submit-project" element={<ProjectForm />} />
+      <Route path="/guidance" element={<GuidancePage />} />
     </Routes>
   );
 }

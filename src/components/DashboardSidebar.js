@@ -8,6 +8,7 @@ import {
   FaSignOutAlt,
   FaHome,
 } from "react-icons/fa";
+import { FaBook } from "react-icons/fa";
 
 const DashboardSidebar = ({ onLogout }) => {
   const location = useLocation();
@@ -46,6 +47,9 @@ const DashboardSidebar = ({ onLogout }) => {
           <FaSignOutAlt /> <span>Logout</span>
         </button>
       </nav>
+      <Link to="/guidance" className={linkClass("/guidance")}>
+        <FaBook /> <span>Guidance</span>
+      </Link>
     </aside>
   );
 };
