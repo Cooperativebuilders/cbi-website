@@ -1,49 +1,43 @@
 // src/components/ProjectTile.js
+
 import React from "react";
 import {
   doc,
+  getDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
-  setDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { adminUIDs } from "../constants/admins";
 
-const ProjectTile = ({ project, projectId }) => {
-  // 1) Get current logged-in user info
+function ProjectTile({ project, projectId }) {
   const [user] = useAuthState(auth);
-
-  // 2) Check if this user is an admin
   const isAdmin = user && adminUIDs.includes(user.uid);
 
-  console.log("Current user UID:", user?.uid);
-  console.log("Is admin?", isAdmin);
+  // Convert fields to numbers
+  const budget = parseInt(project.budget, 10) || 0;
+  const buyIn = parseInt(project.buyIn, 10) || 0;
+  const fundedSoFar = parseInt(project.fundedSoFar, 10) || 0;
 
-  // ------------------------------
-  // JOIN PROJECT BUTTON CLICK
-  // ------------------------------
-  const handleJoin = async () => {
+  // Calculate percentage
+  const percentFunded =
+    budget > 0 ? Math.min(Math.round((fundedSoFar / budget) * 100), 100) : 0;
+
+  async function handleJoin() {
     if (!user) {
       alert("You must be logged in to join a project.");
       return;
     }
-
-    // Optional confirmation prompt
     const confirmJoin = window.confirm(
-      "Are you sure you want to join this project? You will contribute one buy-in."
+      `Are you sure you want to join this project? You will contribute one buy-in of €${buyIn}.`
     );
     if (!confirmJoin) return;
 
     try {
-      // 1) Figure out the current fundedSoFar
-      const fundedSoFar = project.fundedSoFar || 0;
-      const buyInAmount = project.buyIn || 0;
-      const newFundedSoFar = fundedSoFar + buyInAmount;
-
-      // 2) Build references
-      const projectRef = doc(db, "projects", projectId);
+      // Check if participant doc exists
       const participantRef = doc(
         db,
         "projects",
@@ -51,41 +45,39 @@ const ProjectTile = ({ project, projectId }) => {
         "participants",
         user.uid
       );
+      const snap = await getDoc(participantRef);
+      if (snap.exists()) {
+        alert("❌ You have already joined this project.");
+        return;
+      }
 
-      // 3) Write participant data (email, uid, buyIn, timestamp)
+      // Create participant doc
       await setDoc(participantRef, {
         userUid: user.uid,
         email: user.email || "NoEmailFound",
-        buyIn: buyInAmount,
+        buyIn: buyIn.toString(),
         joinedAt: serverTimestamp(),
       });
 
-      // 4) Update the project's fundedSoFar total
-      await updateDoc(projectRef, {
-        fundedSoFar: newFundedSoFar,
-      });
+      // Update fundedSoFar
+      const newFundedSoFar = fundedSoFar + buyIn;
+      const projectRef = doc(db, "projects", projectId);
+      await updateDoc(projectRef, { fundedSoFar: newFundedSoFar });
 
-      // 5) Alert success
       alert(
-        `You contributed €${buyInAmount.toLocaleString()} to ${
-          project.location
-        }!`
+        `You contributed €${buyIn.toLocaleString()} to ${project.location}!`
       );
     } catch (error) {
       console.error("Error joining project:", error);
       alert("❌ Failed to join this project. Please try again later.");
     }
-  };
+  }
 
-  // ------------------------------
-  // DELETE PROJECT BUTTON CLICK
-  // ------------------------------
-  const handleDelete = async () => {
+  async function handleDelete() {
     if (!user) {
       alert("You must be logged in as admin to delete a project.");
       return;
     }
-
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this project?"
     );
@@ -94,30 +86,14 @@ const ProjectTile = ({ project, projectId }) => {
     try {
       await deleteDoc(doc(db, "projects", projectId));
       alert("✅ Project deleted.");
-      // If you want a full refresh, uncomment the line below
-      // window.location.reload();
     } catch (err) {
       console.error("Error deleting project:", err);
       alert("❌ Failed to delete project.");
     }
-  };
+  }
 
-  // ------------------------------
-  // CALCULATE FUNDED PERCENT
-  // ------------------------------
-  const fundedSoFar = project.fundedSoFar || 0;
-  const budget = project.budget || 0;
-  const buyIn = project.buyIn || 0;
-
-  const percentFunded =
-    budget > 0 ? Math.min(Math.round((fundedSoFar / budget) * 100), 100) : 0;
-
-  // ------------------------------
-  // RENDER UI
-  // ------------------------------
   return (
     <div className="bg-white shadow-md rounded-lg p-4 relative">
-      {/* Basic Project Info */}
       <h3 className="text-xl font-bold text-blue-700 mb-2">
         {project.location}
       </h3>
@@ -145,7 +121,6 @@ const ProjectTile = ({ project, projectId }) => {
         <strong>Notes:</strong> {project.notes || "No notes added."}
       </p>
 
-      {/* Join Project button: visible to any logged-in user */}
       {user && (
         <button
           onClick={handleJoin}
@@ -155,7 +130,6 @@ const ProjectTile = ({ project, projectId }) => {
         </button>
       )}
 
-      {/* Delete button: visible to admin only */}
       {isAdmin && (
         <button
           onClick={handleDelete}
@@ -166,6 +140,6 @@ const ProjectTile = ({ project, projectId }) => {
       )}
     </div>
   );
-};
+}
 
 export default ProjectTile;
