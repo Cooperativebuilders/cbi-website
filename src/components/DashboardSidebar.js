@@ -41,7 +41,7 @@ const DashboardSidebar = ({ onLogout }) => {
           <FaProjectDiagram /> <span>View Projects</span>
         </Link>
         <Link to="/guidance" className={linkClass("/guidance")}>
-          <FaBook /> <span>Guidance</span>
+          <FaBook /> <span>Guidanc Notes</span>
         </Link>
         <button
           onClick={onLogout}
