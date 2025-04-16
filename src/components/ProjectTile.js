@@ -1,74 +1,38 @@
 // src/components/ProjectTile.js
-import React, { useEffect, useState } from "react";
-import {
-  doc,
-  deleteDoc,
-  collection,
-  getDocs,
-  addDoc,
-  query,
-  where,
-} from "firebase/firestore";
+import React from "react";
+import { doc, deleteDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { adminUIDs } from "../constants/admins";
 
-const ProjectTile = ({ project }) => {
+const ProjectTile = ({ project, projectId }) => {
   const [user] = useAuthState(auth);
-  const [participants, setParticipants] = useState([]);
-  const [hasJoined, setHasJoined] = useState(false);
 
-  const projectRef = doc(db, "projects", project.id);
+  const isAdmin = user && adminUIDs.includes(user.uid);
 
-  useEffect(() => {
-    const fetchParticipants = async () => {
-      const snapshot = await getDocs(collection(projectRef, "participants"));
-      const list = snapshot.docs.map((doc) => doc.data());
-      setParticipants(list);
-      setHasJoined(list.some((p) => p.uid === user?.uid));
-    };
+  console.log("Current user UID:", user?.uid);
+  console.log("Is admin?", isAdmin);
 
-    if (user) fetchParticipants();
-  }, [project.id, user]);
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this project?"
+    );
+    if (!confirmDelete) return;
 
-  const handleJoin = async () => {
-    if (!user || hasJoined) return;
     try {
-      await addDoc(collection(projectRef, "participants"), {
-        uid: user.uid,
-        email: user.email,
-        joinedAt: new Date().toISOString(),
-      });
-      setHasJoined(true);
-      setParticipants((prev) => [...prev, { uid: user.uid }]);
+      await deleteDoc(doc(db, "projects", projectId));
+      alert("✅ Project deleted.");
+      window.location.reload();
     } catch (err) {
-      console.error("Error joining project:", err);
-      alert("Failed to join the project.");
+      console.error("Error deleting project:", err);
+      alert("❌ Failed to delete project.");
     }
   };
 
   const percentFunded =
     project.buyIn > 0
-      ? Math.min(
-          Math.round(
-            ((participants.length * project.buyIn) / project.budget) * 100
-          ),
-          100
-        )
+      ? Math.min(Math.round((project.budget / project.buyIn) * 100), 100)
       : 0;
-
-  const isAdmin = user?.email === "admin@cooperativebuilders.ie";
-
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this project?"))
-      return;
-    try {
-      await deleteDoc(projectRef);
-      alert("✅ Project deleted.");
-      window.location.reload();
-    } catch (err) {
-      console.error("Error deleting project:", err);
-    }
-  };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 relative">
@@ -98,15 +62,6 @@ const ProjectTile = ({ project }) => {
       <p className="text-sm text-gray-600 italic">
         <strong>Notes:</strong> {project.notes || "No notes added."}
       </p>
-
-      {!isAdmin && user && !hasJoined && (
-        <button
-          onClick={handleJoin}
-          className="mt-3 bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 transition text-sm"
-        >
-          Join Project
-        </button>
-      )}
 
       {isAdmin && (
         <button
