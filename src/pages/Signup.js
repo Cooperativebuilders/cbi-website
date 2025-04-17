@@ -121,14 +121,14 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
+      <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">
+        CBI Member Signup
+      </h1>
       <img
         src={`${process.env.PUBLIC_URL}/big-text-logo.png`}
         alt="CBI Logo"
         className="w-80 h-80 mb-6"
       />
-      <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">
-        CBI Member Signup
-      </h1>
       {!paid ? (
         <div className="text-center space-y-4">
           <p className="text-gray-600 mb-4">
