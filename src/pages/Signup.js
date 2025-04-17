@@ -120,7 +120,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 max-w-xl mx-auto">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
       <img
         src={`${process.env.PUBLIC_URL}/big-text-logo.png`}
         alt="CBI Logo"
