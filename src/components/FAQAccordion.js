@@ -5,7 +5,7 @@ const faqs = [
   {
     question: "💬 What is Co-operative Builders Ireland (CBI)?",
     answer:
-      "CBI is a decentralized network where tradespeople, construction professionals, and investors collaborate to buy, renovate, or build property. Everyone shares an equal stake, an equal say, and a fair share of the profits.",
+      "CBI is a decentralized network where tradespeople, construction professionals, and investors collaborate to buy, renovate, or build property. Everyone shares ownership, has equal rights, and receives a fair share of the profits.",
   },
   {
     question: "🤝 Who can join CBI?",
@@ -20,27 +20,27 @@ const faqs = [
   {
     question: "👷‍♂️ Do I need tools or experience?",
     answer:
-      "No. Some members bring hands-on skills and equipment, while others contribute money, design work, admin, or coordination. We build around everyone’s strengths.",
+      "If you plan to work on-site, you need a valid Safe Pass and manual handling certification. If you’re new to construction, investing in basic hand and power tools—a combi-drill, SDS drill, measuring tape, hammer, and nail bar—will help you contribute more effectively. You’ll also need the right PPE: steel-toe footwear, work trousers, hard hat, gloves, safety glasses, mask, and ear protection. Not everyone has to be on-site, though; some members focus on design, finances, or admin, so there’s room for all skill levels.",
   },
   {
     question: "💁‍♂️ How do I become a member of CBI?",
     answer:
-      "Sign up on our website, pay the €4.99/month membership fee, and join our Discord. The fee keeps our community bot-free and ensures members are genuinely interested.",
+      "Sign up on our website. Once you’re in, you can propose projects, vote on ideas, and collaborate with other members. We’ll guide you through the process.",
   },
   {
     question: "💸 How does the investment work?",
     answer:
-      "Your funds are pooled with other members' to purchase or build properties. A group-selected solicitor holds all money until key milestones are reached. When a project is completed and sold (or rented), profits are shared according to each member’s stake.",
+      "Your funds are pooled with other members' to purchase or build properties. A group-selected solicitor holds all money until they incorporate the group as a company, they then transfer the funds to the company bank account. When a project is completed and sold (or rented), profits are shared according to each member’s stake.",
   },
   {
     question: "🎁 What are the benefits of joining CBI?",
     answer:
-      "Equal voting rights, shared costs, a professional network, and real transparency at every stage. You collaborate with architects, surveyors, and fellow investors in a truly cooperative environment.",
+      "Equal voting rights, shared costs, a professional network, and real transparency at every stage. You collaborate with architects, surveyors, carpenters, electricians and fellow investors in a truly cooperative environment.",
   },
   {
-    question: "📱 What is the CBI app, and how does it work?",
+    question: "📱 What is the CBI Dashboard, and how does it work?",
     answer:
-      "It’s your digital hub for proposing projects, tracking milestones, and voting on key decisions. Once enough members commit, a dedicated group is formed, and the app helps manage everything from budgeting to final sale.",
+      "It’s your digital hub for proposing projects, tracking milestones, and voting on key decisions. Once enough members commit, a dedicated group is formed, and the Dashboard helps manage everything from budgeting to final sale.",
   },
   {
     question: "🏗 How are profits shared?",
