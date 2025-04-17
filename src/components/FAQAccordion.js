@@ -3,24 +3,69 @@ import React, { useState } from "react";
 
 const faqs = [
   {
-    question: "💬 Who can join CBI?",
+    question: "💬 What is Co-operative Builders Ireland (CBI)?",
     answer:
-      "Anyone interested in property development and construction — whether you're a skilled tradesperson, designer, or investor — is welcome.",
+      "CBI is a decentralized network where tradespeople, construction professionals, and investors collaborate to buy, renovate, or build property. Everyone shares an equal stake, an equal say, and a fair share of the profits.",
+  },
+  {
+    question: "🤝 Who can join CBI?",
+    answer:
+      "Anyone interested in property development and construction — whether you're a skilled tradesperson, construction professional, or investor — is welcome to join.",
   },
   {
     question: "💶 How much do I need to invest?",
     answer:
-      "Projects vary, but many start with members contributing between €2,000–€5,000 each. Every project is its own entity, so members vote on structure and buy-in.",
+      "The minimum buy-ins are set by the members who propose each project. They can also decide whether or not to include passive investors. There’s no single fixed amount across all projects, so the cost to join can vary widely based on each project's goals and team preferences.",
   },
   {
     question: "👷‍♂️ Do I need tools or experience?",
     answer:
-      "Nope! Some members bring hands-on skills and equipment, others contribute money, design work, admin, or coordination. We build around everyone’s strengths.",
+      "No. Some members bring hands-on skills and equipment, while others contribute money, design work, admin, or coordination. We build around everyone’s strengths.",
+  },
+  {
+    question: "💁‍♂️ How do I become a member of CBI?",
+    answer:
+      "Sign up on our website, pay the €4.99/month membership fee, and join our Discord. The fee keeps our community bot-free and ensures members are genuinely interested.",
+  },
+  {
+    question: "💸 How does the investment work?",
+    answer:
+      "Your funds are pooled with other members' to purchase or build properties. A group-selected solicitor holds all money until key milestones are reached. When a project is completed and sold (or rented), profits are shared according to each member’s stake.",
+  },
+  {
+    question: "🎁 What are the benefits of joining CBI?",
+    answer:
+      "Equal voting rights, shared costs, a professional network, and real transparency at every stage. You collaborate with architects, surveyors, and fellow investors in a truly cooperative environment.",
+  },
+  {
+    question: "📱 What is the CBI app, and how does it work?",
+    answer:
+      "It’s your digital hub for proposing projects, tracking milestones, and voting on key decisions. Once enough members commit, a dedicated group is formed, and the app helps manage everything from budgeting to final sale.",
   },
   {
     question: "🏗 How are profits shared?",
     answer:
-      "Equally — if 10 people contribute evenly to a project, they all split profits evenly. You decide as a team how to run it.",
+      "Profits are distributed based on your share of the total investment. If you contributed 10% of a project’s funds, you receive 10% of that project's profits.",
+  },
+  {
+    question: "🤑 Are there any additional costs after the initial investment?",
+    answer:
+      "Beyond membership and your project investment, there may be extra costs like renovation overruns or legal fees. These are discussed, voted on, and shared transparently among the project group.",
+  },
+  {
+    question: "📑 How are projects managed within CBI?",
+    answer:
+      "Projects are formed by interested members. Once a threshold is reached, a dedicated chat is created. Members vote on contractors, budgets, and timelines, with progress tracked on the CBI app and Discord.",
+  },
+  {
+    question: "💬 How do I communicate with other members?",
+    answer:
+      "We primarily use Discord for real-time conversation and collaboration. The CBI app also has built-in messaging and forums for project-specific discussions.",
+  },
+  {
+    question: "⚠️ What if a member cannot complete their tasks?",
+    answer:
+      "If you can’t fulfill your responsibilities, let the group know immediately so tasks can be reassigned or outsourced. Any associated costs or timeline changes are voted on. Transparency and teamwork keep projects on track.",
   },
 ];
 
