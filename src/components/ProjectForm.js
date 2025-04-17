@@ -4,7 +4,7 @@ import { doc, setDoc, Timestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, auth, storage } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Utility to generate a code like "PROJ-ABCD12"
 function generateProjectCode() {
@@ -14,6 +14,7 @@ function generateProjectCode() {
 
 const ProjectForm = () => {
   const [user] = useAuthState(auth);
+  const navigate = useNavigate(); // so we can redirect after submit
 
   const [formData, setFormData] = useState({
     location: "",
@@ -46,9 +47,16 @@ const ProjectForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return alert("Please log in first.");
+    console.log("ProjectForm handleSubmit called");
+
+    if (!user) {
+      alert("Please log in first.");
+      console.log("User not logged in, returning early");
+      return;
+    }
 
     try {
+      console.log("Generating project code and parsing data...");
       // 1) Generate a human-readable code for this project
       const projectCode = generateProjectCode();
 
@@ -59,18 +67,19 @@ const ProjectForm = () => {
       let imageUrl = "";
       // 3) If user selected an image, upload to Storage
       if (imageFile) {
+        console.log("Uploading image:", imageFile.name);
         // e.g. /projectImages/PROJ-XXXXXX/<filename>
         const storageRef = ref(
           storage,
           `projectImages/${projectCode}/${imageFile.name}`
         );
 
-        // Upload the file
         await uploadBytes(storageRef, imageFile);
-
-        // Get the download URL
         imageUrl = await getDownloadURL(storageRef);
+        console.log("Image uploaded, url:", imageUrl);
       }
+
+      console.log("Creating doc at /projects/" + projectCode);
 
       // 4) Create the doc at /projects/{projectCode}
       await setDoc(doc(db, "projects", projectCode), {
@@ -86,12 +95,17 @@ const ProjectForm = () => {
         submittedBy: user.email,
         fundedSoFar: 0,
         timestamp: Timestamp.now(),
-        // store image URL in Firestore if available
         imageUrl,
       });
 
+      console.log("Project created successfully:", projectCode);
       alert(`✅ Project submitted!`);
-      window.location.reload(); // or navigate as you prefer
+
+      // Option A: Reload
+      // window.location.reload();
+
+      // Option B: Navigate back to ProjectsPage or wherever:
+      navigate("/projects");
     } catch (err) {
       console.error("Error submitting project:", err);
       alert("❌ Error submitting project.");
@@ -194,7 +208,6 @@ const ProjectForm = () => {
           className="w-full p-2 border rounded mb-4"
         />
 
-        {/* New Image Field */}
         <label className="block mb-2 font-medium text-gray-700">
           Project Image (optional)
         </label>
