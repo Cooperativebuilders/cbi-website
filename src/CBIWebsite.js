@@ -15,9 +15,9 @@ const CBIWebsite = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 sm:p-6">
       {/* Header */}
-      <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 px-4 bg-white shadow-md rounded-xl mb-6">
+      <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 px-4 bg-white shadow-md rounded-xl mb-6 max-w-4xl mx-auto">
         <div className="flex items-center space-x-3 mb-4 sm:mb-0">
-          <img src="/CB Text Logo.png" alt="CBI Logo" className="w-10 h-10" />
+          <img src="/CB Text Logo.png" alt="CBI Logo" className="w-12 h-12" />
           <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
             Co-operative Builders Ireland
           </h1>
@@ -35,25 +35,35 @@ const CBIWebsite = () => {
         </nav>
       </header>
 
-      {/* Hero (Banner) */}
-      <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl overflow-hidden mb-10 px-6 py-12 text-center max-w-4xl mx-auto">
-        <h1 className="text-3xl sm:text-5xl font-extrabold mb-4">
-          Build Together. Profit Together.
-        </h1>
-        <p className="text-lg sm:text-xl text-white/90 mb-6 max-w-2xl mx-auto">
-          Co-operative Builders Ireland (CBI) connects skilled tradespeople and
-          property investors to renovate, build, and thrive – as one.
-        </p>
-        <a
-          href="/signup"
-          className="inline-block bg-white text-blue-700 font-bold py-3 px-6 rounded-lg hover:bg-gray-200 transition"
-        >
-          Get Involved
-        </a>
+      {/* Hero (Banner) with background image */}
+      <section
+        className="relative h-96 rounded-xl shadow-xl overflow-hidden mb-10 max-w-4xl mx-auto"
+        style={{
+          backgroundImage: "url('/hero.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-4">
+            Build Together. Profit Together.
+          </h1>
+          <p className="text-lg sm:text-xl text-white/90 mb-6 max-w-2xl">
+            Co-operative Builders Ireland (CBI) connects skilled tradespeople
+            and property investors to renovate, build, and thrive – as one.
+          </p>
+          <Link
+            to="/signup"
+            className="inline-block bg-white text-blue-700 font-bold py-3 px-6 rounded-lg hover:bg-gray-200 transition"
+          >
+            Get Involved
+          </Link>
+        </div>
       </section>
 
       {/* Main content */}
-      <main id="home" className="space-y-8">
+      <main id="home" className="space-y-8 max-w-4xl mx-auto">
         {/* Three Sections: "About Us", "Membership Details", "Become a Developer" */}
         {[
           {
@@ -75,7 +85,7 @@ const CBIWebsite = () => {
         ].map((section, i) => (
           <section
             key={i}
-            className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 max-w-4xl mx-auto"
+            className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">
               {section.title}
@@ -84,13 +94,12 @@ const CBIWebsite = () => {
               {section.content}
             </p>
             {section.button && (
-              <button
-                target="_blank"
-                className="lp6475702170157056 lpbtn bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
-                yearly="true"
+              <Link
+                to="/signup"
+                className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
               >
                 Join Now
-              </button>
+              </Link>
             )}
           </section>
         ))}
@@ -98,7 +107,7 @@ const CBIWebsite = () => {
         {/* FAQs */}
         <section
           id="faqs"
-          className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 mt-12 max-w-4xl mx-auto"
+          className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 mt-12"
         >
           <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">
             Frequently Asked Questions
@@ -106,9 +115,9 @@ const CBIWebsite = () => {
           <FAQAccordion />
           <p className="text-sm text-gray-500 text-center mt-4">
             Have more questions?{" "}
-            <a href="/contact" className="text-blue-600 hover:underline">
+            <Link to="/contact" className="text-blue-600 hover:underline">
               Contact us
-            </a>
+            </Link>
             .
           </p>
         </section>
@@ -120,7 +129,7 @@ const CBIWebsite = () => {
       </main>
 
       {/* Footer */}
-      <footer className="text-center text-gray-500 mt-12 py-4 border-t">
+      <footer className="text-center text-gray-500 mt-12 py-4 border-t max-w-4xl mx-auto">
         <p>© 2025 Co-operative Builders Ireland. All rights reserved.</p>
       </footer>
     </div>
