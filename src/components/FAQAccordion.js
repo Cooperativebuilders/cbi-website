@@ -55,12 +55,12 @@ const faqs = [
   {
     question: "📑 How are projects managed within CBI?",
     answer:
-      "Projects are formed by interested members. Once a threshold is reached, a dedicated chat is created. Members vote on contractors, budgets, and timelines, with progress tracked on the CBI app and Discord.",
+      "Projects are formed by interested members. Once a threshold is reached, a dedicated chat is created. Members vote on contractors, budgets, and timelines, with progress tracked on the CBI Dashboard and Discord Server.",
   },
   {
     question: "💬 How do I communicate with other members?",
     answer:
-      "We primarily use Discord for real-time conversation and collaboration. The CBI app also has built-in messaging and forums for project-specific discussions.",
+      "We primarily use Discord for real-time conversation and collaboration. The CBI Dashboard is evolving every day and will soon include built-in messaging, forums for project-specific discussions, and more. Eventually, we plan to pivot away from Discord and consolidate everything onto our own purpose-built platform for seamless collaboration.",
   },
   {
     question: "⚠️ What if a member cannot complete their tasks?",
