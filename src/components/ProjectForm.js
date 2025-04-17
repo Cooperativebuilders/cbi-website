@@ -1,11 +1,12 @@
 // src/components/ProjectForm.js
 import React, { useState } from "react";
 import { doc, setDoc, Timestamp } from "firebase/firestore";
-import { db, auth } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, auth, storage } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "react-router-dom";
 
-// Utility to generate a code like "PROJ-4Q27A1"
+// Utility to generate a code like "PROJ-ABCD12"
 function generateProjectCode() {
   const rand = Math.random().toString(36).substring(2, 8).toUpperCase();
   return `PROJ-${rand}`;
@@ -13,6 +14,7 @@ function generateProjectCode() {
 
 const ProjectForm = () => {
   const [user] = useAuthState(auth);
+
   const [formData, setFormData] = useState({
     location: "",
     propertyType: "Residential",
@@ -24,6 +26,9 @@ const ProjectForm = () => {
     notes: "",
   });
 
+  // We'll store the file in state
+  const [imageFile, setImageFile] = useState(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -32,21 +37,43 @@ const ProjectForm = () => {
     }));
   };
 
+  // File input change handler
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return alert("Please log in first.");
 
     try {
-      // 1) Generate a human-readable code (doc ID)
+      // 1) Generate a human-readable code for this project
       const projectCode = generateProjectCode();
 
-      // 2) Parse budget/buyIn as integers
+      // 2) Convert budget/buyIn to integers
       const parseBudget = parseInt(formData.budget, 10) || 0;
       const parseBuyIn = parseInt(formData.buyIn, 10) || 0;
 
-      // 3) Create doc at /projects/{projectCode}
+      let imageUrl = "";
+      // 3) If user selected an image, upload to Storage
+      if (imageFile) {
+        // e.g. /projectImages/PROJ-XXXXXX/<filename>
+        const storageRef = ref(
+          storage,
+          `projectImages/${projectCode}/${imageFile.name}`
+        );
+
+        // Upload the file
+        await uploadBytes(storageRef, imageFile);
+
+        // Get the download URL
+        imageUrl = await getDownloadURL(storageRef);
+      }
+
+      // 4) Create the doc at /projects/{projectCode}
       await setDoc(doc(db, "projects", projectCode), {
-        // store the code for reference
         projectCode,
         location: formData.location,
         propertyType: formData.propertyType,
@@ -57,12 +84,14 @@ const ProjectForm = () => {
         passiveOpen: formData.passiveOpen,
         notes: formData.notes,
         submittedBy: user.email,
-        fundedSoFar: 0, // start at 0
+        fundedSoFar: 0,
         timestamp: Timestamp.now(),
+        // store image URL in Firestore if available
+        imageUrl,
       });
 
-      alert(`✅ Project submitted with ID: ${projectCode}!`);
-      window.location.reload(); // or navigate somewhere else
+      alert(`✅ Project submitted!`);
+      window.location.reload(); // or navigate as you prefer
     } catch (err) {
       console.error("Error submitting project:", err);
       alert("❌ Error submitting project.");
@@ -163,6 +192,17 @@ const ProjectForm = () => {
           onChange={handleChange}
           maxLength={500}
           className="w-full p-2 border rounded mb-4"
+        />
+
+        {/* New Image Field */}
+        <label className="block mb-2 font-medium text-gray-700">
+          Project Image (optional)
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="mb-4"
         />
 
         <button
