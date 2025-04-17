@@ -1,6 +1,6 @@
 // src/components/ProjectForm.js
 import React, { useState } from "react";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { doc, setDoc, updateDoc, Timestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, auth, storage } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -14,7 +14,7 @@ function generateProjectCode() {
 
 const ProjectForm = () => {
   const [user] = useAuthState(auth);
-  const navigate = useNavigate(); // so we can redirect after submit
+  const navigate = useNavigate(); // We'll navigate after a successful submit
 
   const [formData, setFormData] = useState({
     location: "",
@@ -27,9 +27,9 @@ const ProjectForm = () => {
     notes: "",
   });
 
-  // We'll store the file in state
   const [imageFile, setImageFile] = useState(null);
 
+  // Handle text/select field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -38,50 +38,32 @@ const ProjectForm = () => {
     }));
   };
 
-  // File input change handler
+  // Handle file input changes
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setImageFile(e.target.files[0]);
     }
   };
 
+  // **Reordered** handleSubmit
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("ProjectForm handleSubmit called");
 
     if (!user) {
       alert("Please log in first.");
-      console.log("User not logged in, returning early");
       return;
     }
 
     try {
-      console.log("Generating project code and parsing data...");
-      // 1) Generate a human-readable code for this project
+      // 1) Create the project doc first
       const projectCode = generateProjectCode();
+      console.log("Generated code:", projectCode);
 
-      // 2) Convert budget/buyIn to integers
       const parseBudget = parseInt(formData.budget, 10) || 0;
       const parseBuyIn = parseInt(formData.buyIn, 10) || 0;
 
-      let imageUrl = "";
-      // 3) If user selected an image, upload to Storage
-      if (imageFile) {
-        console.log("Uploading image:", imageFile.name);
-        // e.g. /projectImages/PROJ-XXXXXX/<filename>
-        const storageRef = ref(
-          storage,
-          `projectImages/${projectCode}/${imageFile.name}`
-        );
-
-        await uploadBytes(storageRef, imageFile);
-        imageUrl = await getDownloadURL(storageRef);
-        console.log("Image uploaded, url:", imageUrl);
-      }
-
-      console.log("Creating doc at /projects/" + projectCode);
-
-      // 4) Create the doc at /projects/{projectCode}
+      // Create doc at /projects/{projectCode} so that Storage rules can see "submittedBy"
       await setDoc(doc(db, "projects", projectCode), {
         projectCode,
         location: formData.location,
@@ -92,20 +74,43 @@ const ProjectForm = () => {
         buyIn: parseBuyIn,
         passiveOpen: formData.passiveOpen,
         notes: formData.notes,
-        submittedBy: user.email,
+        submittedBy: user.email, // must match rules if referencing email
         fundedSoFar: 0,
         timestamp: Timestamp.now(),
-        imageUrl,
+        imageUrl: "", // temporarily empty
       });
 
-      console.log("Project created successfully:", projectCode);
-      alert(`✅ Project submitted!`);
+      console.log("Project doc created in Firestore");
 
-      // Option A: Reload
-      // window.location.reload();
+      // 2) If user selected an image, upload now
+      let finalImageUrl = "";
+      if (imageFile) {
+        console.log("Uploading image:", imageFile.name);
+        const storageRef = ref(
+          storage,
+          `projectImages/${projectCode}/${imageFile.name}`
+        );
+        await uploadBytes(storageRef, imageFile);
+        console.log("Upload complete, fetching download URL...");
+        finalImageUrl = await getDownloadURL(storageRef);
+        console.log("Image URL:", finalImageUrl);
+      }
 
-      // Option B: Navigate back to ProjectsPage or wherever:
+      // 3) If we have an image URL, update the doc
+      if (finalImageUrl) {
+        console.log("Updating project doc with imageUrl...");
+        await updateDoc(doc(db, "projects", projectCode), {
+          imageUrl: finalImageUrl,
+        });
+      }
+
+      alert("✅ Project submitted!");
+
+      // Optionally navigate to ProjectsPage so we don't keep reloading
       navigate("/projects");
+
+      // Or do a reload, if you prefer:
+      // window.location.reload();
     } catch (err) {
       console.error("Error submitting project:", err);
       alert("❌ Error submitting project.");
