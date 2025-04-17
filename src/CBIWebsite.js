@@ -17,7 +17,7 @@ const CBIWebsite = () => {
       {/* Header */}
       <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 px-4 bg-white shadow-md rounded-xl mb-6 max-w-4xl mx-auto">
         <div className="flex items-center space-x-3 mb-4 sm:mb-0">
-          <img src="/CB Text Logo.png" alt="CBI Logo" className="w-12 h-12" />
+          <img src="/CB Text Logo.png" alt="CBI Logo" className="w-24 h-24" />
           <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
             Co-operative Builders Ireland
           </h1>
