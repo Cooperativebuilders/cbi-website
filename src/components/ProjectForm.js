@@ -27,6 +27,7 @@ const ProjectForm = () => {
     notes: "",
   });
 
+  // We'll store the file in state
   const [imageFile, setImageFile] = useState(null);
 
   // Handle text/select field changes
@@ -45,7 +46,7 @@ const ProjectForm = () => {
     }
   };
 
-  // **Reordered** handleSubmit
+  // **Reordered** handleSubmit: Create Firestore doc first, then upload image.
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("ProjectForm handleSubmit called");
@@ -56,14 +57,14 @@ const ProjectForm = () => {
     }
 
     try {
-      // 1) Create the project doc first
+      // 1) Generate a human-readable code for this project
       const projectCode = generateProjectCode();
       console.log("Generated code:", projectCode);
 
       const parseBudget = parseInt(formData.budget, 10) || 0;
       const parseBuyIn = parseInt(formData.buyIn, 10) || 0;
 
-      // Create doc at /projects/{projectCode} so that Storage rules can see "submittedBy"
+      // 2) Create the project doc in Firestore so Storage rules can see "submittedBy"
       await setDoc(doc(db, "projects", projectCode), {
         projectCode,
         location: formData.location,
@@ -82,7 +83,7 @@ const ProjectForm = () => {
 
       console.log("Project doc created in Firestore");
 
-      // 2) If user selected an image, upload now
+      // 3) If user selected an image, upload now
       let finalImageUrl = "";
       if (imageFile) {
         console.log("Uploading image:", imageFile.name);
@@ -96,7 +97,7 @@ const ProjectForm = () => {
         console.log("Image URL:", finalImageUrl);
       }
 
-      // 3) If we have an image URL, update the doc
+      // 4) If we have an image URL, update the doc
       if (finalImageUrl) {
         console.log("Updating project doc with imageUrl...");
         await updateDoc(doc(db, "projects", projectCode), {
