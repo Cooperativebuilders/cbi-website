@@ -295,7 +295,7 @@ const Dashboard = () => {
 
       <main className="flex-1 p-6">
         <motion.h1
-          className="text-4xl font-bold text-blue-700 mb-6"
+          className="text-4xl font-bold text-blue-700 mb-4"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -303,134 +303,135 @@ const Dashboard = () => {
           Member Dashboard
         </motion.h1>
 
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 mb-8">
           Logged in as <strong>{user.displayName || user.email}</strong>
         </p>
 
-        {/* ============== Projects Overview ============== */}
-        <section className="mb-10">
-          <motion.h2
-            className="text-2xl font-semibold text-blue-800 mb-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            Projects Overview
-          </motion.h2>
-
-          {myProjects.length === 0 ? (
-            <p className="text-gray-600">
-              You haven't joined any projects yet.
-            </p>
-          ) : (
-            <ul className="space-y-3">
-              {myProjects.map(({ projectId, projectData, userBuyIn }) => {
-                const budget = parseInt(projectData.budget || "0", 10);
-                const fundedSoFar = parseInt(
-                  projectData.fundedSoFar || "0",
-                  10
-                );
-                const percentFunded =
-                  budget > 0
-                    ? Math.min(Math.round((fundedSoFar / budget) * 100), 100)
-                    : 0;
-
-                return (
-                  <li
-                    key={projectId}
-                    className="bg-white rounded-md shadow p-4"
-                  >
-                    <p className="font-bold text-blue-700">
-                      {projectData.location} ({projectData.propertyType} /{" "}
-                      {projectData.projectType})
-                    </p>
-                    <p className="text-sm text-gray-600 mb-1">
-                      Budget: €{budget.toLocaleString()} — Funded:{" "}
-                      {percentFunded}%
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <strong>Your Buy-In:</strong> €
-                      {userBuyIn.toLocaleString()}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-
-        {/* ============== Funding Breakdown Text ============== */}
-        <section className="mb-10">
-          <motion.h2
-            className="text-2xl font-semibold text-blue-800 mb-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            Funding Breakdown
-          </motion.h2>
-
-          <div className="bg-white shadow p-4 rounded-md">
-            <p className="text-gray-700">
-              <strong>Total Projects Joined:</strong> {myProjects.length}
-            </p>
-            <p className="text-gray-700">
-              <strong>Total Investment:</strong> €
-              {totalInvestment.toLocaleString()}
-            </p>
-          </div>
-        </section>
-
-        {/* ============== Funding Breakdown Pie Chart ============== */}
-        {myProjects.length > 0 && (
-          <section className="mb-10">
+        {/* GRID CONTAINER */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Projects Overview Card */}
+          <section className="bg-white shadow p-4 rounded-md">
             <motion.h2
               className="text-2xl font-semibold text-blue-800 mb-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              Investment Distribution
+              Projects Overview
             </motion.h2>
-            <div className="bg-white shadow p-4 rounded-md inline-block">
-              <PieChart width={300} height={300}>
-                <Pie
-                  data={chartData}
-                  cx={150}
-                  cy={150}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label
-                >
-                  {chartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
+
+            {myProjects.length === 0 ? (
+              <p className="text-gray-600">
+                You haven't joined any projects yet.
+              </p>
+            ) : (
+              <ul className="space-y-3">
+                {myProjects.map(({ projectId, projectData, userBuyIn }) => {
+                  const budget = parseInt(projectData.budget || "0", 10);
+                  const fundedSoFar = parseInt(
+                    projectData.fundedSoFar || "0",
+                    10
+                  );
+                  const percentFunded =
+                    budget > 0
+                      ? Math.min(Math.round((fundedSoFar / budget) * 100), 100)
+                      : 0;
+
+                  return (
+                    <li
+                      key={projectId}
+                      className="bg-gray-50 rounded-md p-3 border"
+                    >
+                      <p className="font-bold text-blue-700">
+                        {projectData.location} ({projectData.propertyType} /{" "}
+                        {projectData.projectType})
+                      </p>
+                      <p className="text-sm text-gray-600 mb-1">
+                        Budget: €{budget.toLocaleString()} — Funded:{" "}
+                        {percentFunded}%
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <strong>Your Buy-In:</strong> €
+                        {userBuyIn.toLocaleString()}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          {/* Funding Breakdown Card */}
+          <section className="bg-white shadow p-4 rounded-md">
+            <motion.h2
+              className="text-2xl font-semibold text-blue-800 mb-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Funding Breakdown
+            </motion.h2>
+
+            <div>
+              <p className="text-gray-700">
+                <strong>Total Projects Joined:</strong> {myProjects.length}
+              </p>
+              <p className="text-gray-700">
+                <strong>Total Investment:</strong> €
+                {totalInvestment.toLocaleString()}
+              </p>
             </div>
           </section>
-        )}
 
-        {/* ============== Discord Widget ============== */}
-        <section className="mb-10">
-          <motion.h2
-            className="text-2xl font-semibold text-blue-800 mb-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            Live Community Chat
-          </motion.h2>
-          <div className="bg-white shadow p-4 rounded-md">
+          {/* Investment Distribution (Pie Chart) */}
+          {myProjects.length > 0 && (
+            <section className="bg-white shadow p-4 rounded-md">
+              <motion.h2
+                className="text-2xl font-semibold text-blue-800 mb-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                Investment Distribution
+              </motion.h2>
+              <div className="mx-auto" style={{ width: 300, height: 300 }}>
+                <PieChart width={300} height={300}>
+                  <Pie
+                    data={chartData}
+                    cx={150}
+                    cy={150}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </div>
+            </section>
+          )}
+
+          {/* Discord Chat Card */}
+          <section className="bg-white shadow p-4 rounded-md md:col-span-2 lg:col-span-1">
+            <motion.h2
+              className="text-2xl font-semibold text-blue-800 mb-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Live Community Chat
+            </motion.h2>
             <DiscordWidget />
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
     </div>
   );
