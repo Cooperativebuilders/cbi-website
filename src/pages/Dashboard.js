@@ -18,9 +18,8 @@ import {
 import { auth, db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import DashboardSidebar from "../components/DashboardSidebar";
-import { adminUIDs } from "../constants/admins";
-
 import DiscordWidget from "../components/DiscordWidget";
+import { adminUIDs } from "../constants/admins";
 
 // RECHARTS IMPORTS
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
@@ -156,7 +155,6 @@ const Dashboard = () => {
     const unsub = onSnapshot(collection(db, "projects"), async (snapshot) => {
       const joinedProjects = [];
 
-      // We'll iterate each doc and check participants
       for (const projDoc of snapshot.docs) {
         const projectData = projDoc.data();
         const projectId = projDoc.id;
@@ -172,7 +170,6 @@ const Dashboard = () => {
         const participantSnap = await getDoc(participantRef);
 
         if (participantSnap.exists()) {
-          // user joined this project
           const participantData = participantSnap.data();
           const userBuyIn = parseInt(participantData.buyIn || "0", 10);
 
@@ -194,7 +191,7 @@ const Dashboard = () => {
       setTotalInvestment(total);
     });
 
-    return () => unsub(); // unsubscribe on unmount
+    return () => unsub();
   }, [user]);
 
   // ---------------------------
@@ -272,7 +269,6 @@ const Dashboard = () => {
   // ---------------------------
   // PREP DATA FOR PIE CHART
   // ---------------------------
-  // Example: an array of { name: projectLocation, value: userBuyIn }
   const chartData = myProjects.map((jp) => {
     const location = jp.projectData.location || "Untitled";
     return {
@@ -281,7 +277,6 @@ const Dashboard = () => {
     };
   });
 
-  // Some color palette for the chart slices
   const COLORS = [
     "#8884d8",
     "#82ca9d",
@@ -291,22 +286,8 @@ const Dashboard = () => {
     "#8dd1e1",
   ];
 
-  const Dashboard = () => {
-    return (
-      <div className="p-4">
-        <h1 className="text-xl font-bold mb-4">Dashboard</h1>
-
-        {/* Other dashboard content... */}
-
-        <div className="mt-8">
-          <DiscordWidget />
-        </div>
-      </div>
-    );
-  };
-
   // ---------------------------
-  // DASHBOARD LAYOUT
+  // FINAL DASHBOARD RENDER
   // ---------------------------
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -344,7 +325,6 @@ const Dashboard = () => {
           ) : (
             <ul className="space-y-3">
               {myProjects.map(({ projectId, projectData, userBuyIn }) => {
-                // parse data to show funded % or anything else
                 const budget = parseInt(projectData.budget || "0", 10);
                 const fundedSoFar = parseInt(
                   projectData.fundedSoFar || "0",
@@ -436,6 +416,21 @@ const Dashboard = () => {
             </div>
           </section>
         )}
+
+        {/* ============== Discord Widget ============== */}
+        <section className="mb-10">
+          <motion.h2
+            className="text-2xl font-semibold text-blue-800 mb-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            Live Community Chat
+          </motion.h2>
+          <div className="bg-white shadow p-4 rounded-md">
+            <DiscordWidget />
+          </div>
+        </section>
       </main>
     </div>
   );
