@@ -5,12 +5,19 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
+// Your web app's Firebase configuration
+
 const firebaseConfig = {
   apiKey: "AIzaSyB56Cs7kL4vYWRH7NQDTtgFoEa8e9Etkkw",
+
   authDomain: "cbi-platform.firebaseapp.com",
+
   projectId: "cbi-platform",
-  storageBucket: "cbi-platform.appspot.com",
+
+  storageBucket: "cbi-platform.firebasestorage.app",
+
   messagingSenderId: "511299254320",
+
   appId: "1:511299254320:web:8dbceb0bce75afb7ac55f5",
 };
 
