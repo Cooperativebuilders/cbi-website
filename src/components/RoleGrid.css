@@ -1,42 +1,17 @@
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
 .grid-tile {
   background: white;
   border-radius: 0.75rem;
-  aspect-ratio: 1 / 1; /* Keeps perfect square */
+  aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* Center both vertically and horizontally: */
+  justify-content: center; /* <-- was space-between */
   align-items: center;
   padding: 0.6rem;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
   overflow: hidden;
-}
-
-.grid-tile:hover {
-  transform: translateY(-4px);
-}
-
-.role-title {
-  color: #1e3a8a;
-  font-weight: 600;
-  font-size: clamp(0.5rem, 1.2vw, 0.75rem); /* Dynamic shrink */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  text-align: center;
-  margin-top: 0.25rem;
-  flex: 0 0 auto;
 }
 
 .flip-counter {
@@ -46,64 +21,10 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
   min-width: 60px;
+  /* Remove these so it no longer sticks to the bottom:
   margin-top: auto;
-  margin-bottom: 0.25rem;
-}
+  margin-bottom: 0.25rem; */
 
-.solari {
-  display: inline-block;
-  font-family: monospace;
-  animation: flipIn 0.3s ease-out;
-}
-
-@keyframes flipIn {
-  from {
-    transform: rotateX(90deg);
-    opacity: 0;
-  }
-  to {
-    transform: rotateX(0deg);
-    opacity: 1;
-  }
-}
-
-/* 📱 Mobile-specific refinements */
-@media (max-width: 768px) {
-  .grid-container {
-    padding: 0.5rem;
-    gap: 0.5rem;
-  }
-
-  .grid-tile {
-    padding: 0.4rem;
-  }
-
-  .role-title {
-    font-size: clamp(0.45rem, 2vw, 0.65rem);
-  }
-
-  .flip-counter {
-    font-size: clamp(0.9rem, 3.5vw, 1.4rem);
-    padding: 0.35rem;
-  }
-}
-
-/* 💻 Desktop refinement */
-@media (min-width: 1024px) {
-  .grid-container {
-    max-width: 880px;
-  }
-
-  .grid-tile {
-    max-width: none;
-  }
-
-  .role-title {
-    font-size: clamp(0.6rem, 1vw, 0.8rem);
-  }
-
-  .flip-counter {
-    font-size: 1.4rem;
-    padding: 0.4rem;
-  }
+  /* Instead, give them a small vertical margin for spacing: */
+  margin: 0.5rem 0;
 }
