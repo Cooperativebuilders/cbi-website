@@ -58,17 +58,17 @@ const CBIWebsite = () => {
           {
             title: "About Us",
             content:
-              "CBI is a community-driven network of skilled trades and construction professionals. We work together as equal stakeholders to build, renovate, and profit collectively.",
+              "CBI is a diverse, community-driven network of skilled trades, construction professionals, and investors who collaborate on building and renovation projects. Our flexible structures allow members to contribute at different levels, with each participant benefiting from shared knowledge and collective gains. Whether you’re a tradesperson seeking collaborative opportunities or an investor looking for new ventures, CBI brings everyone together to shape a more sustainable, transparent, and profitable future for construction.",
           },
           {
             title: "Membership Details",
             content:
-              "As a member of CBI, you’ll gain access to a vibrant network of tradespeople, professionals, and property investors. Members can propose and vote on new property ideas, forming self-managed project teams with shared profit.",
+              "As a member of CBI, you’ll gain access to a vibrant network of tradespeople, construction professionals, and property investors. Members can propose and vote on new property ideas via our Members Dashboard, forming self-managed project teams with shared profit.",
           },
           {
-            title: "Join the Community",
+            title: "Become a Developer",
             content:
-              "Become part of a network where everyone invests equally, works equally, and shares profits. Join the Discord to start connecting.",
+              "Looking to build a legacy in real estate but don’t know where to start? You’ve come to the right place. CBI is a diverse collective of builders, investors, and dreamers who believe in turning big ideas into actual properties. We share resources, expertise, and profits—making real estate development accessible to everyone. Join our Network today and take the first step toward creating long-term wealth and impactful change in your community.",
             button: true,
           },
         ].map((section, i) => (
