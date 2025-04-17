@@ -1,9 +1,15 @@
 // src/components/ProjectForm.js
 import React, { useState } from "react";
+import { doc, setDoc, Timestamp } from "firebase/firestore";
 import { db, auth } from "../firebase";
-import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "react-router-dom";
+
+// Utility to generate a code like "PROJ-4Q27A1"
+function generateProjectCode() {
+  const rand = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `PROJ-${rand}`;
+}
 
 const ProjectForm = () => {
   const [user] = useAuthState(auth);
@@ -31,13 +37,32 @@ const ProjectForm = () => {
     if (!user) return alert("Please log in first.");
 
     try {
-      await addDoc(collection(db, "projects"), {
-        ...formData,
+      // 1) Generate a human-readable code (doc ID)
+      const projectCode = generateProjectCode();
+
+      // 2) Parse budget/buyIn as integers
+      const parseBudget = parseInt(formData.budget, 10) || 0;
+      const parseBuyIn = parseInt(formData.buyIn, 10) || 0;
+
+      // 3) Create doc at /projects/{projectCode}
+      await setDoc(doc(db, "projects", projectCode), {
+        // store the code for reference
+        projectCode,
+        location: formData.location,
+        propertyType: formData.propertyType,
+        projectType: formData.projectType,
+        startDate: formData.startDate,
+        budget: parseBudget,
+        buyIn: parseBuyIn,
+        passiveOpen: formData.passiveOpen,
+        notes: formData.notes,
         submittedBy: user.email,
+        fundedSoFar: 0, // start at 0
         timestamp: Timestamp.now(),
       });
-      alert("✅ Project submitted!");
-      window.location.reload();
+
+      alert(`✅ Project submitted with ID: ${projectCode}!`);
+      window.location.reload(); // or navigate somewhere else
     } catch (err) {
       console.error("Error submitting project:", err);
       alert("❌ Error submitting project.");
