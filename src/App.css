@@ -13,14 +13,21 @@
   }
 }
 
+/* Replace the dark background with your hero.png */
 .App-header {
-  background-color: #282c34;
+  background-image: url("/hero.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* keep the rest of your layout */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+
+  /* text color to contrast the image */
   color: white;
 }
 
