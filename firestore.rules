@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------
+    // Guidance Notes Collection
+    // -------------------------
+    match /guidanceNotes/{docId} {
+      // Anyone can read guidance
+      allow read: if true;
+      
+      // Only admins can create/update/delete (write) guidance docs
+      allow write: if request.auth != null && isAdmin();
+    }
+
+    // -------------------------
+    // Projects Collection
+    // -------------------------
+    match /projects/{projectId} {
+      // Anyone can read
+      allow read: if true;
+
+      // Only authenticated users can create or update
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+
+      // Only admins can delete
+      allow delete: if request.auth != null && isAdmin();
+
+      // Sub-collection: participants
+      match /participants/{userId} {
+        // Anyone can read participant data
+        allow read: if true;
+
+        // A user can write to their own participant doc
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // -------------------------
+    // Helper Function
+    // -------------------------
+    function isAdmin() {
+      return request.auth != null &&
+        (
+          request.auth.uid in [
+            "XdJonag5LPOYMpoxPS8wCDjZIqg2",
+            "AdminUID_2"
+          ]
+        );
+    }
+  }
+}
+
+
