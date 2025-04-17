@@ -41,25 +41,21 @@ const RoleGrid = () => {
     }
   };
 
-  // Fetch counts initially and every 10s
   useEffect(() => {
     fetchCounts();
     const interval = setInterval(fetchCounts, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  // Animate displayedCounts when counts changes
   useEffect(() => {
     professions.forEach((role, i) => {
       const target = counts[role] || 0;
       let current = displayedCounts[role] || 0;
 
-      if (target === current) return; // No change needed
+      if (target === current) return;
 
-      // If target>current, step=1. If target<current, step=-1.
       const step = target > current ? 1 : -1;
-      // Delay between increments, slightly staggered by i
-      const delay = 120 + i * 24;
+      let delay = 120 + i * 24; // ⬅️ 20% slower (increase both base and step delay by 20%)
 
       const interval = setInterval(() => {
         current += step;
@@ -69,23 +65,18 @@ const RoleGrid = () => {
           [role]: current,
         }));
 
-        // Optionally play sound or vibrate each increment:
-        /*
         const tickSound = new Audio("/tick.mp3");
         tickSound.volume = 0.3;
         tickSound.play().catch(() => {});
 
         if (navigator.vibrate) navigator.vibrate(10);
-        */
 
-        // Stop interval once we reach the target
         if (current === target) {
           clearInterval(interval);
         }
       }, delay);
     });
-  }, [counts]);
-  // Only re-run animation when 'counts' changes
+  }, [counts, displayedCounts]);
 
   return (
     <div className="grid-container">
