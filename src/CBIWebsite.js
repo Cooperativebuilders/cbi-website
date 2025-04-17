@@ -35,8 +35,8 @@ const CBIWebsite = () => {
         </nav>
       </header>
 
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl overflow-hidden mb-10 px-6 py-12 text-center">
+      {/* Hero (Banner) */}
+      <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl overflow-hidden mb-10 px-6 py-12 text-center max-w-4xl mx-auto">
         <h1 className="text-3xl sm:text-5xl font-extrabold mb-4">
           Build Together. Profit Together.
         </h1>
@@ -54,6 +54,7 @@ const CBIWebsite = () => {
 
       {/* Main content */}
       <main id="home" className="space-y-8">
+        {/* Three Sections: "About Us", "Membership Details", "Become a Developer" */}
         {[
           {
             title: "About Us",
@@ -74,7 +75,7 @@ const CBIWebsite = () => {
         ].map((section, i) => (
           <section
             key={i}
-            className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300"
+            className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 max-w-4xl mx-auto"
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">
               {section.title}
