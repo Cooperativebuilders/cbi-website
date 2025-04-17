@@ -20,6 +20,8 @@ import { useNavigate, Link } from "react-router-dom";
 import DashboardSidebar from "../components/DashboardSidebar";
 import { adminUIDs } from "../constants/admins";
 
+import DiscordWidget from "../components/DiscordWidget";
+
 // RECHARTS IMPORTS
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
@@ -288,6 +290,20 @@ const Dashboard = () => {
     "#a4de6c",
     "#8dd1e1",
   ];
+
+  const Dashboard = () => {
+    return (
+      <div className="p-4">
+        <h1 className="text-xl font-bold mb-4">Dashboard</h1>
+
+        {/* Other dashboard content... */}
+
+        <div className="mt-8">
+          <DiscordWidget />
+        </div>
+      </div>
+    );
+  };
 
   // ---------------------------
   // DASHBOARD LAYOUT
