@@ -1,23 +1,24 @@
-// src/pages/Signup.js
 import React, { useEffect, useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase"; // db no longer needed here
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import MemberForm from "../components/MemberForm"; // <-- Import MemberForm
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [experience, setExperience] = useState("");
+  const [specializations, setSpecializations] = useState("");
+  const [locations, setLocations] = useState("");
+  const [readiness, setReadiness] = useState("");
   const [paid, setPaid] = useState(false);
-  const [userCreated, setUserCreated] = useState(false);
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   const navigate = useNavigate();
 
-  // 1. Load LaunchPass script
+  // 🔹 Load LaunchPass script
   useEffect(() => {
     const script = document.createElement("script");
     script.src =
@@ -29,7 +30,7 @@ const Signup = () => {
     };
   }, []);
 
-  // 2. Check paid status via your backend
+  // 🔹 Check paid status via backend
   const checkIfPaid = async () => {
     if (!email) return;
 
@@ -51,16 +52,16 @@ const Signup = () => {
     }
   };
 
-  // 3. Continuously watch for popup close and recheck payment
+  // 🔁 Watch for popup close and recheck payment every 3s
   useEffect(() => {
     if (paid || !email) return;
 
     let lastLaunch = 0;
+
     const interval = setInterval(() => {
       const iframe = document.querySelector("iframe[src*='launchpass']");
       const now = Date.now();
 
-      // Relaunch the popup if it’s been closed for more than 10s
       if (!iframe && now - lastLaunch > 10000) {
         document.querySelector(".lpbtn")?.click();
         lastLaunch = now;
@@ -82,17 +83,33 @@ const Signup = () => {
     document.querySelector(".lpbtn")?.click();
   };
 
-  // 4. Create user with email & password after payment
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      setUserCreated(true);
-      setSuccess("Account created! Please complete your member profile below.");
-      // Optionally redirect to /dashboard after the MemberForm is filled
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCred.user;
+
+      await setDoc(doc(db, "profiles", user.uid), {
+        email,
+        occupation,
+        experience,
+        specializations,
+        locations,
+        readiness,
+        name: "",
+      });
+
+      setSuccess("Account created! Redirecting...");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         setError("This email is already in use. Try logging in instead.");
@@ -104,11 +121,14 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen bg-white p-6 max-w-xl mx-auto">
+      <img
+        src={`${process.env.PUBLIC_URL}/big-text-logo.png`}
+        alt="CBI Logo"
+        className="w-80 h-80 mb-6"
+      />
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">
         CBI Member Signup
       </h1>
-
-      {/* Step 1: Collect email + handle payment */}
       {!paid ? (
         <div className="text-center space-y-4">
           <p className="text-gray-600 mb-4">
@@ -129,7 +149,6 @@ const Signup = () => {
               yearly="true"
             >
               <span>Join the CBI Network</span>
-              {/* Icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 transform rotate-180"
@@ -155,10 +174,10 @@ const Signup = () => {
         </div>
       ) : (
         <>
-          {/* Step 2: Email is paid, so create password/user */}
           {error && (
             <div className="text-red-600 mb-4 text-center">{error}</div>
           )}
+
           {success && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -170,31 +189,70 @@ const Signup = () => {
             </motion.div>
           )}
 
-          {!userCreated && (
-            <form onSubmit={handleSignup} className="space-y-4">
-              <input
-                type="password"
-                placeholder="Create a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 border rounded"
-                required
-              />
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-              >
-                Complete Signup
-              </button>
-            </form>
-          )}
+          <form onSubmit={handleSignup} className="space-y-4">
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border rounded"
+              required
+            />
+            <select
+              className="w-full p-2 border rounded"
+              value={occupation}
+              onChange={(e) => setOccupation(e.target.value)}
+              required
+            >
+              <option value="">Occupation</option>
+              <option>Tradesperson</option>
+              <option>Construction Professional</option>
+              <option>Eager Beginner</option>
+              <option>Passive Investor</option>
+            </select>
+            <input
+              type="number"
+              placeholder="Years of experience"
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
+              className="w-full p-2 border rounded"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Specializations"
+              value={specializations}
+              onChange={(e) => setSpecializations(e.target.value)}
+              className="w-full p-2 border rounded"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Project Locations"
+              value={locations}
+              onChange={(e) => setLocations(e.target.value)}
+              className="w-full p-2 border rounded"
+              required
+            />
+            <select
+              className="w-full p-2 border rounded"
+              value={readiness}
+              onChange={(e) => setReadiness(e.target.value)}
+              required
+            >
+              <option value="">Ready to Go?</option>
+              <option>Currently seeking projects</option>
+              <option>Currently developing</option>
+              <option>Not ready</option>
+            </select>
 
-          {/* Step 3: Once user is created, show MemberForm */}
-          {userCreated && (
-            <div className="mt-8">
-              <MemberForm />
-            </div>
-          )}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            >
+              Complete Signup
+            </button>
+          </form>
 
           <p className="text-sm text-center text-gray-600 mt-6">
             Already have an account?{" "}
