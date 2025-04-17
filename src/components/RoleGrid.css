@@ -4,9 +4,8 @@
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
-  /* Center both vertically and horizontally: */
-  justify-content: center; /* <-- was space-between */
-  align-items: center;
+  justify-content: center; /* Center vertically */
+  align-items: center; /* Center horizontally */
   padding: 0.6rem;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -21,10 +20,5 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
   min-width: 60px;
-  /* Remove these so it no longer sticks to the bottom:
-  margin-top: auto;
-  margin-bottom: 0.25rem; */
-
-  /* Instead, give them a small vertical margin for spacing: */
-  margin: 0.5rem 0;
+  margin: 0.5rem 0; /* small vertical spacing */
 }
