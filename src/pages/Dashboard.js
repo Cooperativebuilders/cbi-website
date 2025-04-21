@@ -345,7 +345,10 @@ const Dashboard = () => {
                   const percentFunded = budget
                     ? Math.min(Math.round((fundedSoFar / budget) * 100), 100)
                     : 0;
+                  // calculate total funded shares
                   const step = budget / 149;
+                  const fundedShares = Math.round(fundedSoFar / step);
+
                   return (
                     <li
                       key={projectId}
@@ -356,8 +359,9 @@ const Dashboard = () => {
                         {projectData.projectType})
                       </p>
                       <p className="text-sm text-gray-600 mb-1">
-                        Budget: €{budget.toLocaleString()} — Funded:{" "}
-                        {percentFunded}%
+                        <strong>Budget:</strong> €{budget.toLocaleString()} —{" "}
+                        <strong>Funded:</strong> {percentFunded}% (
+                        {fundedShares}/149)
                       </p>
                       {!editingProjectId || editingProjectId !== projectId ? (
                         <>
