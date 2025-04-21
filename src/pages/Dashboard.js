@@ -193,12 +193,21 @@ const Dashboard = () => {
   // EDIT BUY-IN
   // ---------------------------
   const handleEditBuyIn = async (projectId, projectData, oldBuyIn) => {
-    const input = prompt("Enter your new buy-in amount:", oldBuyIn.toString());
+    // calculate increment step
+    const budget = parseFloat(projectData.budget || 0);
+    const step = budget / 149;
+    // prompt for number of increments
+    const promptText = `Enter number of increments (1–149).\nEach increment is €${step.toFixed(
+      2
+    )}.`;
+    const input = prompt(promptText, (oldBuyIn / step).toFixed(0));
     if (!input) return;
-    const newBuyIn = parseInt(input, 10);
-    if (isNaN(newBuyIn) || newBuyIn < 0) {
-      return alert("Invalid amount.");
+    const units = parseInt(input, 10);
+    if (isNaN(units) || units < 1 || units > 149) {
+      return alert("Invalid entry: must be an integer between 1 and 149.");
     }
+    const newBuyIn = Math.round(step * units * 100) / 100; // round to cents
+    const diff = newBuyIn - oldBuyIn;
 
     try {
       // update participant doc
@@ -213,11 +222,11 @@ const Dashboard = () => {
 
       // update project fundedSoFar
       const projectRef = doc(db, "projects", projectId);
-      const fundedSoFar = parseInt(projectData.fundedSoFar || 0, 10);
-      const diff = newBuyIn - oldBuyIn;
+      const projSnap = await getDoc(projectRef);
+      const fundedSoFar = parseInt(projSnap.data()?.fundedSoFar || "0", 10);
       await updateDoc(projectRef, { fundedSoFar: fundedSoFar + diff });
 
-      alert("✅ Buy-in updated!");
+      alert(`✅ Buy-in updated to €${newBuyIn.toLocaleString()}`);
     } catch (err) {
       console.error("Error updating buy-in:", err);
       alert("❌ Failed to update buy-in.");
@@ -247,7 +256,7 @@ const Dashboard = () => {
       // update project fundedSoFar
       const projectRef = doc(db, "projects", projectId);
       const projectDoc = await getDoc(projectRef);
-      const fundedSoFar = parseInt(projectDoc.data()?.fundedSoFar || 0, 10);
+      const fundedSoFar = parseInt(projectDoc.data()?.fundedSoFar || "0", 10);
       await updateDoc(projectRef, { fundedSoFar: fundedSoFar - oldBuyIn });
 
       alert("✅ You have left the project.");
