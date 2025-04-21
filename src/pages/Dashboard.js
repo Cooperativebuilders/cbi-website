@@ -27,28 +27,26 @@ import { adminUIDs } from "../constants/admins";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
 const Dashboard = () => {
-  // ---------------------------
   // AUTH & LOADING STATES
-  // ---------------------------
   const [user, setUser] = useState(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // For email login
+  // Email login form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
 
-  // ---------------------------
   // MY PROJECTS STATES
-  // ---------------------------
-  const [myProjects, setMyProjects] = useState([]); // array of { projectId, projectData, userBuyIn }
+  const [myProjects, setMyProjects] = useState([]);
   const [totalInvestment, setTotalInvestment] = useState(0);
 
-  // ---------------------------
+  // Slider-editing state
+  const [editingProjectId, setEditingProjectId] = useState(null);
+  const [editUnits, setEditUnits] = useState(0);
+
   // LOGIN METHODS
-  // ---------------------------
   const handleEmailLogin = async () => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
@@ -69,14 +67,11 @@ const Dashboard = () => {
     }
   };
 
-  // ---------------------------
   // PAYMENT CHECK
-  // ---------------------------
   const verifyPayment = async (user) => {
     if (!user?.email) return;
     setIsVerifying(true);
 
-    // Admin bypass
     if (adminUIDs.includes(user.uid)) {
       setLoading(false);
       setIsVerifying(false);
@@ -105,16 +100,12 @@ const Dashboard = () => {
     }
   };
 
-  // ---------------------------
   // onAuthStateChanged
-  // ---------------------------
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
         await verifyPayment(currentUser);
-
-        // Create doc in 'members' if not exists
         const userRef = doc(db, "members", currentUser.uid);
         const docSnap = await getDoc(userRef);
         if (!docSnap.exists()) {
@@ -125,16 +116,13 @@ const Dashboard = () => {
             createdAt: new Date().toISOString(),
           });
         }
-
         setLoading(false);
       }
     });
     return () => unsubscribe();
   }, []);
 
-  // ---------------------------
   // LOGOUT
-  // ---------------------------
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -143,20 +131,14 @@ const Dashboard = () => {
     }
   };
 
-  // ---------------------------
-  // REAL-TIME FETCH OF ALL PROJECTS & FILTER
-  // ---------------------------
+  // REAL-TIME FETCH OF PROJECTS
   useEffect(() => {
     if (!user) return;
-
     const unsub = onSnapshot(collection(db, "projects"), async (snapshot) => {
       const joinedProjects = [];
-
       for (const projDoc of snapshot.docs) {
         const projectData = projDoc.data();
         const projectId = projDoc.id;
-
-        // participant sub-doc
         const participantRef = doc(
           db,
           "projects",
@@ -165,52 +147,37 @@ const Dashboard = () => {
           user.uid
         );
         const participantSnap = await getDoc(participantRef);
-
         if (participantSnap.exists()) {
           const participantData = participantSnap.data();
-          const userBuyIn = parseInt(participantData.buyIn || "0", 10);
-
-          joinedProjects.push({
-            projectId,
-            projectData,
-            userBuyIn,
-          });
+          const userBuyIn = parseFloat(participantData.buyIn || "0");
+          joinedProjects.push({ projectId, projectData, userBuyIn });
         }
       }
-
       setMyProjects(joinedProjects);
-
-      // compute total
-      let total = 0;
-      joinedProjects.forEach((jp) => (total += jp.userBuyIn));
-      setTotalInvestment(total);
+      setTotalInvestment(
+        joinedProjects.reduce((sum, jp) => sum + jp.userBuyIn, 0)
+      );
     });
-
     return () => unsub();
   }, [user]);
 
-  // ---------------------------
-  // EDIT BUY-IN
-  // ---------------------------
-  const handleEditBuyIn = async (projectId, projectData, oldBuyIn) => {
-    // calculate increment step
+  // START EDIT MODE
+  const startEdit = (projectId, projectData, oldBuyIn) => {
     const budget = parseFloat(projectData.budget || 0);
     const step = budget / 149;
-    // prompt for number of increments
-    const promptText = `Enter number of increments (1–149).\nEach increment is €${step.toFixed(
-      2
-    )}.`;
-    const input = prompt(promptText, (oldBuyIn / step).toFixed(0));
-    if (!input) return;
-    const units = parseInt(input, 10);
-    if (isNaN(units) || units < 1 || units > 149) {
-      return alert("Invalid entry: must be an integer between 1 and 149.");
-    }
-    const newBuyIn = Math.round(step * units * 100) / 100; // round to cents
+    const initialUnits = Math.round(oldBuyIn / step);
+    setEditingProjectId(projectId);
+    setEditUnits(initialUnits);
+  };
+
+  // SAVE SLIDER EDIT
+  const saveEdit = async (projectId, projectData, oldBuyIn) => {
+    const budget = parseFloat(projectData.budget || 0);
+    const step = budget / 149;
+    const newBuyIn = Math.round(editUnits * step * 100) / 100;
     const diff = newBuyIn - oldBuyIn;
 
     try {
-      // update participant doc
       const participantRef = doc(
         db,
         "projects",
@@ -220,30 +187,24 @@ const Dashboard = () => {
       );
       await updateDoc(participantRef, { buyIn: newBuyIn.toString() });
 
-      // update project fundedSoFar
       const projectRef = doc(db, "projects", projectId);
       const projSnap = await getDoc(projectRef);
-      const fundedSoFar = parseInt(projSnap.data()?.fundedSoFar || "0", 10);
+      const fundedSoFar = parseFloat(projSnap.data()?.fundedSoFar || 0);
       await updateDoc(projectRef, { fundedSoFar: fundedSoFar + diff });
 
-      alert(`✅ Buy-in updated to €${newBuyIn.toLocaleString()}`);
+      alert(`✅ Buy‑in updated to €${newBuyIn.toLocaleString()}`);
     } catch (err) {
       console.error("Error updating buy-in:", err);
-      alert("❌ Failed to update buy-in.");
+      alert("❌ Failed to update buy‑in.");
+    } finally {
+      setEditingProjectId(null);
     }
   };
 
-  // ---------------------------
   // LEAVE PROJECT
-  // ---------------------------
   const handleLeaveProject = async (projectId, oldBuyIn) => {
-    const confirmLeave = window.confirm(
-      "Are you sure you want to leave this project?"
-    );
-    if (!confirmLeave) return;
-
+    if (!window.confirm("Are you sure you want to leave this project?")) return;
     try {
-      // delete participant doc
       const participantRef = doc(
         db,
         "projects",
@@ -253,10 +214,9 @@ const Dashboard = () => {
       );
       await deleteDoc(participantRef);
 
-      // update project fundedSoFar
       const projectRef = doc(db, "projects", projectId);
-      const projectDoc = await getDoc(projectRef);
-      const fundedSoFar = parseInt(projectDoc.data()?.fundedSoFar || "0", 10);
+      const projSnap = await getDoc(projectRef);
+      const fundedSoFar = parseFloat(projSnap.data()?.fundedSoFar || 0);
       await updateDoc(projectRef, { fundedSoFar: fundedSoFar - oldBuyIn });
 
       alert("✅ You have left the project.");
@@ -266,9 +226,7 @@ const Dashboard = () => {
     }
   };
 
-  // ---------------------------
   // LOADING STATES
-  // ---------------------------
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
@@ -326,7 +284,6 @@ const Dashboard = () => {
       </div>
     );
   }
-
   if (loading || isVerifying) {
     return (
       <div className="flex items-center justify-center h-screen text-blue-600 text-lg">
@@ -335,14 +292,11 @@ const Dashboard = () => {
     );
   }
 
-  // ---------------------------
   // PREP DATA FOR PIE CHART
-  // ---------------------------
   const chartData = myProjects.map((jp) => ({
     name: jp.projectData.location || "Untitled",
     value: jp.userBuyIn,
   }));
-
   const COLORS = [
     "#8884d8",
     "#82ca9d",
@@ -352,13 +306,10 @@ const Dashboard = () => {
     "#8dd1e1",
   ];
 
-  // ---------------------------
-  // FINAL DASHBOARD RENDER
-  // ---------------------------
+  // RENDER
   return (
     <div className="flex min-h-screen bg-gray-50">
       <DashboardSidebar onLogout={handleLogout} />
-
       <main className="flex-1 p-6">
         <motion.h1
           className="text-4xl font-bold text-blue-700 mb-4"
@@ -368,14 +319,13 @@ const Dashboard = () => {
         >
           Member Dashboard
         </motion.h1>
-
         <p className="text-gray-600 mb-8">
           Logged in as <strong>{user.displayName || user.email}</strong>
         </p>
 
-        {/* GRID CONTAINER */}
+        {/* GRID */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Projects Overview Card */}
+          {/* Projects Overview */}
           <section className="bg-white shadow p-4 rounded-md">
             <motion.h2
               className="text-2xl font-semibold text-blue-800 mb-3"
@@ -385,29 +335,25 @@ const Dashboard = () => {
             >
               Projects Overview
             </motion.h2>
-
             {myProjects.length === 0 ? (
               <p className="text-gray-600">
                 You haven't joined any projects yet.
               </p>
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {myProjects.map(({ projectId, projectData, userBuyIn }) => {
-                  const budget = parseInt(projectData.budget || "0", 10);
-                  const fundedSoFar = parseInt(
-                    projectData.fundedSoFar || "0",
-                    10
-                  );
+                  const budget = parseFloat(projectData.budget || 0);
+                  const fundedSoFar = parseFloat(projectData.fundedSoFar || 0);
                   const percentFunded = budget
                     ? Math.min(Math.round((fundedSoFar / budget) * 100), 100)
                     : 0;
-
+                  const step = budget / 149;
                   return (
                     <li
                       key={projectId}
-                      className="bg-gray-50 rounded-md p-3 border"
+                      className="bg-gray-50 rounded-md p-4 border"
                     >
-                      <p className="font-bold text-blue-700">
+                      <p className="font-bold text-blue-700 mb-2">
                         {projectData.location} ({projectData.propertyType} /{" "}
                         {projectData.projectType})
                       </p>
@@ -415,28 +361,77 @@ const Dashboard = () => {
                         Budget: €{budget.toLocaleString()} — Funded:{" "}
                         {percentFunded}%
                       </p>
-                      <p className="text-sm text-gray-600 mb-2">
-                        <strong>Your Buy-In:</strong> €
-                        {userBuyIn.toLocaleString()}
-                      </p>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() =>
-                            handleEditBuyIn(projectId, projectData, userBuyIn)
-                          }
-                          className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded hover:bg-yellow-300 transition"
-                        >
-                          Edit Buy-In
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleLeaveProject(projectId, userBuyIn)
-                          }
-                          className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded hover:bg-red-300 transition"
-                        >
-                          Leave Project
-                        </button>
-                      </div>
+                      {!editingProjectId || editingProjectId !== projectId ? (
+                        <>
+                          <p className="text-sm text-gray-600 mb-3">
+                            <strong>Your Buy‑In:</strong> €
+                            {userBuyIn.toLocaleString()}
+                          </p>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() =>
+                                startEdit(projectId, projectData, userBuyIn)
+                              }
+                              className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded hover:bg-yellow-300 transition"
+                            >
+                              Edit Buy‑In
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleLeaveProject(projectId, userBuyIn)
+                              }
+                              className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded hover:bg-red-300 transition"
+                            >
+                              Leave Project
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        // Slider edit UI
+                        <div className="space-y-2">
+                          <div>
+                            <label className="text-sm font-medium">
+                              Shares: {editUnits} / 149
+                            </label>
+                            <input
+                              type="range"
+                              min="0"
+                              max="149"
+                              value={editUnits}
+                              onChange={(e) =>
+                                setEditUnits(Number(e.target.value))
+                              }
+                              className="w-full"
+                            />
+                          </div>
+                          <p className="text-sm">
+                            <strong>Unit Cost:</strong> €{step.toFixed(2)}
+                          </p>
+                          <p className="text-sm">
+                            <strong>Total Cost:</strong> €
+                            {(editUnits * step).toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </p>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() =>
+                                saveEdit(projectId, projectData, userBuyIn)
+                              }
+                              className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded hover:bg-green-300 transition"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => setEditingProjectId(null)}
+                              className="text-xs bg-gray-200 text-gray-800 px-2 py-1 rounded hover:bg-gray-300 transition"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </li>
                   );
                 })}
@@ -444,7 +439,7 @@ const Dashboard = () => {
             )}
           </section>
 
-          {/* Funding Breakdown Card */}
+          {/* Funding Breakdown */}
           <section className="bg-white shadow p-4 rounded-md">
             <motion.h2
               className="text-2xl font-semibold text-blue-800 mb-3"
@@ -454,19 +449,16 @@ const Dashboard = () => {
             >
               Funding Breakdown
             </motion.h2>
-
-            <div>
-              <p className="text-gray-700">
-                <strong>Total Projects Joined:</strong> {myProjects.length}
-              </p>
-              <p className="text-gray-700">
-                <strong>Total Investment:</strong> €
-                {totalInvestment.toLocaleString()}
-              </p>
-            </div>
+            <p className="text-gray-700">
+              <strong>Total Projects Joined:</strong> {myProjects.length}
+            </p>
+            <p className="text-gray-700">
+              <strong>Total Investment:</strong> €
+              {totalInvestment.toLocaleString()}
+            </p>
           </section>
 
-          {/* Investment Distribution (Pie Chart) */}
+          {/* Investment Distribution */}
           {myProjects.length > 0 && (
             <section className="bg-white shadow p-4 rounded-md">
               <motion.h2
@@ -502,7 +494,7 @@ const Dashboard = () => {
             </section>
           )}
 
-          {/* Discord Chat Card */}
+          {/* Discord Chat */}
           <section className="bg-white shadow p-4 rounded-md md:col-span-2 lg:col-span-1">
             <motion.h2
               className="text-2xl font-semibold text-blue-800 mb-3"
