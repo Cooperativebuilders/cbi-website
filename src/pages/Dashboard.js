@@ -22,8 +22,6 @@ import { useNavigate, Link } from "react-router-dom";
 import DashboardSidebar from "../components/DashboardSidebar";
 import DiscordWidget from "../components/DiscordWidget";
 import { adminUIDs } from "../constants/admins";
-
-// RECHARTS IMPORTS
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
 const Dashboard = () => {
