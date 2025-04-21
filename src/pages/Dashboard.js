@@ -290,7 +290,7 @@ const Dashboard = () => {
     );
   }
 
-  // PREP DATA FOR PIE CHART
+  // PREP DATA FOR PIE CHART & TOTAL SHARES
   const chartData = myProjects.map((jp) => ({
     name: jp.projectData.location || "Untitled",
     value: jp.userBuyIn,
@@ -303,6 +303,15 @@ const Dashboard = () => {
     "#a4de6c",
     "#8dd1e1",
   ];
+  // calculate total shares purchased across all projects
+  const totalUnits = myProjects.reduce((sum, { projectData, userBuyIn }) => {
+    const budget = parseFloat(projectData.budget || 0);
+    if (!budget) return sum;
+    const step = budget / 149;
+    const units = Math.round(userBuyIn / step);
+    return sum + units;
+  }, 0);
+  const maxUnits = myProjects.length * 149;
 
   // RENDER
   return (
@@ -345,7 +354,6 @@ const Dashboard = () => {
                   const percentFunded = budget
                     ? Math.min(Math.round((fundedSoFar / budget) * 100), 100)
                     : 0;
-                  const step = budget / 149;
                   return (
                     <li
                       key={projectId}
@@ -403,14 +411,18 @@ const Dashboard = () => {
                             />
                           </div>
                           <p className="text-sm">
-                            <strong>Unit Cost:</strong> €{step.toFixed(2)}
+                            <strong>Unit Cost:</strong> €
+                            {(budget / 149).toFixed(2)}
                           </p>
                           <p className="text-sm">
                             <strong>Total Cost:</strong> €
-                            {(editUnits * step).toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
+                            {(editUnits * (budget / 149)).toLocaleString(
+                              undefined,
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
                           </p>
                           <div className="flex space-x-2">
                             <button
@@ -453,6 +465,22 @@ const Dashboard = () => {
             <p className="text-gray-700">
               <strong>Total Investment:</strong> €
               {totalInvestment.toLocaleString()}
+            </p>
+          </section>
+
+          {/* Total Shares Purchased */}
+          <section className="bg-white shadow p-4 rounded-md">
+            <motion.h2
+              className="text-2xl font-semibold text-blue-800 mb-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Total Shares Purchased
+            </motion.h2>
+            <p className="text-gray-700">
+              <strong>{totalUnits}</strong> of <strong>{maxUnits}</strong>{" "}
+              shares
             </p>
           </section>
 
