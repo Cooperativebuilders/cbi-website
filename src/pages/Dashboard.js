@@ -14,6 +14,8 @@ import {
   setDoc,
   onSnapshot,
   collection,
+  updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
@@ -76,7 +78,6 @@ const Dashboard = () => {
 
     // Admin bypass
     if (adminUIDs.includes(user.uid)) {
-      console.log("✅ Admin bypass: Access granted for", user.email);
       setLoading(false);
       setIsVerifying(false);
       return;
@@ -91,14 +92,12 @@ const Dashboard = () => {
       const data = await res.json();
 
       if (data.paid) {
-        console.log("✅ Paid member verified:", user.email);
         setLoading(false);
       } else {
-        console.warn("❌ Not a paid member:", user.email);
         navigate("/membership-required");
       }
     } catch (err) {
-      console.error("❌ Error verifying payment:", err);
+      console.error("Error verifying payment:", err);
       alert("Error checking membership status.");
       navigate("/membership-required");
     } finally {
@@ -130,7 +129,6 @@ const Dashboard = () => {
         setLoading(false);
       }
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -151,7 +149,6 @@ const Dashboard = () => {
   useEffect(() => {
     if (!user) return;
 
-    // We only fetch user’s projects after verifying user is logged in
     const unsub = onSnapshot(collection(db, "projects"), async (snapshot) => {
       const joinedProjects = [];
 
@@ -185,9 +182,7 @@ const Dashboard = () => {
 
       // compute total
       let total = 0;
-      for (const jp of joinedProjects) {
-        total += jp.userBuyIn;
-      }
+      joinedProjects.forEach((jp) => (total += jp.userBuyIn));
       setTotalInvestment(total);
     });
 
@@ -195,10 +190,77 @@ const Dashboard = () => {
   }, [user]);
 
   // ---------------------------
+  // EDIT BUY-IN
+  // ---------------------------
+  const handleEditBuyIn = async (projectId, projectData, oldBuyIn) => {
+    const input = prompt("Enter your new buy-in amount:", oldBuyIn.toString());
+    if (!input) return;
+    const newBuyIn = parseInt(input, 10);
+    if (isNaN(newBuyIn) || newBuyIn < 0) {
+      return alert("Invalid amount.");
+    }
+
+    try {
+      // update participant doc
+      const participantRef = doc(
+        db,
+        "projects",
+        projectId,
+        "participants",
+        user.uid
+      );
+      await updateDoc(participantRef, { buyIn: newBuyIn.toString() });
+
+      // update project fundedSoFar
+      const projectRef = doc(db, "projects", projectId);
+      const fundedSoFar = parseInt(projectData.fundedSoFar || 0, 10);
+      const diff = newBuyIn - oldBuyIn;
+      await updateDoc(projectRef, { fundedSoFar: fundedSoFar + diff });
+
+      alert("✅ Buy-in updated!");
+    } catch (err) {
+      console.error("Error updating buy-in:", err);
+      alert("❌ Failed to update buy-in.");
+    }
+  };
+
+  // ---------------------------
+  // LEAVE PROJECT
+  // ---------------------------
+  const handleLeaveProject = async (projectId, oldBuyIn) => {
+    const confirmLeave = window.confirm(
+      "Are you sure you want to leave this project?"
+    );
+    if (!confirmLeave) return;
+
+    try {
+      // delete participant doc
+      const participantRef = doc(
+        db,
+        "projects",
+        projectId,
+        "participants",
+        user.uid
+      );
+      await deleteDoc(participantRef);
+
+      // update project fundedSoFar
+      const projectRef = doc(db, "projects", projectId);
+      const projectDoc = await getDoc(projectRef);
+      const fundedSoFar = parseInt(projectDoc.data()?.fundedSoFar || 0, 10);
+      await updateDoc(projectRef, { fundedSoFar: fundedSoFar - oldBuyIn });
+
+      alert("✅ You have left the project.");
+    } catch (err) {
+      console.error("Error leaving project:", err);
+      alert("❌ Failed to leave project.");
+    }
+  };
+
+  // ---------------------------
   // LOADING STATES
   // ---------------------------
   if (!user) {
-    // Not logged in, show login UI
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
         <Link to="/">
@@ -208,7 +270,6 @@ const Dashboard = () => {
             className="w-80 h-80 mb-6"
           />
         </Link>
-
         <motion.h1
           className="text-4xl font-bold text-blue-700 mb-6"
           initial={{ opacity: 0, y: -20 }}
@@ -217,7 +278,6 @@ const Dashboard = () => {
         >
           Member Dashboard
         </motion.h1>
-
         <p className="text-lg text-gray-600 mb-6">Please log in:</p>
         <div className="space-y-4 w-full max-w-sm">
           <input
@@ -269,13 +329,10 @@ const Dashboard = () => {
   // ---------------------------
   // PREP DATA FOR PIE CHART
   // ---------------------------
-  const chartData = myProjects.map((jp) => {
-    const location = jp.projectData.location || "Untitled";
-    return {
-      name: location,
-      value: jp.userBuyIn,
-    };
-  });
+  const chartData = myProjects.map((jp) => ({
+    name: jp.projectData.location || "Untitled",
+    value: jp.userBuyIn,
+  }));
 
   const COLORS = [
     "#8884d8",
@@ -332,10 +389,9 @@ const Dashboard = () => {
                     projectData.fundedSoFar || "0",
                     10
                   );
-                  const percentFunded =
-                    budget > 0
-                      ? Math.min(Math.round((fundedSoFar / budget) * 100), 100)
-                      : 0;
+                  const percentFunded = budget
+                    ? Math.min(Math.round((fundedSoFar / budget) * 100), 100)
+                    : 0;
 
                   return (
                     <li
@@ -350,10 +406,28 @@ const Dashboard = () => {
                         Budget: €{budget.toLocaleString()} — Funded:{" "}
                         {percentFunded}%
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 mb-2">
                         <strong>Your Buy-In:</strong> €
                         {userBuyIn.toLocaleString()}
                       </p>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() =>
+                            handleEditBuyIn(projectId, projectData, userBuyIn)
+                          }
+                          className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded hover:bg-yellow-300 transition"
+                        >
+                          Edit Buy-In
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleLeaveProject(projectId, userBuyIn)
+                          }
+                          className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded hover:bg-red-300 transition"
+                        >
+                          Leave Project
+                        </button>
+                      </div>
                     </li>
                   );
                 })}
