@@ -1,9 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase";
 import { Link } from "react-router-dom";
 
 const ResetPassword = () => {
+  // --- FORCE ONE-TIME RELOAD ON MOUNT ---
+  useEffect(() => {
+    const hasReloaded = sessionStorage.getItem("resetReloaded");
+    if (!hasReloaded) {
+      // mark that we've reloaded once
+      sessionStorage.setItem("resetReloaded", "true");
+      // reload the page
+      window.location.reload();
+    } else {
+      // clean up so subsequent visits will reload again if needed
+      sessionStorage.removeItem("resetReloaded");
+    }
+  }, []);
+
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
