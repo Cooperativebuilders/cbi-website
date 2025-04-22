@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+
 import Signup from "./pages/Signup";
 import CBIWebsite from "./CBIWebsite";
 import Dashboard from "./pages/Dashboard";
@@ -9,12 +10,15 @@ import EditProfile from "./pages/EditProfile";
 import ProjectsPage from "./pages/ProjectsPage";
 import ProjectForm from "./components/ProjectForm";
 import Guidance from "./pages/Guidance";
+import ResetPassword from "./pages/ResetPassword"; // ← import it here
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<CBIWebsite />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/reset-password" element={<ResetPassword />} />{" "}
+      {/* ← new route */}
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/membership-required" element={<MembershipRequired />} />
       <Route path="/members" element={<MembersPage />} />
