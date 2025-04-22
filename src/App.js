@@ -10,7 +10,7 @@ import EditProfile from "./pages/EditProfile";
 import ProjectsPage from "./pages/ProjectsPage";
 import ProjectForm from "./components/ProjectForm";
 import Guidance from "./pages/Guidance";
-import ResetPassword from "./pages/ResetPassword"; // ← import it here
+import ResetPassword from "./pages/ResetPassword.js"; // ← import it here
 
 function App() {
   return (

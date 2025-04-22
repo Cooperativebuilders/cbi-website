@@ -23,6 +23,7 @@ import DashboardSidebar from "../components/DashboardSidebar";
 import DiscordWidget from "../components/DiscordWidget";
 import { adminUIDs } from "../constants/admins";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import ResetPassword from "./ResetPassword.js";
 
 const Dashboard = () => {
   // AUTH & LOADING STATES
