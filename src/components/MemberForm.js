@@ -96,6 +96,8 @@ const MemberForm = () => {
 
     try {
       // write into "profiles" collection, merging with any existing fields
+      console.log("Saving profile for UID:", user.uid);
+
       await setDoc(
         doc(db, "profiles", user.uid),
         {
