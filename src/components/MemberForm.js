@@ -1,6 +1,6 @@
 // src/components/MemberForm.js
-import React, { useState, useEffect } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import React, { useState } from "react";
+import { doc, setDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -55,7 +55,7 @@ const provinces = {
 
 const MemberForm = () => {
   const [user] = useAuthState(auth);
-  const [loading, setLoading] = useState(true);
+
   const [formData, setFormData] = useState({
     firstName: "",
     profession: "",
@@ -72,30 +72,14 @@ const MemberForm = () => {
     availability: "",
   });
 
-  // Load existing profile
-  useEffect(() => {
-    if (!user) return setLoading(false);
-    (async () => {
-      try {
-        const ref = doc(db, "profiles", user.uid);
-        const snap = await getDoc(ref);
-        if (snap.exists()) setFormData(snap.data());
-      } catch (e) {
-        console.error("Error loading profile:", e);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [user]);
-
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     if (name === "projectType") {
-      const vals = Array.from(e.target.selectedOptions, (o) => o.value);
-      setFormData((p) => ({ ...p, projectType: vals }));
+      const values = Array.from(e.target.selectedOptions, (opt) => opt.value);
+      setFormData((prev) => ({ ...prev, projectType: values }));
     } else {
-      setFormData((p) => ({
-        ...p,
+      setFormData((prev) => ({
+        ...prev,
         [name]:
           type === "number" || type === "range" ? parseInt(value, 10) : value,
       }));
@@ -104,22 +88,28 @@ const MemberForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return alert("Please log in first.");
+    if (!user) {
+      alert("Please log in first.");
+      return;
+    }
+
     try {
-      // <-- write into "profiles", matching your rules
-      await setDoc(doc(db, "profiles", user.uid), {
-        ...formData,
-        email: user.email,
-        updatedAt: new Date().toISOString(),
-      });
+      // write into "profiles" collection, merging with any existing data
+      await setDoc(
+        doc(db, "profiles", user.uid),
+        {
+          ...formData,
+          email: user.email,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
       alert("✅ Profile saved!");
     } catch (err) {
       console.error("Error saving profile:", err);
       alert("❌ Error saving profile.");
     }
   };
-
-  if (loading) return <p className="text-center py-4">Loading…</p>;
 
   return (
     <form
@@ -254,7 +244,7 @@ const MemberForm = () => {
       />
 
       <label className="block text-sm font-medium text-gray-700">
-        Available from...
+        Available for my next project from...
       </label>
       <input
         type="date"
