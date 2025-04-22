@@ -1,4 +1,3 @@
-// src/components/MemberForm.js
 import React, { useState } from "react";
 import { doc, setDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
@@ -59,7 +58,7 @@ const MemberForm = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     profession: "",
-    yearsExperience: "",
+    yearsExperience: 0,
     specialisations: "",
     licences: "",
     tools: "",
@@ -74,17 +73,17 @@ const MemberForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-
     if (name === "projectType") {
-      const values = Array.from(
-        e.target.selectedOptions,
-        (option) => option.value
-      );
-      setFormData((prev) => ({ ...prev, projectType: values }));
+      const values = Array.from(e.target.selectedOptions, (opt) => opt.value);
+      setFormData((prev) => ({
+        ...prev,
+        projectType: values,
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: type === "number" ? parseInt(value, 10) : value,
+        [name]:
+          type === "number" || type === "range" ? parseInt(value, 10) : value,
       }));
     }
   };
@@ -92,11 +91,12 @@ const MemberForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return alert("Please log in first.");
-
     try {
-      await setDoc(doc(db, "profiles", user.uid), {
+      // Write to 'members' to align with Dashboard
+      await setDoc(doc(db, "members", user.uid), {
         ...formData,
         email: user.email,
+        updatedAt: new Date().toISOString(),
       });
       alert("✅ Profile saved!");
     } catch (err) {
@@ -138,6 +138,7 @@ const MemberForm = () => {
 
       <input
         name="yearsExperience"
+        type="number"
         placeholder="Years Experience"
         value={formData.yearsExperience}
         onChange={handleChange}
@@ -174,14 +175,13 @@ const MemberForm = () => {
         onChange={handleChange}
         className="w-full p-2 border rounded"
       >
-        {["All Ireland", ...Object.keys(provinces)].map((province) => (
-          <option key={province} value={province}>
-            {province}
+        {["All Ireland", ...Object.keys(provinces)].map((prov) => (
+          <option key={prov} value={prov}>
+            {prov}
           </option>
         ))}
       </select>
 
-      {/* Show county dropdown if a specific province is selected */}
       {formData.location !== "All Ireland" && (
         <select
           name="county"
@@ -190,9 +190,9 @@ const MemberForm = () => {
           className="w-full p-2 border rounded"
         >
           <option value="">Select County</option>
-          {provinces[formData.location].map((county) => (
-            <option key={county} value={county}>
-              {county}
+          {provinces[formData.location].map((cty) => (
+            <option key={cty} value={cty}>
+              {cty}
             </option>
           ))}
         </select>
@@ -223,8 +223,8 @@ const MemberForm = () => {
         <option value="All Types">All Types</option>
       </select>
 
-      <label className="block text-sm font-medium text-gray-700 mt-4">
-        Max Buy-In (€{formData.buyInTo})
+      <label className="block text-sm font-medium text-gray-700">
+        Max Buy-In (€{formData.buyInTo.toLocaleString()})
       </label>
       <input
         type="range"
@@ -237,7 +237,7 @@ const MemberForm = () => {
         className="w-full"
       />
 
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-gray-700">
         Available for my next project from...
       </label>
       <input
@@ -250,7 +250,7 @@ const MemberForm = () => {
 
       <button
         type="submit"
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
       >
         Save Tile
       </button>
