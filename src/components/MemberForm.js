@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { doc, setDoc } from "firebase/firestore";
+// src/components/MemberForm.js
+import React, { useState, useEffect } from "react";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -54,7 +55,7 @@ const provinces = {
 
 const MemberForm = () => {
   const [user] = useAuthState(auth);
-
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     firstName: "",
     profession: "",
@@ -71,14 +72,27 @@ const MemberForm = () => {
     availability: "",
   });
 
+  // Load existing profile if present
+  useEffect(() => {
+    if (!user) return setLoading(false);
+    const loadProfile = async () => {
+      try {
+        const snap = await getDoc(doc(db, "profiles", user.uid));
+        if (snap.exists()) setFormData(snap.data());
+      } catch (e) {
+        console.error("Error loading profile:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProfile();
+  }, [user]);
+
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     if (name === "projectType") {
       const values = Array.from(e.target.selectedOptions, (opt) => opt.value);
-      setFormData((prev) => ({
-        ...prev,
-        projectType: values,
-      }));
+      setFormData((prev) => ({ ...prev, projectType: values }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -91,9 +105,9 @@ const MemberForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return alert("Please log in first.");
+
     try {
-      // Write to 'members' to align with Dashboard
-      await setDoc(doc(db, "members", user.uid), {
+      await setDoc(doc(db, "profiles", user.uid), {
         ...formData,
         email: user.email,
         updatedAt: new Date().toISOString(),
@@ -104,6 +118,8 @@ const MemberForm = () => {
       alert("❌ Error saving profile.");
     }
   };
+
+  if (loading) return <p className="text-center py-4">Loading…</p>;
 
   return (
     <form
