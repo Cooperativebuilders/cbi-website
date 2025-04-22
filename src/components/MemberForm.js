@@ -95,11 +95,15 @@ const MemberForm = () => {
     }
 
     try {
-      // write into "profiles" collection, merging with any existing fields
+      // build the DocumentReference
+      const profileRef = doc(db, "profiles", user.uid);
+
+      // log the UID and the exact path we’re attempting to write
       console.log("Saving profile for UID:", user.uid);
+      console.log("Writing to document path:", profileRef.path);
 
       await setDoc(
-        doc(db, "profiles", user.uid),
+        profileRef,
         {
           ...formData,
           email: user.email,
@@ -107,6 +111,7 @@ const MemberForm = () => {
         },
         { merge: true }
       );
+
       alert("✅ Profile saved!");
     } catch (err) {
       console.error("Error saving profile:", err);
