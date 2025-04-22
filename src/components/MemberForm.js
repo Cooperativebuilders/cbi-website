@@ -72,30 +72,29 @@ const MemberForm = () => {
     availability: "",
   });
 
-  // Load existing profile if present
+  // load existing profile (if any)
   useEffect(() => {
     if (!user) return setLoading(false);
-    const loadProfile = async () => {
+    (async () => {
       try {
         const snap = await getDoc(doc(db, "profiles", user.uid));
         if (snap.exists()) setFormData(snap.data());
       } catch (e) {
-        console.error("Error loading profile:", e);
+        console.error("load profile:", e);
       } finally {
         setLoading(false);
       }
-    };
-    loadProfile();
+    })();
   }, [user]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     if (name === "projectType") {
-      const values = Array.from(e.target.selectedOptions, (opt) => opt.value);
-      setFormData((prev) => ({ ...prev, projectType: values }));
+      const vals = Array.from(e.target.selectedOptions, (o) => o.value);
+      setFormData((p) => ({ ...p, projectType: vals }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
+      setFormData((p) => ({
+        ...p,
         [name]:
           type === "number" || type === "range" ? parseInt(value, 10) : value,
       }));
@@ -105,8 +104,8 @@ const MemberForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return alert("Please log in first.");
-
     try {
+      // <-- write into "profiles" (not "members")
       await setDoc(doc(db, "profiles", user.uid), {
         ...formData,
         email: user.email,
@@ -197,7 +196,6 @@ const MemberForm = () => {
           </option>
         ))}
       </select>
-
       {formData.location !== "All Ireland" && (
         <select
           name="county"
@@ -254,7 +252,7 @@ const MemberForm = () => {
       />
 
       <label className="block text-sm font-medium text-gray-700">
-        Available for my next project from...
+        Available from...
       </label>
       <input
         type="date"
