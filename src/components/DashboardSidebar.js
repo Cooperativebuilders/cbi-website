@@ -34,7 +34,7 @@ const DashboardSidebar = ({ onLogout }) => {
           <FaHome /> <span>Dashboard Home</span>
         </Link>
         <Link to="/edit-profile" className={linkClass("/edit-profile")}>
-          <FaUserEdit /> <span>Edit My Tile Info</span>
+          <FaUserEdit /> <span>Edit My Info</span>
         </Link>
         <Link to="/members" className={linkClass("/members")}>
           <FaUsers /> <span>View Members</span>
