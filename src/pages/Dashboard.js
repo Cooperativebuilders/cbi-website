@@ -23,7 +23,6 @@ import DashboardSidebar from "../components/DashboardSidebar";
 import DiscordWidget from "../components/DiscordWidget";
 import { adminUIDs } from "../constants/admins";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
-import ResetPassword from "./ResetPassword.js";
 
 const Dashboard = () => {
   // AUTH & LOADING STATES
@@ -260,15 +259,7 @@ const Dashboard = () => {
             placeholder="Password"
             className="w-full p-2 border rounded-lg"
           />
-          {/* Forgot Password Link */}
-          <div className="text-right">
-            <Link
-              to="/reset-password"
-              className="text-sm text-blue-600 hover:underline"
-            >
-              Forgot your password?
-            </Link>
-          </div>
+
           <button
             onClick={handleEmailLogin}
             className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
@@ -282,6 +273,15 @@ const Dashboard = () => {
           >
             Sign in with Google
           </button>
+          {/* Forgot Password Link */}
+          <div className="text-right">
+            <Link
+              to="/reset-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Forgot your password?
+            </Link>
+          </div>
           <p className="text-sm text-gray-600 mt-4 text-center">
             Don’t have an account?{" "}
             <a href="/signup" className="text-blue-600 hover:underline">
