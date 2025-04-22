@@ -1,26 +1,23 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-
-        // -------------------------
+    
+    // -------------------------
     // Member Profiles Collection
     // -------------------------
     match /profiles/{userId} {
-      // Anyone (even unauthenticated) can read the member directory
-      allow read: if true;
-      // Only the signed‑in user can write their own profile
-      allow write: if request.auth != null && request.auth.uid == userId;
+      // Public directory
+      allow read:  if true;
+      // Only owner can write
+      allow write: if request.auth != null
+                   && request.auth.uid == userId;
     }
 
     // -------------------------
     // Guidance Notes Collection
     // -------------------------
     match /guidanceNotes/{docId} {
-      // Anyone can read guidance
-      allow read: if true;
-      
-      // Only admins can create/update/delete (write) guidance docs
+      allow read:  if true;
       allow write: if request.auth != null && isAdmin();
     }
 
@@ -28,23 +25,16 @@ service cloud.firestore {
     // Projects Collection
     // -------------------------
     match /projects/{projectId} {
-      // Anyone can read
-      allow read: if true;
-
-      // Only authenticated users can create or update
+      allow read:   if true;
       allow create: if request.auth != null;
       allow update: if request.auth != null;
-
-      // Only admins can delete
       allow delete: if request.auth != null && isAdmin();
 
-      // Sub-collection: participants
+      // Participants sub‑collection
       match /participants/{userId} {
-        // Anyone can read participant data
-        allow read: if true;
-
-        // A user can write to their own participant doc
-        allow write: if request.auth != null && request.auth.uid == userId;
+        allow read:  if true;
+        allow write: if request.auth != null
+                     && request.auth.uid == userId;
       }
     }
 
@@ -52,15 +42,14 @@ service cloud.firestore {
     // Helper Function
     // -------------------------
     function isAdmin() {
-      return request.auth != null &&
-        (
-          request.auth.uid in [
-            "XdJonag5LPOYMpoxPS8wCDjZIqg2",
-            "AdminUID_2"
-          ]
-        );
+      return request.auth != null
+        && request.auth.uid in [
+          "XdJonag5LPOYMpoxPS8wCDjZIqg2",
+          "AdminUID_2"
+        ];
     }
   }
 }
+
 
 
