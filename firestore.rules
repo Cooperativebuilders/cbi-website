@@ -5,12 +5,16 @@ service cloud.firestore {
     // -------------------------
     // Member Profiles Collection
     // -------------------------
-    match /profiles/{userId} {
+       match /profiles/{userId} {
       // Public directory
-      allow read:  if true;
-      // Only owner can write
-      allow write: if request.auth != null
-                   && request.auth.uid == userId;
+      allow read: if true;
+      // Only the signed‑in user can create *or* update their own doc
+      allow create: if request.auth != null
+                    && request.auth.uid == userId;
+      allow update: if request.auth != null
+                    && request.auth.uid == userId;
+      // (optional) disallow delete, or only admin:
+      allow delete: if false;
     }
 
     // -------------------------
