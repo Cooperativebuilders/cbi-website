@@ -74,6 +74,7 @@ const MemberForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
+
     if (name === "projectType") {
       const values = Array.from(e.target.selectedOptions, (opt) => opt.value);
       setFormData((prev) => ({ ...prev, projectType: values }));
@@ -94,7 +95,7 @@ const MemberForm = () => {
     }
 
     try {
-      // write into "profiles" collection, merging with any existing data
+      // write into "profiles" collection, merging with any existing fields
       await setDoc(
         doc(db, "profiles", user.uid),
         {
