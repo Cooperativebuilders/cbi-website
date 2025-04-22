@@ -1,6 +1,6 @@
 // src/components/MemberForm.js
 import React, { useState, useEffect } from "react";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -72,15 +72,16 @@ const MemberForm = () => {
     availability: "",
   });
 
-  // load existing profile (if any)
+  // Load existing profile
   useEffect(() => {
     if (!user) return setLoading(false);
     (async () => {
       try {
-        const snap = await getDoc(doc(db, "profiles", user.uid));
+        const ref = doc(db, "profiles", user.uid);
+        const snap = await getDoc(ref);
         if (snap.exists()) setFormData(snap.data());
       } catch (e) {
-        console.error("load profile:", e);
+        console.error("Error loading profile:", e);
       } finally {
         setLoading(false);
       }
@@ -105,7 +106,7 @@ const MemberForm = () => {
     e.preventDefault();
     if (!user) return alert("Please log in first.");
     try {
-      // <-- write into "profiles" (not "members")
+      // <-- write into "profiles", matching your rules
       await setDoc(doc(db, "profiles", user.uid), {
         ...formData,
         email: user.email,
@@ -196,6 +197,7 @@ const MemberForm = () => {
           </option>
         ))}
       </select>
+
       {formData.location !== "All Ireland" && (
         <select
           name="county"
