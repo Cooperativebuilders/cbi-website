@@ -274,7 +274,7 @@ const Dashboard = () => {
             Sign in with Google
           </button>
           {/* Forgot Password Link */}
-          <div className="text-right">
+          <div className="text-center">
             <Link
               to="/reset-password"
               className="text-sm text-blue-600 hover:underline"
