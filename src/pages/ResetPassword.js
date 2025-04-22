@@ -76,7 +76,7 @@ const ResetPassword = () => {
 
       <p className="mt-4 text-sm text-center">
         Remembered your password?{" "}
-        <Link to="/Dashboard" className="text-blue-600 hover:underline">
+        <Link to="/dashboard" className="text-blue-600 hover:underline">
           Log in
         </Link>
       </p>
