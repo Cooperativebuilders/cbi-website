@@ -17,8 +17,7 @@ function App() {
     <Routes>
       <Route path="/" element={<CBIWebsite />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/reset-password" element={<ResetPassword />} />{" "}
-      {/* ← new route */}
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/membership-required" element={<MembershipRequired />} />
       <Route path="/members" element={<MembersPage />} />
