@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [experience, setExperience] = useState("");
-  const [specializations, setSpecializations] = useState("");
-  const [locations, setLocations] = useState("");
-  const [readiness, setReadiness] = useState("");
   const [paid, setPaid] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -89,23 +83,7 @@ const Signup = () => {
     setSuccess("");
 
     try {
-      const userCred = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCred.user;
-
-      await setDoc(doc(db, "profiles", user.uid), {
-        email,
-        occupation,
-        experience,
-        specializations,
-        locations,
-        readiness,
-        name: "",
-      });
-
+      await createUserWithEmailAndPassword(auth, email, password);
       setSuccess("Account created! Redirecting...");
       setTimeout(() => {
         navigate("/dashboard");
@@ -129,6 +107,7 @@ const Signup = () => {
         alt="CBI Logo"
         className="w-80 h-80 mb-6"
       />
+
       {!paid ? (
         <div className="text-center space-y-4">
           <p className="text-gray-600 mb-4">
@@ -198,54 +177,6 @@ const Signup = () => {
               className="w-full p-2 border rounded"
               required
             />
-            <select
-              className="w-full p-2 border rounded"
-              value={occupation}
-              onChange={(e) => setOccupation(e.target.value)}
-              required
-            >
-              <option value="">Occupation</option>
-              <option>Tradesperson</option>
-              <option>Construction Professional</option>
-              <option>Eager Beginner</option>
-              <option>Passive Investor</option>
-            </select>
-            <input
-              type="number"
-              placeholder="Years of experience"
-              value={experience}
-              onChange={(e) => setExperience(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Specializations"
-              value={specializations}
-              onChange={(e) => setSpecializations(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Project Locations"
-              value={locations}
-              onChange={(e) => setLocations(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-            <select
-              className="w-full p-2 border rounded"
-              value={readiness}
-              onChange={(e) => setReadiness(e.target.value)}
-              required
-            >
-              <option value="">Ready to Go?</option>
-              <option>Currently seeking projects</option>
-              <option>Currently developing</option>
-              <option>Not ready</option>
-            </select>
-
             <button
               type="submit"
               className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
