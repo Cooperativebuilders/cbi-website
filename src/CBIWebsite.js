@@ -50,7 +50,7 @@ const CBIWebsite = () => {
             Build Together. Profit Together.
           </h1>
           <p className="text-lg sm:text-xl text-white/90 mb-6 max-w-2xl">
-            Co-operative Builders Ireland (CBI) connecting skilled tradespeople
+            Co-operative Builders Ireland (CBI) connecting skilled tradespeople, construction professionals
             and property investors to renovate, build, and thrive – as one.
           </p>
           <Link
