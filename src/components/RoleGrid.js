@@ -16,6 +16,7 @@ const professions = [
   "Surveyor",
   "Health & Safety Officer",
   "Project Manager",
+  "Mechanic",
   "Site Foreman",
   "Groundworker",
   "Dumper Operator",
