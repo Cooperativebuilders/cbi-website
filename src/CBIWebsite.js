@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import RoleGrid from "./components/RoleGrid";
 import FAQAccordion from "./components/FAQAccordion";
+// 👇 Make absolutely sure this matches the file name on disk (LoadingBanner.js)
 import LoadingBanner from "./components/LoadingBanner";
 
 const CBIWebsite = () => {
@@ -14,6 +15,8 @@ const CBIWebsite = () => {
     script.async = true;
     document.body.appendChild(script);
   }, []);
+
+  console.log("🏠 CBIWebsite rendering, about to mount LoadingBanner");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 sm:p-6">
@@ -32,7 +35,7 @@ const CBIWebsite = () => {
         </nav>
       </header>
 
-      {/* Hero Banner */}
+      {/* Hero (Banner) */}
       <section
         className="relative h-96 rounded-xl shadow-xl overflow-hidden mb-10 max-w-4xl mx-auto"
         style={{
@@ -61,6 +64,7 @@ const CBIWebsite = () => {
       </section>
 
       {/* CBIRE0001 Loading + Distribution Banner */}
+      {/* This is where we mount the banner — you should see the console.log above */}
       <LoadingBanner />
 
       {/* Main content */}
@@ -117,8 +121,7 @@ const CBIWebsite = () => {
             Have more questions?{" "}
             <Link to="/contact" className="text-blue-600 hover:underline">
               Contact us
-            </Link>
-            .
+            </Link>.
           </p>
         </section>
 
