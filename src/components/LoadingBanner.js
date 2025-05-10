@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 
 const LoadingBanner = () => {
+  console.log("🔔 LoadingBanner mounted");
+
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
   const [memberCount, setMemberCount] = useState(0);
