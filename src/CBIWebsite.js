@@ -1,7 +1,10 @@
+// src/CBIWebsite.js
+
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import RoleGrid from "./components/RoleGrid";
 import FAQAccordion from "./components/FAQAccordion";
+import LoadingBanner from "./components/LoadingBanner";
 
 const CBIWebsite = () => {
   useEffect(() => {
@@ -23,19 +26,13 @@ const CBIWebsite = () => {
           </h1>
         </div>
         <nav className="flex justify-center sm:justify-end space-x-4 text-blue-600 text-base sm:text-lg font-medium">
-          <Link to="/" className="hover:text-blue-800 transition">
-            Home
-          </Link>
-          <a href="#faqs" className="hover:text-blue-800 transition">
-            FAQs
-          </a>
-          <Link to="/dashboard" className="hover:text-blue-800 transition">
-            Dashboard
-          </Link>
+          <Link to="/" className="hover:text-blue-800 transition">Home</Link>
+          <a href="#faqs" className="hover:text-blue-800 transition">FAQs</a>
+          <Link to="/dashboard" className="hover:text-blue-800 transition">Dashboard</Link>
         </nav>
       </header>
 
-      {/* Hero (Banner) with background image */}
+      {/* Hero Banner */}
       <section
         className="relative h-96 rounded-xl shadow-xl overflow-hidden mb-10 max-w-4xl mx-auto"
         style={{
@@ -44,14 +41,15 @@ const CBIWebsite = () => {
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="absolute inset-0 bg-black opacity-50" />
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
           <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-4">
             Build Together. Profit Together.
           </h1>
           <p className="text-lg sm:text-xl text-white/90 mb-6 max-w-2xl">
-            Co-operative Builders Ireland (CBI) connecting skilled tradespeople, construction professionals
-            and property investors to renovate, build, and thrive – as one.
+            Co-operative Builders Ireland (CBI) connecting skilled tradespeople,
+            construction professionals and property investors to renovate, build,
+            and thrive – as one.
           </p>
           <Link
             to="/signup"
@@ -62,9 +60,11 @@ const CBIWebsite = () => {
         </div>
       </section>
 
+      {/* CBIRE0001 Loading + Distribution Banner */}
+      <LoadingBanner />
+
       {/* Main content */}
       <main id="home" className="space-y-8 max-w-4xl mx-auto">
-        {/* Three Sections: "About Us", "Membership Details", "Become a Developer" */}
         {[
           {
             title: "About Us",
