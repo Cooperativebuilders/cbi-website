@@ -4,10 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 const LoadingBanner = () => {
-  const [loading, setLoading]           = useState(true);
-  const [error, setError]               = useState(null);
-  const [memberCount, setMemberCount]   = useState(0);
-  const [distribution, setDistribution] = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState(null);
+  const [memberCount, setMemberCount] = useState(0);
   const totalMembers = 149;
 
   const percentage = totalMembers > 0
@@ -17,24 +16,16 @@ const LoadingBanner = () => {
   useEffect(() => {
     let mounted = true;
 
-    const fetchData = async () => {
+    const fetchCount = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // fetch the count
-        const countRes = await fetch('/api/role-count/CBIRE0001');
-        if (!countRes.ok) throw new Error(`Count fetch failed: ${countRes.status}`);
-        const { count } = await countRes.json();
-
-        // fetch the distribution
-        const distRes = await fetch('/api/cbire0001-role-distribution');
-        if (!distRes.ok) throw new Error(`Dist fetch failed: ${distRes.status}`);
-        const { distribution } = await distRes.json();
-
+        const res = await fetch('/api/role-count/CBIRE0001');
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const { count } = await res.json();
         if (!mounted) return;
         setMemberCount(count);
-        setDistribution(distribution);
       } catch (err) {
         console.error('LoadingBanner fetch error', err);
         if (mounted) setError('Failed to load banner data.');
@@ -43,8 +34,8 @@ const LoadingBanner = () => {
       }
     };
 
-    fetchData();
-    const interval = setInterval(fetchData, 30000);
+    fetchCount();
+    const interval = setInterval(fetchCount, 30000);
     return () => {
       mounted = false;
       clearInterval(interval);
@@ -58,6 +49,7 @@ const LoadingBanner = () => {
       </div>
     );
   }
+
   if (error) {
     return (
       <div className="w-full max-w-4xl mx-auto bg-red-100 p-4 rounded-xl shadow-md mb-8 text-red-600">
@@ -68,7 +60,6 @@ const LoadingBanner = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white p-4 rounded-xl shadow-md mb-8">
-      {/* Overall progress */}
       <div className="mb-3 text-lg font-medium text-gray-800">
         Loaded <span className="font-semibold">{memberCount}</span> of{' '}
         <span className="font-semibold">{totalMembers}</span> members{' '}
@@ -82,38 +73,6 @@ const LoadingBanner = () => {
           transition={{ duration: 0.5 }}
         />
       </div>
-
-      {/* Distribution */}
-      {distribution.length > 0 && (
-        <div>
-          <div className="text-md font-semibold text-gray-700 mb-2">
-            CBIRE0001 Role Distribution
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            {distribution.map(({ name, count }) => {
-              const rp = totalMembers > 0
-                ? Math.min(100, Math.floor((count / totalMembers) * 100))
-                : 0;
-              return (
-                <div key={name} className="text-center">
-                  <div className="text-sm text-gray-600 mb-1">{name}</div>
-                  <div className="relative h-12 bg-gray-100 rounded-lg overflow-hidden">
-                    <motion.div
-                      className="absolute bottom-0 left-0 right-0 bg-green-500"
-                      initial={{ height: 0 }}
-                      animate={{ height: `${rp}%` }}
-                      transition={{ duration: 0.5 }}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
-                      {count}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
