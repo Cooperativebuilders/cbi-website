@@ -9,7 +9,7 @@ const LoadingBanner = () => {
   const [memberCount, setMemberCount] = useState(0);
   const totalMembers = 149;
 
-  const percentage = totalMembers > 0
+  const percentage = totalMembers
     ? Math.min(100, Math.floor((memberCount / totalMembers) * 100))
     : 0;
 
@@ -19,16 +19,19 @@ const LoadingBanner = () => {
     const fetchCount = async () => {
       setLoading(true);
       setError(null);
-
       try {
-        const res = await fetch('/api/role-count/CBIRE0001');
-        if (!res.ok) throw new Error(`Status ${res.status}`);
-        const { count } = await res.json();
-        if (!mounted) return;
-        setMemberCount(count);
+        const res = await fetch(
+          "https://cbi-backend-l001.onrender.com/api/discord-role-counts"
+        );
+        const json = await res.json();
+        if (!json.success) {
+          throw new Error(json.error || "Unknown error");
+        }
+        const count = json.data.CBIRE0001 ?? 0;
+        if (mounted) setMemberCount(count);
       } catch (err) {
-        console.error('LoadingBanner fetch error', err);
-        if (mounted) setError('Failed to load banner data.');
+        console.error("LoadingBanner fetch error", err);
+        if (mounted) setError("Failed to load banner data.");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -49,7 +52,6 @@ const LoadingBanner = () => {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="w-full max-w-4xl mx-auto bg-red-100 p-4 rounded-xl shadow-md mb-8 text-red-600">
