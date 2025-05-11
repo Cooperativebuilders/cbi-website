@@ -2,14 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
 
 const LoadingBanner = () => {
-  console.log("🔔 LoadingBanner mounted");
-
-  const [loading, setLoading]         = useState(true);
-  const [error, setError]             = useState(null);
-  const [memberCount, setMemberCount] = useState(0);
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState(null);
+  const [memberCount, setMemberCount]   = useState(0);
   const [distribution, setDistribution] = useState([]);
   const totalMembers = 149;
 
@@ -23,14 +20,21 @@ const LoadingBanner = () => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+
       try {
-        const [countRes, distRes] = await Promise.all([
-          axios.get('/api/role-count/CBIRE0001'),
-          axios.get('/api/cbire0001-role-distribution'),
-        ]);
+        // fetch the count
+        const countRes = await fetch('/api/role-count/CBIRE0001');
+        if (!countRes.ok) throw new Error(`Count fetch failed: ${countRes.status}`);
+        const { count } = await countRes.json();
+
+        // fetch the distribution
+        const distRes = await fetch('/api/cbire0001-role-distribution');
+        if (!distRes.ok) throw new Error(`Dist fetch failed: ${distRes.status}`);
+        const { distribution } = await distRes.json();
+
         if (!mounted) return;
-        setMemberCount(countRes.data.count);
-        setDistribution(distRes.data.distribution);
+        setMemberCount(count);
+        setDistribution(distribution);
       } catch (err) {
         console.error('LoadingBanner fetch error', err);
         if (mounted) setError('Failed to load banner data.');
@@ -64,7 +68,7 @@ const LoadingBanner = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white p-4 rounded-xl shadow-md mb-8">
-      {/* Overall CBIRE0001 progress */}
+      {/* Overall progress */}
       <div className="mb-3 text-lg font-medium text-gray-800">
         Loaded <span className="font-semibold">{memberCount}</span> of{' '}
         <span className="font-semibold">{totalMembers}</span> members{' '}
@@ -79,7 +83,7 @@ const LoadingBanner = () => {
         />
       </div>
 
-      {/* Distribution of CBIRE0001 members across other roles */}
+      {/* Distribution */}
       {distribution.length > 0 && (
         <div>
           <div className="text-md font-semibold text-gray-700 mb-2">
