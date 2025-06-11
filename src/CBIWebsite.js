@@ -108,6 +108,26 @@ const CBIWebsite = () => {
           </section>
         ))}
 
+        {/* Download 2025 Handbook */}
+        <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 flex flex-col items-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-4 text-center">
+            Download 2025 Handbook
+          </h2>
+          <p className="text-base sm:text-lg text-gray-700 mb-6 text-center max-w-2xl">
+            Get the official CBI 2025 Handbook: <br />
+            <span className="italic">A Practical Guide To Building And Owning Together</span>
+          </p>
+          <a
+            href="https://firebasestorage.googleapis.com/v0/b/cbi-platform.firebasestorage.app/o/A%20Practical%20Guide%20To%20Building%20And%20Owning%20Together%20-%202025.pdf?alt=media&token=050ba270-bdf6-4068-af42-2d400abeb01a"
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+            className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
+          >
+            Download PDF
+          </a>
+        </section>
+
         {/* FAQs */}
         <section
           id="faqs"
