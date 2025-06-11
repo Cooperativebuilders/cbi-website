@@ -27,9 +27,10 @@ function TenderTile({ tender, tenderId }) {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 relative">
-      <h3 className="text-xl font-bold text-blue-700 mb-2">
-        {tender.description}
+      <h3 className="text-xl font-bold text-blue-700 mb-1">
+        {tender.title}
       </h3>
+      <div className="text-gray-800 mb-2">{tender.description}</div>
       <p className="text-sm text-gray-500 mb-1">
         <strong>Type:</strong> {tender.type}
       </p>
