@@ -23,6 +23,7 @@ import DashboardSidebar from "../components/DashboardSidebar";
 import DiscordWidget from "../components/DiscordWidget";
 import { adminUIDs } from "../constants/admins";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import TenderTile from "../components/TenderTile"; // If not already imported
 
 const Dashboard = () => {
   // AUTH & LOADING STATES
@@ -39,6 +40,9 @@ const Dashboard = () => {
   // MY PROJECTS STATES
   const [myProjects, setMyProjects] = useState([]);
   const [totalInvestment, setTotalInvestment] = useState(0);
+
+  // Tender states
+  const [myTenders, setMyTenders] = useState([]);
 
   // Slider-editing state
   const [editingProjectId, setEditingProjectId] = useState(null);
@@ -159,6 +163,18 @@ const Dashboard = () => {
     return () => unsub();
   }, [user]);
 
+  // FETCH USER'S TENDERS
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(collection(db, "tenders"), (snapshot) => {
+      const userTenders = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((tender) => tender.postedBy === user.uid);
+      setMyTenders(userTenders);
+    });
+    return () => unsub();
+  }, [user]);
+
   // START EDIT MODE
   const startEdit = (projectId, projectData, oldBuyIn) => {
     const budget = parseFloat(projectData.budget || 0);
@@ -221,6 +237,17 @@ const Dashboard = () => {
     } catch (err) {
       console.error("Error leaving project:", err);
       alert("❌ Failed to leave project.");
+    }
+  };
+
+  // DELETE TENDER
+  const handleDeleteTender = async (tenderId) => {
+    if (!window.confirm("Are you sure you want to delete this tender?")) return;
+    try {
+      await deleteDoc(doc(db, "tenders", tenderId));
+      setMyTenders((prev) => prev.filter((t) => t.id !== tenderId));
+    } catch (err) {
+      alert("Failed to delete tender.");
     }
   };
 
@@ -456,10 +483,31 @@ const Dashboard = () => {
             <h2 className="text-2xl font-semibold text-blue-800 mb-3">
               Tenders Overview
             </h2>
-            <Link to="/tenders" className="text-blue-600 hover:underline">
-              View All Tenders
-            </Link>
-            {/* Optionally, fetch and display a summary or recent tenders here */}
+            {myTenders.length === 0 ? (
+              <p className="text-gray-600">You haven't submitted any tenders yet.</p>
+            ) : (
+              <ul className="space-y-2">
+                {myTenders.map((tender) => (
+                  <li key={tender.id} className="flex items-center justify-between border-b py-2">
+                    <span className="font-medium text-blue-700">{tender.title}</span>
+                    <div className="flex gap-2">
+                      <Link
+                        to={`/edit-tender/${tender.id}`}
+                        className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteTender(tender.id)}
+                        className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
 
           {/* Funding Breakdown */}
