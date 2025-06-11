@@ -9,13 +9,16 @@ const EditTenderForm = () => {
   const { tenderId } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState(null);
+  const [asap, setAsap] = useState(false);
 
   useEffect(() => {
     const fetchTender = async () => {
       const docRef = doc(db, "tenders", tenderId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        setFormData(docSnap.data());
+        const data = docSnap.data();
+        setFormData(data);
+        setAsap(data.startDate === "ASAP");
       }
     };
     fetchTender();
@@ -32,13 +35,34 @@ const EditTenderForm = () => {
     }));
   };
 
+  const handleAsapChange = (e) => {
+    const checked = e.target.checked;
+    setAsap(checked);
+    setFormData((prev) => ({
+      ...prev,
+      startDate: checked ? "ASAP" : "",
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateDoc(doc(db, "tenders", tenderId), {
-      ...formData,
-    });
-    alert("Tender updated!");
-    navigate("/tenders");
+    // If not ASAP, ensure startDate is set
+    if (!asap && !formData.startDate) {
+      alert("Please select a start date or choose ASAP.");
+      return;
+    }
+    try {
+      await updateDoc(doc(db, "tenders", tenderId), {
+        ...formData,
+        startDate: asap ? "ASAP" : formData.startDate,
+        budget: parseInt(formData.budget, 10) || 0,
+      });
+      alert("Tender updated!");
+      navigate("/tenders");
+    } catch (err) {
+      alert("Failed to update tender.");
+      console.error(err);
+    }
   };
 
   return (
@@ -60,7 +84,78 @@ const EditTenderForm = () => {
         className="w-full p-2 border rounded mb-4"
         required
       />
-      {/* ...repeat for other fields... */}
+      <select
+        name="type"
+        value={formData.type}
+        onChange={handleChange}
+        className="w-full p-2 border rounded mb-4"
+      >
+        <option value="Labour Only">Labour Only</option>
+        <option value="Labour & Materials">Labour & Materials</option>
+      </select>
+      <label className="block mb-1 font-medium text-gray-700" htmlFor="startDate">
+        Start Date
+      </label>
+      <div className="flex items-center mb-4">
+        <input
+          type="date"
+          id="startDate"
+          name="startDate"
+          value={asap ? "" : (formData.startDate === "ASAP" ? "" : formData.startDate)}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          disabled={asap}
+          required={!asap}
+          style={{ maxWidth: "200px" }}
+        />
+        <label className="ml-4 flex items-center">
+          <input
+            type="checkbox"
+            checked={asap}
+            onChange={handleAsapChange}
+            className="mr-2"
+          />
+          ASAP
+        </label>
+      </div>
+      <label className="block mb-1 font-medium text-gray-700" htmlFor="deadline">
+        Deadline
+      </label>
+      <input
+        type="date"
+        id="deadline"
+        name="deadline"
+        value={formData.deadline}
+        onChange={handleChange}
+        className="w-full p-2 border rounded mb-4"
+        required
+      />
+      <input
+        name="budget"
+        placeholder="Budget (€)"
+        value={formData.budget}
+        onChange={handleChange}
+        className="w-full p-2 border rounded mb-4"
+        required
+        type="number"
+        min="0"
+      />
+      <input
+        name="contact"
+        placeholder="Contact Information"
+        value={formData.contact}
+        onChange={handleChange}
+        className="w-full p-2 border rounded mb-4"
+        required
+      />
+      <input
+        name="location"
+        placeholder="Location"
+        value={formData.location}
+        onChange={handleChange}
+        className="w-full p-2 border rounded mb-4"
+        required
+      />
       <button
         type="submit"
         className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
