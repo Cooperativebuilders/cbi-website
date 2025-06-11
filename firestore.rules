@@ -43,6 +43,15 @@ service cloud.firestore {
     }
 
     // -------------------------
+    // Handbook Emails Collection
+    // -------------------------
+    match /handbookEmails/{docId} {
+      allow create: if true;   // Allow anyone to submit
+      allow read: if false;    // (Optional) Only allow server/admin to read
+      allow update, delete: if false;
+    }
+
+    // -------------------------
     // Helper Function
     // -------------------------
     function isAdmin() {

@@ -1,11 +1,13 @@
 // src/CBIWebsite.js
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { db } from "./firebase"; // Adjust path if needed
 import RoleGrid from "./components/RoleGrid";
 import FAQAccordion from "./components/FAQAccordion";
 // 👇 Make absolutely sure this matches the file name on disk (LoadingBanner.js)
 import LoadingBanner from "./components/LoadingBanner";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const CBIWebsite = () => {
   useEffect(() => {
@@ -17,6 +19,28 @@ const CBIWebsite = () => {
   }, []);
 
   console.log("🏠 CBIWebsite rendering, about to mount LoadingBanner");
+
+  const [email, setEmail] = useState("");
+  const [downloaded, setDownloaded] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+    if (!email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
+    setEmailError("");
+    try {
+      await addDoc(collection(db, "handbookEmails"), {
+        email,
+        createdAt: serverTimestamp(),
+      });
+      setDownloaded(true);
+    } catch (err) {
+      setEmailError("Failed to save email. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 sm:p-6">
@@ -108,7 +132,7 @@ const CBIWebsite = () => {
           </section>
         ))}
 
-        {/* Download 2025 Handbook */}
+        {/* Download 2025 Handbook with Email Wall */}
         <section className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 flex flex-col items-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-4 text-center">
             Download 2025 Handbook
@@ -117,15 +141,40 @@ const CBIWebsite = () => {
             Get the official CBI 2025 Handbook: <br />
             <span className="italic">A Practical Guide To Building And Owning Together</span>
           </p>
-          <a
-            href="https://firebasestorage.googleapis.com/v0/b/cbi-platform.firebasestorage.app/o/A%20Practical%20Guide%20To%20Building%20And%20Owning%20Together%20-%202025.pdf?alt=media&token=050ba270-bdf6-4068-af42-2d400abeb01a"
-            target="_blank"
-            rel="noopener noreferrer"
-            download
-            className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
-          >
-            Download PDF
-          </a>
+          {downloaded ? (
+            <a
+              href="https://firebasestorage.googleapis.com/v0/b/cbi-platform.firebasestorage.app/o/A%20Practical%20Guide%20To%20Building%20And%20Owning%20Together%20-%202025.pdf?alt=media&token=050ba270-bdf6-4068-af42-2d400abeb01a"
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
+            >
+              Download PDF
+            </a>
+          ) : (
+            <form
+              className="flex flex-col items-center w-full max-w-sm"
+              onSubmit={handleEmailSubmit}
+            >
+              <input
+                type="email"
+                required
+                placeholder="Enter your email to download"
+                className="border border-gray-300 rounded-lg px-4 py-2 mb-4 w-full"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300 w-full"
+              >
+                Submit & Show Download
+              </button>
+              {emailError && (
+                <span className="text-red-500 text-sm mt-2">{emailError}</span>
+              )}
+            </form>
+          )}
         </section>
 
         {/* FAQs */}
