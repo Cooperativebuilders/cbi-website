@@ -89,16 +89,24 @@ const TenderForm = () => {
           <option value="Labour Only">Labour Only</option>
           <option value="Labour & Materials">Labour & Materials</option>
         </select>
+        <label className="block mb-1 font-medium text-gray-700" htmlFor="startDate">
+          Start Date
+        </label>
         <input
           type="date"
+          id="startDate"
           name="startDate"
           value={formData.startDate}
           onChange={handleChange}
           className="w-full p-2 border rounded mb-4"
           required
         />
+        <label className="block mb-1 font-medium text-gray-700" htmlFor="deadline">
+          Deadline
+        </label>
         <input
           type="date"
+          id="deadline"
           name="deadline"
           value={formData.deadline}
           onChange={handleChange}
