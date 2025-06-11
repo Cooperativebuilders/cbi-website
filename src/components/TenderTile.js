@@ -3,6 +3,7 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { adminUIDs } from "../constants/admins";
+import { Link } from "react-router-dom";
 
 function TenderTile({ tender, tenderId }) {
   const [user] = useAuthState(auth);
@@ -51,6 +52,14 @@ function TenderTile({ tender, tenderId }) {
         >
           Delete
         </button>
+      )}
+      {isPoster && (
+        <Link
+          to={`/edit-tender/${tenderId}`}
+          className="absolute top-2 right-16 text-blue-600 text-xs border border-blue-600 px-2 py-1 rounded hover:bg-blue-100"
+        >
+          Edit
+        </Link>
       )}
     </div>
   );

@@ -15,13 +15,14 @@ const TenderForm = () => {
   const [asap, setAsap] = useState(false);
 
   const [formData, setFormData] = useState({
+    title: "", // <-- Add this line
     description: "",
     type: "Labour Only",
     startDate: "",
     deadline: "",
     budget: "",
     contact: "",
-    location: "", // <-- Add this line
+    location: "",
   });
 
   const handleChange = (e) => {
@@ -42,13 +43,14 @@ const TenderForm = () => {
       const tenderCode = generateTenderCode();
       await setDoc(doc(db, "tenders", tenderCode), {
         tenderCode,
+        title: formData.title, // <-- Add this line
         description: formData.description,
         type: formData.type,
         startDate: formData.startDate,
         deadline: formData.deadline,
         budget: parseInt(formData.budget, 10) || 0,
         contact: formData.contact,
-        location: formData.location, // <-- Add this line
+        location: formData.location,
         postedBy: user.uid,
         postedByEmail: user.email,
         timestamp: Timestamp.now(),
@@ -83,6 +85,14 @@ const TenderForm = () => {
         <h2 className="text-2xl font-bold text-blue-700 mb-6">
           Submit a Tender
         </h2>
+        <input
+          name="title"
+          placeholder="Tender Title"
+          value={formData.title}
+          onChange={handleChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
         <textarea
           name="description"
           placeholder="Tender Description"
@@ -153,7 +163,7 @@ const TenderForm = () => {
         />
         <input
           name="contact"
-          placeholder="Contact Info"
+          placeholder="Contact Information"
           value={formData.contact}
           onChange={handleChange}
           className="w-full p-2 border rounded mb-4"

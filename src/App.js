@@ -13,6 +13,7 @@ import Guidance from "./pages/Guidance";
 import ResetPassword from "./pages/ResetPassword.js"; // ← import it here
 import TenderForm from "./components/TenderForm";
 import TendersPage from "./pages/TendersPage";
+import EditTenderForm from "./components/EditTenderForm"; // Import the EditTenderForm component
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
       <Route path="/guidance" element={<Guidance />} />
       <Route path="/submit-tender" element={<TenderForm />} />
       <Route path="/tenders" element={<TendersPage />} />
+      <Route path="/edit-tender/:tenderId" element={<EditTenderForm />} />{" "}
+      {/* Add the route for editing tenders */}
     </Routes>
   );
 }

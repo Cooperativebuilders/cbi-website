@@ -60,6 +60,17 @@ service cloud.firestore {
     }
 
     // -------------------------
+    // Tenders Collection
+    // -------------------------
+    match /tenders/{tenderId} {
+      allow create: if request.auth != null; // Only signed-in users can submit
+      allow read: if true;                   // Anyone can read
+      allow update, delete: if request.auth != null && (
+        request.auth.uid == resource.data.postedBy || isAdmin()
+      );
+    }
+
+    // -------------------------
     // Helper Function
     // -------------------------
     function isAdmin() {
