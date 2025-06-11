@@ -12,6 +12,7 @@ function generateTenderCode() {
 const TenderForm = () => {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
+  const [asap, setAsap] = useState(false);
 
   const [formData, setFormData] = useState({
     description: "",
@@ -102,15 +103,34 @@ const TenderForm = () => {
         <label className="block mb-1 font-medium text-gray-700" htmlFor="startDate">
           Start Date
         </label>
-        <input
-          type="date"
-          id="startDate"
-          name="startDate"
-          value={formData.startDate}
-          onChange={handleChange}
-          className="w-full p-2 border rounded mb-4"
-          required
-        />
+        <div className="flex items-center mb-4">
+          <input
+            type="date"
+            id="startDate"
+            name="startDate"
+            value={asap ? "" : formData.startDate}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+            disabled={asap}
+            required={!asap}
+            style={{ maxWidth: "200px" }}
+          />
+          <label className="ml-4 flex items-center">
+            <input
+              type="checkbox"
+              checked={asap}
+              onChange={(e) => {
+                setAsap(e.target.checked);
+                setFormData((prev) => ({
+                  ...prev,
+                  startDate: e.target.checked ? "ASAP" : "",
+                }));
+              }}
+              className="mr-2"
+            />
+            ASAP
+          </label>
+        </div>
         <label className="block mb-1 font-medium text-gray-700" htmlFor="deadline">
           Deadline
         </label>
