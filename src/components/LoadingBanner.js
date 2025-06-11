@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from "react-router-dom";
+import { db } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const LoadingBanner = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [memberCount, setMemberCount] = useState(0);
+  const [pledgeEmail, setPledgeEmail] = useState("");
+  const [pledgeError, setPledgeError] = useState("");
+  const [pledgeLoading, setPledgeLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Constants
   const totalShares = 149;
@@ -44,6 +51,28 @@ const LoadingBanner = () => {
       clearInterval(interval);
     };
   }, []);
+
+  const handlePledge = async (e) => {
+    e.preventDefault();
+    setPledgeError("");
+    if (!pledgeEmail.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
+      setPledgeError("Please enter a valid email address.");
+      return;
+    }
+    setPledgeLoading(true);
+    try {
+      await addDoc(collection(db, "pledgeEmails"), {
+        email: pledgeEmail,
+        createdAt: serverTimestamp(),
+      });
+      setPledgeEmail("");
+      navigate("/signup");
+    } catch (err) {
+      setPledgeError("Failed to save email. Please try again.");
+    } finally {
+      setPledgeLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -88,7 +117,7 @@ const LoadingBanner = () => {
       <div className="mb-2 text-gray-800">
         <span className="font-semibold">Funding:</span> €{fundedAmount.toLocaleString()} of €{fundingTarget.toLocaleString()} ({fundsPct}%)
       </div>
-      <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+      <div className="h-3 bg-gray-200 rounded-full overflow-hidden mb-6">
         <motion.div
           className="h-full bg-green-500"
           initial={{ width: 0 }}
@@ -96,6 +125,33 @@ const LoadingBanner = () => {
           transition={{ duration: 0.7 }}
         />
       </div>
+
+      {/* Pledge A Share */}
+      <form
+        className="flex flex-col sm:flex-row items-center gap-3 mt-4"
+        onSubmit={handlePledge}
+        style={{ maxWidth: 400, margin: "0 auto" }}
+      >
+        <input
+          type="email"
+          required
+          placeholder="Your email to pledge a share"
+          className="border border-gray-300 rounded-lg px-4 py-2 w-full"
+          value={pledgeEmail}
+          onChange={(e) => setPledgeEmail(e.target.value)}
+          disabled={pledgeLoading}
+        />
+        <button
+          type="submit"
+          className="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
+          disabled={pledgeLoading}
+        >
+          {pledgeLoading ? "Submitting..." : "Pledge A Share"}
+        </button>
+      </form>
+      {pledgeError && (
+        <div className="text-red-500 text-sm mt-2 text-center">{pledgeError}</div>
+      )}
     </div>
   );
 };

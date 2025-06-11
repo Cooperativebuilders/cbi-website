@@ -52,6 +52,14 @@ service cloud.firestore {
     }
 
     // -------------------------
+    // Pledge Emails Collection
+    // -------------------------
+    match /pledgeEmails/{docId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+
+    // -------------------------
     // Helper Function
     // -------------------------
     function isAdmin() {
