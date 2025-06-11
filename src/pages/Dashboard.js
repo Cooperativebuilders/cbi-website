@@ -451,6 +451,17 @@ const Dashboard = () => {
             )}
           </section>
 
+          {/* Tenders Overview */}
+          <section className="bg-white shadow p-4 rounded-md">
+            <h2 className="text-2xl font-semibold text-blue-800 mb-3">
+              Tenders Overview
+            </h2>
+            <Link to="/tenders" className="text-blue-600 hover:underline">
+              View All Tenders
+            </Link>
+            {/* Optionally, fetch and display a summary or recent tenders here */}
+          </section>
+
           {/* Funding Breakdown */}
           <section className="bg-white shadow p-4 rounded-md">
             <motion.h2

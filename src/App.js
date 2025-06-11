@@ -11,6 +11,8 @@ import ProjectsPage from "./pages/ProjectsPage";
 import ProjectForm from "./components/ProjectForm";
 import Guidance from "./pages/Guidance";
 import ResetPassword from "./pages/ResetPassword.js"; // ← import it here
+import TenderForm from "./components/TenderForm";
+import TendersPage from "./pages/TendersPage";
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
       <Route path="/projects" element={<ProjectsPage />} />
       <Route path="/submit-project" element={<ProjectForm />} />
       <Route path="/guidance" element={<Guidance />} />
+      <Route path="/submit-tender" element={<TenderForm />} />
+      <Route path="/tenders" element={<TendersPage />} />
     </Routes>
   );
 }
