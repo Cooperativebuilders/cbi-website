@@ -20,6 +20,7 @@ const TenderForm = () => {
     deadline: "",
     budget: "",
     contact: "",
+    location: "", // <-- Add this line
   });
 
   const handleChange = (e) => {
@@ -46,6 +47,7 @@ const TenderForm = () => {
         deadline: formData.deadline,
         budget: parseInt(formData.budget, 10) || 0,
         contact: formData.contact,
+        location: formData.location, // <-- Add this line
         postedBy: user.uid,
         postedByEmail: user.email,
         timestamp: Timestamp.now(),
@@ -65,6 +67,14 @@ const TenderForm = () => {
           ← Back to Dashboard
         </Link>
       </nav>
+      {/* Page Descriptor */}
+      <div className="max-w-xl mx-auto mb-6">
+        <p className="text-gray-700 text-base bg-blue-50 border border-blue-100 rounded p-4">
+          <strong>Find Sub-Contractors</strong> by posting contract offers here.
+          Your offers will be available to view by all CBI Members until you remove
+          it.
+        </p>
+      </div>
       <form
         onSubmit={handleSubmit}
         className="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto"
@@ -125,6 +135,14 @@ const TenderForm = () => {
           name="contact"
           placeholder="Contact Info"
           value={formData.contact}
+          onChange={handleChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <input
+          name="location"
+          placeholder="Location"
+          value={formData.location}
           onChange={handleChange}
           className="w-full p-2 border rounded mb-4"
           required
