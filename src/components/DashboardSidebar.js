@@ -8,6 +8,9 @@ import {
   FaSignOutAlt,
   FaHome,
   FaBook,
+  FaPlusSquare,
+  FaFileSignature,
+  FaClipboardList,
 } from "react-icons/fa";
 
 const DashboardSidebar = ({ onLogout }) => {
@@ -40,16 +43,16 @@ const DashboardSidebar = ({ onLogout }) => {
           <FaUsers /> <span>View Members</span>
         </Link>
         <Link to="/submit-project" className={linkClass("/submit-project")}>
-          <FaProjectDiagram /> <span>Submit Project</span>
+          <FaPlusSquare /> <span>Submit Project</span>
         </Link>
         <Link to="/projects" className={linkClass("/projects")}>
           <FaProjectDiagram /> <span>View Projects</span>
         </Link>
         <Link to="/submit-tender" className={linkClass("/submit-tender")}>
-          <FaProjectDiagram /> <span>Submit Tender</span>
+          <FaFileSignature /> <span>Submit Tender</span>
         </Link>
         <Link to="/tenders" className={linkClass("/tenders")}>
-          <FaProjectDiagram /> <span>View Tenders</span>
+          <FaClipboardList /> <span>View Tenders</span>
         </Link>
         <Link to="/guidance" className={linkClass("/guidance")}>
           <FaBook /> <span>Guidance Notes</span>
